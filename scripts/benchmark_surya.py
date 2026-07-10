@@ -6,6 +6,7 @@ import html
 import json
 import os
 import re
+import shutil
 import time
 import unicodedata
 from html.parser import HTMLParser
@@ -125,10 +126,33 @@ def repo_path(path: str) -> Path:
     return value if value.is_absolute() else REPO_ROOT / value
 
 
-def run_surya(image_paths: list[Path], output_root: Path) -> None:
-    os.environ.setdefault("SURYA_INFERENCE_BACKEND", "vllm")
+def configure_surya_backend(backend: str | None, inference_url: str | None) -> None:
+    if backend:
+        os.environ["SURYA_INFERENCE_BACKEND"] = backend
+    if inference_url:
+        os.environ["SURYA_INFERENCE_URL"] = inference_url
     os.environ.setdefault("SURYA_INFERENCE_PARALLEL", "1")
     os.environ.setdefault("SURYA_INFERENCE_KEEP_ALIVE", "1")
+
+    if os.environ.get("SURYA_INFERENCE_URL"):
+        return
+    backend = os.environ.get("SURYA_INFERENCE_BACKEND")
+    if backend is None and not shutil.which("docker"):
+        if shutil.which("llama-server"):
+            os.environ["SURYA_INFERENCE_BACKEND"] = "llamacpp"
+            return
+        raise SystemExit(
+            "Surya OCR needs a serving backend. Install Docker for vllm, install llama-server and run "
+            "with --backend llamacpp, or pass --inference-url."
+        )
+    if backend == "vllm" and not shutil.which("docker"):
+        raise SystemExit("Surya vllm backend needs Docker. Install Docker or run with --backend llamacpp.")
+    if backend == "llamacpp" and not shutil.which("llama-server"):
+        raise SystemExit("Surya llama.cpp backend needs llama-server. Install llama.cpp or use --inference-url.")
+
+
+def run_surya(image_paths: list[Path], output_root: Path, backend: str | None, inference_url: str | None) -> None:
+    configure_surya_backend(backend, inference_url)
 
     from PIL import Image
     from surya.inference import SuryaInferenceManager
@@ -222,6 +246,8 @@ def main() -> None:
     parser.add_argument("--bench-root", default="small_bench")
     parser.add_argument("--output-root", default="bench_runs/surya-ocr-2")
     parser.add_argument("--model-name", default="surya-ocr-2")
+    parser.add_argument("--backend", choices=["vllm", "llamacpp"])
+    parser.add_argument("--inference-url")
     parser.add_argument("--score-only", action="store_true")
     args = parser.parse_args()
 
@@ -232,13 +258,14 @@ def main() -> None:
         raise SystemExit(f"No JPG files found under {bench_root}")
 
     if not args.score_only:
-        run_surya(images, output_root)
+        run_surya(images, output_root, args.backend, args.inference_url)
         (output_root / "run_info.json").write_text(
             json.dumps(
                 {
                     "model": args.model_name,
                     "note": PROMPT_NOTE,
-                    "surya_inference_backend": os.environ.get("SURYA_INFERENCE_BACKEND", "vllm"),
+                    "surya_inference_backend": os.environ.get("SURYA_INFERENCE_BACKEND", "auto"),
+                    "surya_inference_url": os.environ.get("SURYA_INFERENCE_URL", ""),
                     "surya_inference_parallel": os.environ.get("SURYA_INFERENCE_PARALLEL", "1"),
                 },
                 ensure_ascii=False,
