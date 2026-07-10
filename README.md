@@ -109,8 +109,8 @@ path is to install the needed packages into the active notebook environment.
 Replace the URL with your GitHub repo URL after you push this project.
 
 ```python
-!git clone https://github.com/YOUR_USER/persian-ocr.git
-%cd persian-ocr
+!git clone https://github.com/mshojaei77/persian-ocr-bench-bench.git
+%cd persian-ocr-bench
 ```
 
 If you uploaded the project to Google Drive instead:
@@ -118,7 +118,7 @@ If you uploaded the project to Google Drive instead:
 ```python
 from google.colab import drive
 drive.mount("/content/drive")
-%cd /content/drive/MyDrive/persian-ocr
+%cd /content/drive/MyDrive/persian-ocr-bench
 ```
 
 ### 2. Install Runtime Dependencies
@@ -182,8 +182,8 @@ pd.read_csv("bench_runs/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0/summary.csv")
 ```python
 from google.colab import drive
 drive.mount("/content/drive")
-!mkdir -p /content/drive/MyDrive/persian-ocr-results
-!cp -r bench_runs /content/drive/MyDrive/persian-ocr-results/
+!mkdir -p /content/drive/MyDrive/persian-ocr-bench-results
+!cp -r bench_runs /content/drive/MyDrive/persian-ocr-bench-results/
 ```
 
 ## Output Layout
