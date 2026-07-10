@@ -14,6 +14,7 @@ from typing import Any
 
 
 PROMPT_NOTE = "Surya OCR 2 page OCR via surya.recognition.RecognitionPredictor"
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class TextHTMLParser(HTMLParser):
@@ -119,6 +120,11 @@ def bench_items(root: Path) -> list[Path]:
     return sorted(root.glob("*/*.jpg"), key=lambda path: (path.parent.name, int(path.stem)))
 
 
+def repo_path(path: str) -> Path:
+    value = Path(path)
+    return value if value.is_absolute() else REPO_ROOT / value
+
+
 def run_surya(image_paths: list[Path], output_root: Path) -> None:
     os.environ.setdefault("SURYA_INFERENCE_BACKEND", "vllm")
     os.environ.setdefault("SURYA_INFERENCE_PARALLEL", "1")
@@ -219,8 +225,8 @@ def main() -> None:
     parser.add_argument("--score-only", action="store_true")
     args = parser.parse_args()
 
-    bench_root = Path(args.bench_root)
-    output_root = Path(args.output_root)
+    bench_root = repo_path(args.bench_root)
+    output_root = repo_path(args.output_root)
     images = bench_items(bench_root)
     if not images:
         raise SystemExit(f"No JPG files found under {bench_root}")
