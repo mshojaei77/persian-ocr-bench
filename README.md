@@ -94,39 +94,218 @@ Get-Content small_bench/typed/1.md
 Get-Content bench_runs/<model>/typed/1.md
 ```
 
-## Available Model Scripts
+## Commands For Every Model
 
-Use one row at a time. The pull script downloads or warms local assets under
-`models/`; the benchmark script writes results under `bench_runs/`.
+Run one block at a time. Stop after each block and inspect the summary before
+pulling the next model.
 
-| model key | pull script | benchmark script |
-| --- | --- | --- |
-| `chandra_ocr2` | `scripts/pull_chandra_ocr2_model.py` | `scripts/benchmark_chandra_ocr2.py` |
-| `deepseek_ocr` | `scripts/pull_deepseek_ocr_model.py` | `scripts/benchmark_deepseek_ocr.py` |
-| `deepseek_ocr2` | `scripts/pull_deepseek_ocr2_model.py` | `scripts/benchmark_deepseek_ocr2.py` |
-| `dots_mocr` | `scripts/pull_dots_mocr_model.py` | `scripts/benchmark_dots_mocr.py` |
-| `dots_ocr` | `scripts/pull_dots_ocr_model.py` | `scripts/benchmark_dots_ocr.py` |
-| `easyocr_fa` | `scripts/pull_easyocr_fa_model.py` | `scripts/benchmark_easyocr_fa.py` |
-| `falcon_ocr` | `scripts/pull_falcon_ocr_model.py` | `scripts/benchmark_falcon_ocr.py` |
-| `glm_ocr` | `scripts/pull_glm_ocr_model.py` | `scripts/benchmark_glm_ocr.py` |
-| `got_ocr2` | `scripts/pull_got_ocr2_model.py` | `scripts/benchmark_got_ocr2.py` |
-| `hezarai_crnn_fa_v2` | `scripts/pull_hezarai_crnn_fa_v2_model.py` | `scripts/benchmark_hezarai_crnn_fa_v2.py` |
-| `hunyuan_ocr` | `scripts/pull_hunyuan_ocr_model.py` | `scripts/benchmark_hunyuan_ocr.py` |
-| `infinity_parser2_flash` | `scripts/pull_infinity_parser2_flash_model.py` | `scripts/benchmark_infinity_parser2_flash.py` |
-| `infinity_parser2_pro` | `scripts/pull_infinity_parser2_pro_model.py` | `scripts/benchmark_infinity_parser2_pro.py` |
-| `kdl_frontier_parser_nano` | `scripts/pull_kdl_frontier_parser_nano_model.py` | `scripts/benchmark_kdl_frontier_parser_nano.py` |
-| `khanandeh` | `scripts/pull_khanandeh_model.py` | `scripts/benchmark_khanandeh.py` |
-| `kraken_fas` | `scripts/pull_kraken_fas_model.py` | `scripts/benchmark_kraken_fas.py` |
-| `lightonocr2_1b` | `scripts/pull_lightonocr2_1b_model.py` | `scripts/benchmark_lightonocr2_1b.py` |
-| `mineru25_pro` | `scripts/pull_mineru25_pro_model.py` | `scripts/benchmark_mineru25_pro.py` |
-| `nanonets_ocr2_15b` | `scripts/pull_nanonets_ocr2_15b_model.py` | `scripts/benchmark_nanonets_ocr2_15b.py` |
-| `paddleocr_vl` | `scripts/pull_paddleocr_vl_model.py` | `scripts/benchmark_paddleocr_vl.py` |
-| `ppocrv5_fa` | `scripts/pull_ppocrv5_fa_model.py` | `scripts/benchmark_ppocrv5_fa.py` |
-| `qwen3_vl_persian_arabic_ocr` | `scripts/pull_qwen3_vl_persian_arabic_ocr_model.py` | `scripts/benchmark_qwen3_vl_persian_arabic_ocr.py` |
-| `surya` | `scripts/pull_surya_model.py` | `scripts/benchmark_surya.py` |
-| `tesseract_fas` | `scripts/pull_tesseract_fas_model.py` | `scripts/benchmark_tesseract_fas.py` |
-| `unlimited_ocr_gguf` | `scripts/pull_unlimited_ocr_gguf_model.py` | `scripts/benchmark_unlimited_ocr_gguf.py` |
-| `weightedai_persian_ocr` | `scripts/pull_weightedai_persian_ocr_model.py` | `scripts/benchmark_weightedai_persian_ocr.py` |
+### `easyocr_fa`
+
+```powershell
+uv run python scripts/pull_easyocr_fa_model.py
+uv run python scripts/benchmark_easyocr_fa.py --gpu
+Import-Csv bench_runs/easyocr-fa/summary.csv | Format-Table
+```
+
+### `tesseract_fas`
+
+```powershell
+uv run python scripts/pull_tesseract_fas_model.py
+uv run python scripts/benchmark_tesseract_fas.py
+Import-Csv bench_runs/tesseract5-fas/summary.csv | Format-Table
+```
+
+### `kraken_fas`
+
+```powershell
+uv run python scripts/pull_kraken_fas_model.py
+uv run python scripts/benchmark_kraken_fas.py
+Import-Csv bench_runs/kraken-fas/summary.csv | Format-Table
+```
+
+### `hezarai_crnn_fa_v2`
+
+```powershell
+uv run python scripts/pull_hezarai_crnn_fa_v2_model.py
+uv run python scripts/benchmark_hezarai_crnn_fa_v2.py
+Import-Csv bench_runs/hezarai-crnn-base-fa-v2/summary.csv | Format-Table
+```
+
+### `chandra_ocr2`
+
+```powershell
+uv run python scripts/pull_chandra_ocr2_model.py
+uv run python scripts/benchmark_chandra_ocr2.py
+Import-Csv bench_runs/chandra-ocr-2/summary.csv | Format-Table
+```
+
+### `deepseek_ocr`
+
+```powershell
+uv run python scripts/pull_deepseek_ocr_model.py
+uv run python scripts/benchmark_deepseek_ocr.py
+Import-Csv bench_runs/DeepSeek-OCR/summary.csv | Format-Table
+```
+
+### `deepseek_ocr2`
+
+```powershell
+uv run python scripts/pull_deepseek_ocr2_model.py
+uv run python scripts/benchmark_deepseek_ocr2.py
+Import-Csv bench_runs/DeepSeek-OCR-2/summary.csv | Format-Table
+```
+
+### `dots_mocr`
+
+```powershell
+uv run python scripts/pull_dots_mocr_model.py
+uv run python scripts/benchmark_dots_mocr.py
+Import-Csv bench_runs/DotsMOCR/summary.csv | Format-Table
+```
+
+### `dots_ocr`
+
+```powershell
+uv run python scripts/pull_dots_ocr_model.py
+uv run python scripts/benchmark_dots_ocr.py
+Import-Csv bench_runs/DotsOCR/summary.csv | Format-Table
+```
+
+### `falcon_ocr`
+
+```powershell
+uv run python scripts/pull_falcon_ocr_model.py
+uv run python scripts/benchmark_falcon_ocr.py
+Import-Csv bench_runs/Falcon-OCR/summary.csv | Format-Table
+```
+
+### `glm_ocr`
+
+```powershell
+uv run python scripts/pull_glm_ocr_model.py
+uv run python scripts/benchmark_glm_ocr.py
+Import-Csv bench_runs/GLM-OCR/summary.csv | Format-Table
+```
+
+### `got_ocr2`
+
+```powershell
+uv run python scripts/pull_got_ocr2_model.py
+uv run python scripts/benchmark_got_ocr2.py
+Import-Csv bench_runs/GOT-OCR-2.0-hf/summary.csv | Format-Table
+```
+
+### `hunyuan_ocr`
+
+```powershell
+uv run python scripts/pull_hunyuan_ocr_model.py
+uv run python scripts/benchmark_hunyuan_ocr.py
+Import-Csv bench_runs/HunyuanOCR/summary.csv | Format-Table
+```
+
+### `infinity_parser2_flash`
+
+```powershell
+uv run python scripts/pull_infinity_parser2_flash_model.py
+uv run python scripts/benchmark_infinity_parser2_flash.py
+Import-Csv bench_runs/Infinity-Parser2-Flash/summary.csv | Format-Table
+```
+
+### `infinity_parser2_pro`
+
+```powershell
+uv run python scripts/pull_infinity_parser2_pro_model.py
+uv run python scripts/benchmark_infinity_parser2_pro.py
+Import-Csv bench_runs/Infinity-Parser2-Pro/summary.csv | Format-Table
+```
+
+### `kdl_frontier_parser_nano`
+
+```powershell
+uv run python scripts/pull_kdl_frontier_parser_nano_model.py
+uv run python scripts/benchmark_kdl_frontier_parser_nano.py
+Import-Csv bench_runs/KDL-Frontier-Parser-nano/summary.csv | Format-Table
+```
+
+### `khanandeh`
+
+```powershell
+uv run python scripts/pull_khanandeh_model.py
+uv run python scripts/benchmark_khanandeh.py
+Import-Csv bench_runs/Khanandeh-0.1-Persian-OCR-2B-Instruct/summary.csv | Format-Table
+```
+
+### `lightonocr2_1b`
+
+```powershell
+uv run python scripts/pull_lightonocr2_1b_model.py
+uv run python scripts/benchmark_lightonocr2_1b.py
+Import-Csv bench_runs/LightOnOCR-2-1B/summary.csv | Format-Table
+```
+
+### `mineru25_pro`
+
+```powershell
+uv run python scripts/pull_mineru25_pro_model.py
+uv run python scripts/benchmark_mineru25_pro.py
+Import-Csv bench_runs/MinerU2.5-Pro-2605-1.2B/summary.csv | Format-Table
+```
+
+### `nanonets_ocr2_15b`
+
+```powershell
+uv run python scripts/pull_nanonets_ocr2_15b_model.py
+uv run python scripts/benchmark_nanonets_ocr2_15b.py
+Import-Csv bench_runs/Nanonets-OCR2-1.5B-exp/summary.csv | Format-Table
+```
+
+### `paddleocr_vl`
+
+```powershell
+uv run python scripts/pull_paddleocr_vl_model.py
+uv run python scripts/benchmark_paddleocr_vl.py
+Import-Csv bench_runs/PaddleOCR-VL-0.9B/summary.csv | Format-Table
+```
+
+### `ppocrv5_fa`
+
+```powershell
+uv run python scripts/pull_ppocrv5_fa_model.py
+uv run python scripts/benchmark_ppocrv5_fa.py
+Import-Csv bench_runs/PP-OCRv5-fa/summary.csv | Format-Table
+```
+
+### `qwen3_vl_persian_arabic_ocr`
+
+```powershell
+uv run python scripts/pull_qwen3_vl_persian_arabic_ocr_model.py
+uv run python scripts/benchmark_qwen3_vl_persian_arabic_ocr.py
+Import-Csv bench_runs/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0/summary.csv | Format-Table
+```
+
+### `surya`
+
+```powershell
+uv run python scripts/pull_surya_model.py
+uv run python scripts/benchmark_surya.py
+Import-Csv bench_runs/surya-ocr-2/summary.csv | Format-Table
+```
+
+### `unlimited_ocr_gguf`
+
+```powershell
+uv run python scripts/pull_unlimited_ocr_gguf_model.py
+uv run python scripts/benchmark_unlimited_ocr_gguf.py
+Import-Csv bench_runs/Unlimited-OCR-GGUF-Q4_K_M/summary.csv | Format-Table
+```
+
+### `weightedai_persian_ocr`
+
+```powershell
+uv run python scripts/pull_weightedai_persian_ocr_model.py
+uv run python scripts/benchmark_weightedai_persian_ocr.py
+Import-Csv bench_runs/WeightedAI-Persian_OCR/summary.csv | Format-Table
+```
 
 ## Run Order
 
