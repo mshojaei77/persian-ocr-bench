@@ -3,13 +3,20 @@
 Small benchmark project for comparing Persian OCR and vision-language OCR models
 on a fixed 20-image dataset.
 
+> **⚠️ This is a 20-image diagnostic benchmark, not a definitive Persian OCR
+> ranking.** With only ten images per split, one image represents 10% of that
+> split's sample count, so results are highly sensitive to individual document
+> difficulty.
+
 The repo contains:
 
 - `small_bench/typed/`: 10 printed Persian samples.
 - `small_bench/hand-written/`: 10 handwritten Persian samples.
 - Matching `.md` reference transcriptions for every `.jpg`.
+- `models.yaml`: machine-readable registry of all 26 models with Persian-support metadata.
 - `scripts/pull_*_model.py`: download model weights into `models/`.
 - `scripts/benchmark_*.py`: run a model, save predictions, and score them.
+- `scripts/ocr_bench.py`: shared scoring and normalization utilities used by every benchmark.
 - `BENCHMARK_GUIDE.md`: metric and benchmark design notes.
 
 Generated model weights and benchmark outputs are intentionally local artifacts:
@@ -36,9 +43,12 @@ Core metrics:
 
 ## Local Setup
 
-This project uses `uv`.
+This project uses `uv` and requires **Python 3.12** (not 3.13+ — several OCR
+backends and custom CUDA wheels do not support newer Python versions).
 
 ```powershell
+uv python install 3.12
+uv venv --python 3.12
 uv sync
 ```
 
@@ -98,6 +108,26 @@ Get-Content bench_runs/<model>/typed/1.md
 
 Run one block at a time. Stop after each block and inspect the summary before
 pulling the next model.
+
+### `surya`
+
+```powershell
+uv run python scripts/pull_surya_model.py
+uv run python scripts/benchmark_surya.py
+Import-Csv bench_runs/surya-ocr-2/summary.csv | Format-Table
+```
+
+To run Surya with debug diagnostics on one typed and one handwritten image:
+
+```powershell
+uv run python scripts/benchmark_surya.py --debug small_bench/typed/1.jpg small_bench/hand-written/1.jpg
+```
+
+Debug artifacts are saved to `bench_runs/surya-ocr-2/_debug/`:
+- `raw_model_output.json` — raw prediction object
+- `extracted_text.txt` — text extracted via BeautifulSoup
+- `normalized_prediction.txt` — Persian-normalized prediction
+- `normalized_reference.txt` — Persian-normalized reference text
 
 ### `easyocr_fa`
 
@@ -281,14 +311,6 @@ Import-Csv bench_runs/PP-OCRv5-fa/summary.csv | Format-Table
 uv run python scripts/pull_qwen3_vl_persian_arabic_ocr_model.py
 uv run python scripts/benchmark_qwen3_vl_persian_arabic_ocr.py
 Import-Csv bench_runs/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0/summary.csv | Format-Table
-```
-
-### `surya`
-
-```powershell
-uv run python scripts/pull_surya_model.py
-uv run python scripts/benchmark_surya.py
-Import-Csv bench_runs/surya-ocr-2/summary.csv | Format-Table
 ```
 
 ### `unlimited_ocr_gguf`
