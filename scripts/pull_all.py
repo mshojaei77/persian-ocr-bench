@@ -1,3 +1,5 @@
+"""Resumable coordinator for the unified Hugging Face downloader."""
+
 from __future__ import annotations
 
 import argparse
@@ -6,64 +8,68 @@ import subprocess
 import sys
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS_DIR = ROOT / "scripts"
 DEFAULT_STATE_FILE = ROOT / "models" / ".pull_all_state.json"
+DEFAULT_MANIFEST = ROOT / "models" / "manifest.json"
 
 
-def pull_scripts() -> list[Path]:
-    return sorted(
-        path
-        for path in SCRIPTS_DIR.glob("pull_*_model.py")
-        if path.name != Path(__file__).name
-    )
-
-
-def load_done(state_file: Path) -> set[str]:
-    if not state_file.exists():
+def load_state(path: Path) -> set[str]:
+    if not path.exists():
         return set()
-    data = json.loads(state_file.read_text(encoding="utf-8"))
-    return set(data.get("done", []))
+    return set(json.loads(path.read_text(encoding="utf-8")).get("done", []))
 
 
-def save_done(state_file: Path, done: set[str]) -> None:
-    state_file.parent.mkdir(parents=True, exist_ok=True)
-    state_file.write_text(
-        json.dumps({"done": sorted(done)}, indent=2) + "\n",
-        encoding="utf-8",
-    )
+def save_state(path: Path, done: set[str]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"done": sorted(done)}, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Pull every OCR model one by one, resumably.")
+    from persian_ocr.registry import MODELS
+
+    parser = argparse.ArgumentParser(
+        description="Pull registered OCR models with resumable HF caching."
+    )
+    parser.add_argument(
+        "--model", "--models", default="all",
+        help="Model ID, comma-separated IDs, or 'all'.",
+    )
     parser.add_argument("--state-file", type=Path, default=DEFAULT_STATE_FILE)
-    parser.add_argument("--restart", action="store_true", help="Ignore previous completed-script state.")
-    parser.add_argument("--list", action="store_true", help="Print pull order and exit.")
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument("--cache-dir", type=Path, default=ROOT / ".cache" / "huggingface")
+    parser.add_argument("--restart", action="store_true", help="Ignore completed model state.")
+    parser.add_argument("--list", action="store_true", help="Print model order and exit.")
     args = parser.parse_args()
 
-    scripts = pull_scripts()
+    model_ids = list(MODELS) if args.model == "all" else [x.strip() for x in args.model.split(",") if x.strip()]
+    unknown = sorted(set(model_ids) - set(MODELS))
+    if unknown:
+        parser.error(f"Unknown models: {', '.join(unknown)}")
     if args.list:
-        for script in scripts:
-            print(script.name)
+        print("\n".join(model_ids))
         return 0
 
-    done = set() if args.restart else load_done(args.state_file)
-    for index, script in enumerate(scripts, start=1):
-        if script.name in done:
-            print(f"[{index}/{len(scripts)}] skip {script.name}")
+    done = set() if args.restart else load_state(args.state_file)
+    command = [
+        sys.executable, str(ROOT / "scripts" / "pull.py"),
+        "--cache-dir", str(args.cache_dir), "--manifest", str(args.manifest),
+    ]
+
+    for index, model_id in enumerate(model_ids, 1):
+        if model_id in done:
+            print(f"[{index}/{len(model_ids)}] skip {model_id}", flush=True)
             continue
 
-        print(f"[{index}/{len(scripts)}] run {script.name}", flush=True)
-        result = subprocess.run([sys.executable, str(script)], cwd=ROOT)
+        print(f"[{index}/{len(model_ids)}] pull {model_id}", flush=True)
+        result = subprocess.run([*command, "--model", model_id], cwd=ROOT)
         if result.returncode:
-            print(f"Failed: {script.name}. Re-run this command to resume.", file=sys.stderr)
+            print(f"Failed: {model_id}. Re-run to resume; HF cache is retained.", file=sys.stderr)
             return result.returncode
 
-        done.add(script.name)
-        save_done(args.state_file, done)
+        done.add(model_id)
+        save_state(args.state_file, done)
 
-    print("All pull scripts completed.")
+    print("All selected models are ready.")
     return 0
 
 
