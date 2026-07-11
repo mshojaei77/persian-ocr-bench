@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -54,6 +55,9 @@ def main() -> int:
         sys.executable, str(ROOT / "scripts" / "pull.py"),
         "--cache-dir", str(args.cache_dir), "--manifest", str(args.manifest),
     ]
+    env = os.environ.copy()
+    env.setdefault("HF_XET_HIGH_PERFORMANCE", "1")
+    env.setdefault("HF_XET_CACHE", str(args.cache_dir / "xet"))
 
     for index, model_id in enumerate(model_ids, 1):
         if model_id in done:
@@ -61,7 +65,7 @@ def main() -> int:
             continue
 
         print(f"[{index}/{len(model_ids)}] pull {model_id}", flush=True)
-        result = subprocess.run([*command, "--model", model_id], cwd=ROOT)
+        result = subprocess.run([*command, "--model", model_id], cwd=ROOT, env=env)
         if result.returncode:
             print(f"Failed: {model_id}. Re-run to resume; HF cache is retained.", file=sys.stderr)
             return result.returncode
