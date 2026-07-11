@@ -1,17 +1,71 @@
 [project]
 name = "persian-ocr"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Persian OCR/VLM benchmark — 26 models on a 20-image diagnostic dataset"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12,<3.13"
 dependencies = [
+    "beautifulsoup4>=4.13.0",
+    "huggingface-hub>=1.23.0",
+    "pillow>=10.2.0,<11",
+    "pyyaml>=6.0",
+    "requests>=2.32.0",
+]
+
+[project.optional-dependencies]
+# Shared Transformers + PEFT stack (used by most VLMs)
+transformers = [
     "accelerate>=1.14.0",
     "bitsandbytes>=0.49.2",
-    "hf-xet>=1.5.1",
-    "huggingface-hub>=1.23.0",
     "peft>=0.19.1",
-    "pillow>=12.3.0",
     "qwen-vl-utils>=0.0.14",
     "safetensors>=0.8.0",
     "transformers>=4.55.0",
 ]
+
+# Surya OCR 2
+surya = [
+    "surya-ocr>=0.21.1",
+]
+
+# Chandler OCR 2 (shares Surya infra)
+chandra = [
+    "surya-ocr>=0.21.1",
+]
+
+# DeepSeek OCR (vLLM + flash-attn recommended)
+deepseek = [
+    "transformers>=4.55.0",
+    "accelerate>=1.14.0",
+    "safetensors>=0.8.0",
+]
+
+# PaddleOCR
+paddle = [
+    "paddleocr<4.0",
+]
+
+# Traditional OCR engines
+traditional = [
+    "easyocr",
+    "pytesseract",
+    "hezar",
+]
+
+# GGUF / llama.cpp
+gguf = [
+    "llama-cpp-python>=0.3.0",
+]
+
+# All-in-one (for local use — too large for Colab)
+all = [
+    "persian-ocr[transformers]",
+    "persian-ocr[surya]",
+    "persian-ocr[deepseek]",
+    "persian-ocr[paddle]",
+    "persian-ocr[traditional]",
+    "persian-ocr[gguf]",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

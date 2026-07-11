@@ -1,0 +1,237 @@
+# Persian OCR Benchmark — Model Registry Reference
+#
+# This file documents all 26 models. The authoritative source of truth
+# is ``src/persian_ocr/registry.py`` (the ``MODELS`` dict).
+#
+# Priority is defined in the ``PRIORITY`` list in ``registry.py``.
+
+models:
+  - id: ppocrv5_fa
+    category: traditional_ocr
+    official_persian: true
+    backend: paddle
+    adapter: persian_ocr.adapters.paddle:PaddleOCRAdapter
+    profile: paddle
+
+  - id: easyocr_fa
+    category: traditional_ocr
+    official_persian: true
+    backend: easyocr
+    adapter: persian_ocr.adapters.traditional:EasyOCRAdapter
+    profile: traditional
+
+  - id: tesseract_fas
+    category: traditional_ocr
+    official_persian: true
+    backend: tesseract
+    adapter: persian_ocr.adapters.traditional:TesseractAdapter
+    profile: traditional
+
+  - id: kraken_fas
+    category: traditional_ocr
+    official_persian: true
+    backend: kraken
+    adapter: persian_ocr.adapters.traditional:KrakenAdapter
+    profile: traditional
+
+  - id: hezarai_crnn_fa_v2
+    category: traditional_ocr
+    official_persian: true
+    backend: hezar
+    adapter: persian_ocr.adapters.traditional:HezarAdapter
+    profile: traditional
+    source_hf: hezarai/crnn-base-fa-v2
+
+  - id: surya-ocr-2
+    category: document_vlm
+    official_persian: true
+    persian_evidence: "Official 91-language benchmark: fa Persian 82.3%"
+    backend: surya
+    adapter: persian_ocr.adapters.surya:SuryaAdapter
+    profile: surya
+    source_hf: datalab-to/surya-ocr-2
+
+  - id: chandra-ocr-2
+    category: document_vlm
+    official_persian: true
+    persian_evidence: "Official 90-language benchmark: fa 75.1%"
+    backend: chandra
+    adapter: persian_ocr.adapters.chandra:ChandraAdapter
+    profile: surya
+    source_hf: datalab-to/chandra-ocr-2
+
+  - id: qwen3_vl_persian_arabic_ocr
+    category: persian_finetune
+    official_persian: true
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:QwenVLAdapter
+    profile: transformers
+    source_hf: mohajesmaeili/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0
+
+  - id: weightedai_persian_ocr
+    category: persian_finetune
+    official_persian: true
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:WeightedAIAdapter
+    profile: transformers
+    source_hf: WeightedAI/Persian_OCR
+
+  - id: khanandeh
+    category: persian_finetune
+    official_persian: true
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:KhanandehAdapter
+    profile: transformers
+    source_hf: oddadmix/Khanandeh-0.1-Persian-OCR-2B-Instruct
+
+  - id: deepseek-ocr
+    category: document_vlm
+    official_persian: false
+    backend: deepseek
+    adapter: persian_ocr.adapters.deepseek:DeepSeekOCRAdapter
+    profile: deepseek
+    source_hf: deepseek-ai/DeepSeek-OCR
+
+  - id: deepseek-ocr-2
+    category: document_vlm
+    official_persian: false
+    backend: deepseek
+    adapter: persian_ocr.adapters.deepseek:DeepSeekOCR2Adapter
+    profile: deepseek
+    source_hf: deepseek-ai/DeepSeek-OCR-2
+
+  - id: dots_mocr
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: rednote-hilab/dots.mocr
+
+  - id: dots_ocr
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: rednote-hilab/dots.ocr
+
+  - id: falcon_ocr
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: tiiuae/Falcon-OCR
+
+  - id: glm_ocr
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: zai-org/GLM-OCR
+
+  - id: got_ocr2
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: stepfun-ai/GOT-OCR-2.0-hf
+
+  - id: hunyuan_ocr
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: tencent/HunyuanOCR
+
+  - id: infinity_parser2_flash
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: infly/Infinity-Parser2-Flash
+
+  - id: infinity_parser2_pro
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: infly/Infinity-Parser2-Pro
+
+  - id: kdl_frontier_parser_nano
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: KDLAI/KDL-Frontier-Parser-nano
+
+  - id: lightonocr2_1b
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: lightonai/LightOnOCR-2-1B
+
+  - id: mineru25_pro
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: opendatalab/MinerU2.5-Pro-2605-1.2B
+
+  - id: nanonets_ocr2_15b
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: nanonets/Nanonets-OCR2-1.5B-exp
+
+  - id: paddleocr_vl
+    category: document_vlm
+    official_persian: false
+    backend: transformers
+    adapter: persian_ocr.adapters.transformers_vlm:GenericVLMAdapter
+    profile: transformers
+    source_hf: lvyufeng/PaddleOCR-VL-0.9B
+
+  - id: unlimited_ocr_gguf
+    category: document_vlm
+    official_persian: false
+    backend: gguf
+    adapter: persian_ocr.adapters.gguf:UnlimitedOCRAdapter
+    profile: gguf
+    source_hf: sahilchachra/Unlimited-OCR-GGUF
+
+environments:
+  traditional:
+    deps: [easyocr, pytesseract, hezar, kraken]
+    notes: "Also needs tesseract-ocr system package"
+
+  transformers:
+    deps: [transformers>=4.55.0, accelerate>=1.14.0, bitsandbytes>=0.49.2, peft>=0.19.1, qwen-vl-utils, safetensors]
+
+  deepseek:
+    deps: [transformers>=4.55.0, accelerate>=1.14.0]
+    notes: "vLLM 0.8.5 + flash-attn 2.7.0 recommended; Python 3.12.9 + CUDA 11.8 + PyTorch 2.6"
+
+  surya:
+    deps: [surya-ocr>=0.21.1]
+    notes: "Requires Docker (vllm) or llama-server (llamacpp)"
+
+  chandra:
+    deps: [surya-ocr>=0.21.1]
+    notes: "Shares Surya infrastructure"
+
+  gguf:
+    deps: [llama-cpp-python>=0.3.0]
+    notes: "Requires llama-server binary"
