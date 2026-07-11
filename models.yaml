@@ -1,0 +1,265 @@
+# Benchmark catalog for the Colab workflow in COLAB_GUIDE.md.
+# Sorted by approximate model size. Traditional engines have no comparable
+# parameter count, so they are listed first as lightweight baselines.
+# Links were checked against the model/project pages on 2026-07-11.
+
+models:
+  - id: tesseract_fas
+    name: Tesseract Persian
+    size: lightweight
+    parameters: null
+    category: traditional_ocr
+    languages: [fas]
+    huggingface: https://huggingface.co/collections/tesseract
+    github: https://github.com/tesseract-ocr/tesseract
+    notes: Install tesseract-ocr-fas in Colab; strong baseline for clean print.
+
+  - id: easyocr_fa
+    name: EasyOCR Persian
+    size: lightweight
+    parameters: null
+    category: traditional_ocr
+    languages: [fa]
+    huggingface: https://huggingface.co/models?search=easyocr%20persian
+    github: https://github.com/JaidedAI/EasyOCR
+    notes: Simple GPU baseline; verify Persian model availability in the runtime.
+
+  - id: kraken_fas
+    name: Kraken Persian
+    size: lightweight
+    parameters: null
+    category: traditional_ocr
+    languages: [fas]
+    huggingface: https://huggingface.co/models?search=kraken%20persian%20ocr
+    github: https://github.com/mittagessen/kraken
+    notes: Useful when a compatible Persian recognition model is supplied.
+
+  - id: ppocrv5_fa
+    name: PaddleOCR PP-OCRv5 Persian
+    size: small
+    parameters: null
+    category: traditional_ocr
+    languages: [fa]
+    huggingface: https://huggingface.co/models?search=PP-OCRv5%20Persian
+    github: https://github.com/PaddlePaddle/PaddleOCR
+    notes: Benchmark the official Persian model and record PaddleOCR version.
+
+  - id: hezarai_crnn_fa_v2
+    name: Hezar CRNN Base FA v2
+    size: small
+    parameters: null
+    category: traditional_ocr
+    languages: [fa]
+    huggingface: https://huggingface.co/hezarai/crnn-base-fa-v2
+    github: https://github.com/hezarai/hezar
+    notes: Persian-specific recognition baseline.
+
+  - id: got_ocr2
+    name: GOT-OCR 2.0
+    size: 580M
+    parameters: 0.58B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/stepfun-ai/GOT-OCR-2.0-hf
+    github: https://github.com/Ucas-HaoranWei/GOT-OCR2.0
+    notes: Small document VLM; check VRAM needs in the Colab runtime.
+
+  - id: surya_ocr_2
+    name: Surya OCR 2
+    size: 0.7B
+    parameters: 0.7B
+    category: document_vlm
+    languages: [fa, multilingual]
+    huggingface: https://huggingface.co/datalab-to/surya-ocr-2
+    github: https://github.com/datalab-to/surya
+    notes: End-to-end document OCR; the model card reports multilingual support.
+
+  - id: paddleocr_vl
+    name: PaddleOCR-VL 0.9B
+    size: 0.9B
+    parameters: 0.9B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/lvyufeng/PaddleOCR-VL-0.9B
+    github: https://github.com/PaddlePaddle/PaddleOCR
+    notes: Use the model-card inference path rather than the legacy adapter.
+
+  - id: glm_ocr
+    name: GLM-OCR
+    size: 1B
+    parameters: 1B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/zai-org/GLM-OCR
+    github: https://github.com/zai-org/GLM-OCR
+    notes: Requires the current SGLang/Transformers instructions from the model card.
+
+  - id: lightonocr2_1b
+    name: LightOnOCR-2-1B
+    size: 1B
+    parameters: 1B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/lightonai/LightOnOCR-2-1B
+    github: https://github.com/lightonai/LightOnOCR
+    notes: End-to-end document OCR optimized for rendered pages.
+
+  - id: mineru25_pro
+    name: MinerU 2.5 Pro
+    size: 1.2B
+    parameters: 1.2B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B
+    github: https://github.com/opendatalab/MinerU
+    notes: Compare text extraction and layout preservation separately.
+
+  - id: nanonets_ocr2_15b
+    name: Nanonets OCR2
+    size: 1.5B
+    parameters: 1.5B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/nanonets/Nanonets-OCR2-1.5B-exp
+    github: https://github.com/NanoNets/Nanonets-OCR-s
+    notes: Use the official prompt and image-resolution requirements.
+
+  - id: qwen3_vl_persian_arabic_ocr
+    name: Qwen3-VL Persian Arabic OCR
+    size: 2B
+    parameters: 2B
+    category: persian_finetune
+    languages: [fa, ar]
+    huggingface: https://huggingface.co/mohajesmaeili/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0
+    github: https://github.com/QwenLM/Qwen3-VL
+    notes: Persian/Arabic fine-tune; especially relevant to this dataset.
+
+  - id: khanandeh
+    name: Khanandeh Persian OCR
+    size: 2B
+    parameters: 2B
+    category: persian_finetune
+    languages: [fa]
+    huggingface: https://huggingface.co/oddadmix/Khanandeh-0.1-Persian-OCR-2B-Instruct
+    github: https://github.com/oddadmix/Khanandeh
+    notes: Persian-focused instruct model; verify repository availability before use.
+
+  - id: infinity_parser2_flash
+    name: Infinity Parser 2 Flash
+    size: undisclosed
+    parameters: null
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/infly/Infinity-Parser2-Flash
+    github: https://github.com/infly-ai/Infinity
+    notes: Fast variant; record actual memory use in Colab.
+
+  - id: infinity_parser2_pro
+    name: Infinity Parser 2 Pro
+    size: undisclosed
+    parameters: null
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/infly/Infinity-Parser2-Pro
+    github: https://github.com/infly-ai/Infinity
+    notes: Larger quality-oriented variant when GPU memory allows.
+
+  - id: dots_mocr
+    name: dots.mocr
+    size: 3B
+    parameters: 3B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/rednote-hilab/dots.mocr
+    github: https://github.com/rednote-hilab/dots.ocr
+    notes: OCR-focused multimodal model.
+
+  - id: dots_ocr
+    name: dots.ocr
+    size: 3B
+    parameters: 3B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/rednote-hilab/dots.ocr
+    github: https://github.com/rednote-hilab/dots.ocr
+    notes: Compare with dots.mocr using the same prompt and preprocessing.
+
+  - id: falcon_ocr
+    name: Falcon-OCR
+    size: 3B
+    parameters: 3B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/tiiuae/Falcon-OCR
+    github: https://github.com/tiiuae/Falcon
+    notes: Confirm the current serving requirements before allocating a Colab GPU.
+
+  - id: weightedai_persian_ocr
+    name: WeightedAI Persian OCR
+    size: undisclosed
+    parameters: null
+    category: persian_finetune
+    languages: [fa]
+    huggingface: https://huggingface.co/WeightedAI/Persian_OCR
+    github: https://github.com/WeightedAI/Persian_OCR
+    notes: Persian-specific candidate; treat parameter size as unknown until the model card states it.
+
+  - id: deepseek_ocr
+    name: DeepSeek-OCR
+    size: 3B
+    parameters: 3B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/deepseek-ai/DeepSeek-OCR
+    github: https://github.com/deepseek-ai/DeepSeek-OCR
+    notes: Use the official repository environment and prompt.
+
+  - id: deepseek_ocr_2
+    name: DeepSeek-OCR 2
+    size: undisclosed
+    parameters: null
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/deepseek-ai/DeepSeek-OCR-2
+    github: https://github.com/deepseek-ai/DeepSeek-OCR-2
+    notes: Record the exact revision because model requirements may change.
+
+  - id: chandra_ocr_2
+    name: Chandra OCR 2
+    size: 5B
+    parameters: 5B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/datalab-to/chandra-ocr-2
+    github: https://github.com/datalab-to/chandra
+    notes: Larger document OCR model; use only when Colab memory is sufficient.
+
+  - id: hunyuan_ocr
+    name: HunyuanOCR
+    size: 7B
+    parameters: 7B
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/tencent/HunyuanOCR
+    github: https://github.com/Tencent-Hunyuan/HunyuanOCR
+    notes: High-memory comparison candidate.
+
+  - id: kdl_frontier_parser_nano
+    name: KDL Frontier Parser Nano
+    size: undisclosed
+    parameters: null
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/KDLAI/KDL-Frontier-Parser-nano
+    github: https://github.com/KDLAI/KDL-Frontier-Parser
+    notes: Keep as an optional candidate until its runtime requirements are confirmed.
+
+  - id: unlimited_ocr_gguf
+    name: Unlimited OCR GGUF
+    size: quantized
+    parameters: null
+    category: document_vlm
+    languages: [multilingual]
+    huggingface: https://huggingface.co/sahilchachra/Unlimited-OCR-GGUF
+    github: https://github.com/sahilchachra/Unlimited-OCR
+    notes: Quantized format; compare VRAM and speed separately from model quality.

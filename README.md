@@ -5,6 +5,9 @@ guide for running OCR/VLM comparisons on Google Colab.
 
 Start here: [COLAB_GUIDE.md](COLAB_GUIDE.md)
 
+The benchmark catalog is in [models.yaml](models.yaml), sorted by approximate
+model size with Hugging Face and GitHub links.
+
 The benchmark contains paired images and reference transcriptions in
 [`small_bench/`](small_bench/):
 
