@@ -1,265 +1,1386 @@
-# Benchmark catalog for the Colab workflow in COLAB_GUIDE.md.
-# Sorted by approximate model size. Traditional engines have no comparable
-# parameter count, so they are listed first as lightweight baselines.
-# Links were checked against the model/project pages on 2026-07-11.
+# Persian and multilingual OCR benchmark catalog.
+# Updated and source-audited on 2026-07-11.
+#
+# IMPORTANT:
+# - Official multilingual claims are not treated as proof of Persian support.
+# - Classical OCR pipelines are listed before VLMs because their parameter counts
+#   are not directly comparable.
+# - Document parsing and raw character recognition must be scored separately.
+# - URLs under `links` point to official or model-author resources whenever available.
 
+catalog:
+  title: Persian and Multilingual OCR Benchmark Model Catalog
+  version: 2
+  updated_at: '2026-07-11'
+  scope: Open-weight OCR engines, OCR-specialized VLMs, and a small number of general VLM controls relevant to Persian
+    (fa/fas) text extraction.
+  objective: Choose the strongest model for Persian character recognition, RTL reading order, and structured document
+    reconstruction rather than relying on English/Chinese aggregate scores.
+  ordering:
+  - Classical and line-recognition baselines are first because their parameter counts are not directly comparable
+    with VLMs.
+  - Neural document models are then sorted by approximate total parameter count, smallest to largest.
+  - For equal sizes, models with stronger Persian evidence and higher benchmark priority appear first.
+  parameter_policy:
+    exact: Official model card or repository states the total parameter count.
+    approximate: Official materials state a rounded size or only a backbone/model class; use for ordering, not memory
+      prediction.
+    not_comparable: Classical OCR engine or multi-model pipeline without one meaningful total parameter count.
+    base_model_only: Community adapter/fine-tune inherits the listed base-model size; trainable adapter size may
+      be much smaller.
+  priority_levels:
+    P0: Mandatory Persian bake-off candidate.
+    P1: Recommended second-wave candidate.
+    P2: Optional diagnostic candidate; weaker Persian evidence, redundant architecture, or higher operating cost.
+    EXCLUDE: Do not include in the main quality leaderboard; reason is recorded below.
+  persian_support_status:
+    explicit_model: The exact checkpoint/model card officially names Persian/Farsi/fa/fas or publishes a Persian
+      score.
+    explicit_family: The official model family or OCR runtime lists Persian, but the exact checkpoint does not publish
+      a Persian-specific result.
+    community_targeted: A community checkpoint is specifically trained for Persian; evidence is not an official
+      upstream claim.
+    broad_multilingual_no_fa: Officially multilingual, but Persian is not specifically named.
+    not_listed: The official supported-language list does not include Persian.
+    unknown: No reliable language list was found.
+benchmark_protocol:
+  leaderboards:
+  - name: raw_recognition
+    metrics:
+    - CER_raw
+    - WER_raw
+    - exact_line_accuracy
+    note: Score before Unicode or Persian/Arabic character normalization.
+  - name: normalized_recognition
+    metrics:
+    - CER_normalized
+    - WER_normalized
+    normalization:
+    - Unicode NFC
+    - Arabic ي to Persian ی
+    - Arabic ك to Persian ک
+    - optional digit normalization reported separately
+    - whitespace normalization
+  - name: persian_failure_slices
+    metrics:
+    - Persian_yeh_accuracy
+    - Persian_kaf_accuracy
+    - ZWNJ_accuracy
+    - RTL_reading_order_error
+    - mixed_fa_en_order_error
+    - Persian_vs_Arabic_digit_accuracy
+    - diacritic_accuracy_when_present
+  - name: document_structure
+    metrics:
+    - reading_order
+    - layout_element_F1
+    - table_TEDS
+    - formula_CDM
+    - markdown_edit_distance
+    note: Do not combine this score with character recognition; report both leaderboards.
+  - name: operations
+    metrics:
+    - pages_per_second
+    - peak_VRAM_GB
+    - cold_start_seconds
+    - failure_rate
+    - output_tokens_per_page
+    note: Measure on identical hardware, image resolution, precision, and batch/concurrency settings.
+  required_document_slices:
+  - clean digital Persian print
+  - low-resolution and compressed scans
+  - phone photos with skew, glare, shadows, and curved pages
+  - multi-column RTL pages
+  - mixed Persian-English text
+  - tables and forms
+  - Persian handwriting
+  - historical fonts and degraded print
+  - math/formulas embedded in Persian text
 models:
-  - id: tesseract_fas
-    name: Tesseract Persian
-    size: lightweight
-    parameters: null
-    category: traditional_ocr
-    languages: [fas]
-    huggingface: https://huggingface.co/collections/tesseract
+- rank: 1
+  id: tesseract_fas
+  name: Tesseract Persian (fas)
+  category: classical_ocr
+  checkpoint_type: language_pack
+  priority: P0
+  parameter_count_b: null
+  parameter_display: not comparable; fas.traineddata is a small language pack
+  parameter_confidence: not_comparable
+  persian_support:
+    status: explicit_model
+    codes:
+    - fas
+    evidence: Official Tesseract traineddata repositories provide fas.traineddata for Farsi/Persian.
+  multilingual_scope: One language pack at a time; combine packs for mixed-language OCR.
+  outputs:
+  - plain_text
+  - TSV
+  - hOCR
+  - PDF
+  - word_boxes
+  - confidence
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - operations
+  inference:
+    backend: tesseract CLI or pytesseract
+    device: CPU
+    colab_fit: easy
+    important_settings:
+    - pin the Tesseract version
+    - record OEM and PSM
+    - test fas and fas+eng for mixed pages
+  license:
+    code: Apache-2.0
+    weights: traineddata license follows official repository
+  links:
+    huggingface: null
     github: https://github.com/tesseract-ocr/tesseract
-    notes: Install tesseract-ocr-fas in Colab; strong baseline for clean print.
-
-  - id: easyocr_fa
-    name: EasyOCR Persian
-    size: lightweight
-    parameters: null
-    category: traditional_ocr
-    languages: [fa]
-    huggingface: https://huggingface.co/models?search=easyocr%20persian
-    github: https://github.com/JaidedAI/EasyOCR
-    notes: Simple GPU baseline; verify Persian model availability in the runtime.
-
-  - id: kraken_fas
-    name: Kraken Persian
-    size: lightweight
-    parameters: null
-    category: traditional_ocr
-    languages: [fas]
-    huggingface: https://huggingface.co/models?search=kraken%20persian%20ocr
-    github: https://github.com/mittagessen/kraken
-    notes: Useful when a compatible Persian recognition model is supplied.
-
-  - id: ppocrv5_fa
-    name: PaddleOCR PP-OCRv5 Persian
-    size: small
-    parameters: null
-    category: traditional_ocr
-    languages: [fa]
-    huggingface: https://huggingface.co/models?search=PP-OCRv5%20Persian
+    weights: https://github.com/tesseract-ocr/tessdata_best/blob/main/fas.traineddata
+  strengths:
+  - reproducible CPU baseline
+  - word boxes and confidences
+  - very low operating cost
+  risks:
+  - weak on complex layouts and photos
+  - language-pack and page-segmentation choices strongly affect results
+- rank: 2
+  id: ppocrv5_arabic_mobile_rec
+  name: PP-OCRv5 Arabic Mobile Recognition
+  category: line_recognizer
+  checkpoint_type: recognition_checkpoint
+  priority: P0
+  parameter_count_b: 0.002
+  parameter_display: ~2M recognition parameters; detector is separate
+  parameter_confidence: exact
+  persian_support:
+    status: explicit_family
+    codes:
+    - fa
+    evidence: PaddleOCR officially maps Persian to fa in its multilingual OCR family; use the Arabic-script recognition
+      checkpoint with an explicit detector.
+  multilingual_scope: Arabic-script multilingual recognizer within the PP-OCRv5 family.
+  outputs:
+  - recognized_text
+  - text_boxes_via_detector
+  - confidence
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - operations
+  inference:
+    backend: PaddleOCR/PaddlePaddle
+    device: CPU or GPU
+    colab_fit: easy
+    important_settings:
+    - pin PaddleOCR and PaddlePaddle versions
+    - record detector checkpoint separately
+    - avoid comparing recognizer-only latency with full-page VLM latency
+  license:
+    code: Apache-2.0
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/PaddlePaddle/arabic_PP-OCRv5_mobile_rec
     github: https://github.com/PaddlePaddle/PaddleOCR
-    notes: Benchmark the official Persian model and record PaddleOCR version.
-
-  - id: hezarai_crnn_fa_v2
-    name: Hezar CRNN Base FA v2
-    size: small
-    parameters: null
-    category: traditional_ocr
-    languages: [fa]
+    language_docs: https://paddlepaddle.github.io/PaddleOCR/main/en/version3.x/pipeline_usage/OCR.html
+  strengths:
+  - tiny
+  - fast
+  - official Persian family support
+  - boxes and confidence through the full PaddleOCR pipeline
+  risks:
+  - recognition model alone is not a page parser
+  - RTL line ordering must be evaluated outside the recognizer
+- rank: 3
+  id: easyocr_fa
+  name: EasyOCR Persian
+  category: traditional_neural_ocr
+  checkpoint_type: detector_plus_recognizer_pipeline
+  priority: P0
+  parameter_count_b: null
+  parameter_display: not comparable; detector and script recognizer are separate
+  parameter_confidence: not_comparable
+  persian_support:
+    status: explicit_family
+    codes:
+    - fa
+    evidence: EasyOCR officially added Farsi/Persian support and exposes the fa language code.
+  multilingual_scope: 80+ languages across multiple script recognizers.
+  outputs:
+  - text
+  - polygons
+  - confidence
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - operations
+  inference:
+    backend: PyTorch/EasyOCR
+    device: CPU or GPU
+    colab_fit: easy
+    important_settings:
+    - record detector and recognizer versions
+    - use identical paragraph and rotation settings
+  license:
+    code: Apache-2.0
+    weights: see project
+  links:
+    huggingface: null
+    github: https://github.com/JaidedAI/EasyOCR
+  strengths:
+  - simple API
+  - boxes and confidence
+  - official Persian language code
+  risks:
+  - older recognition architecture
+  - paragraph grouping can hide RTL ordering errors
+- rank: 4
+  id: hezar_crnn_base_fa_v2
+  name: Hezar CRNN Base FA v2
+  category: line_recognizer
+  checkpoint_type: persian_recognition_checkpoint
+  priority: P0
+  parameter_count_b: null
+  parameter_display: 37.2 MB checkpoint; parameter count not officially stated
+  parameter_confidence: not_comparable
+  persian_support:
+    status: explicit_model
+    codes:
+    - fa
+    evidence: Persian-specific Hezar CRNN checkpoint for printed/scanned text recognition.
+  multilingual_scope: Persian-specific.
+  outputs:
+  - recognized_line_text
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - operations
+  inference:
+    backend: Hezar/PyTorch
+    device: CPU or GPU
+    colab_fit: easy
+    important_settings:
+    - crop or detect text lines first
+    - model documentation notes roughly 50-character line lengths
+  license:
+    code: see model card
+    weights: see model card
+  links:
     huggingface: https://huggingface.co/hezarai/crnn-base-fa-v2
     github: https://github.com/hezarai/hezar
-    notes: Persian-specific recognition baseline.
-
-  - id: got_ocr2
-    name: GOT-OCR 2.0
-    size: 580M
-    parameters: 0.58B
-    category: document_vlm
-    languages: [multilingual]
+  strengths:
+  - Persian-specific baseline
+  - small checkpoint
+  - good sanity check for line crops
+  risks:
+  - not a full-page layout system
+  - line-length and crop quality constraints
+- rank: 5
+  id: weightedai_persian_ocr
+  name: WeightedAI Persian-OCR
+  category: line_recognizer
+  checkpoint_type: community_persian_checkpoint
+  priority: P1
+  parameter_count_b: null
+  parameter_display: ~400 MB repository; parameter count not stated
+  parameter_confidence: not_comparable
+  persian_support:
+    status: community_targeted
+    codes:
+    - fa
+    evidence: CNN+Transformer CTC model trained specifically on approximately 600k synthetic Persian text images
+      across 49 fonts.
+  multilingual_scope: Persian-specific.
+  outputs:
+  - recognized_text
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  inference:
+    backend: custom PyTorch code from the Hugging Face repository
+    device: CPU or GPU
+    colab_fit: easy
+    important_settings:
+    - pin the repository revision
+    - audit custom code before execution
+    - score real documents separately from synthetic-font data
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0 on model card
+  links:
+    huggingface: https://huggingface.co/WeightedAI/Persian_OCR
+    github: null
+  strengths:
+  - Persian-targeted
+  - longer line sequences than some CRNN baselines
+  risks:
+  - reported 96% sequence accuracy is model-card self-report on its synthetic dataset
+  - no established public real-world benchmark
+  - custom remote code
+- rank: 6
+  id: falcon_ocr
+  name: Falcon-OCR
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 0.3
+  parameter_display: 0.3B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official materials provide multilingual document results but do not explicitly list Persian; benchmark
+      as a very small OCR VLM candidate.
+  multilingual_scope: Multilingual evidence exists, but official language coverage is not enumerated on the model
+    card.
+  outputs:
+  - plain_text
+  - LaTeX
+  - HTML_tables
+  - layout_aware_markdown_via_pipeline
+  - boxes_via_layout_pipeline
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers, project inference engine, or vLLM Docker
+    device: GPU; MLX path available for Apple Silicon
+    colab_fit: easy_to_moderate
+    important_settings:
+    - PyTorch 2.5+ for FlexAttention
+    - compare direct full-page and layout+crop modes separately
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0
+  links:
+    huggingface: https://huggingface.co/tiiuae/Falcon-OCR
+    github: https://github.com/tiiuae/Falcon-Perception
+    paper: https://arxiv.org/abs/2603.27365
+  strengths:
+  - smallest current competitive document OCR VLM in this catalog
+  - plain/formula/table task prompts
+  - optional layout pipeline
+  risks:
+  - Persian not officially named
+  - old scans and tiny text are stated limitations
+  - layout mode adds a separate detector
+- rank: 7
+  id: got_ocr2
+  name: GOT-OCR 2.0
+  category: document_vlm
+  checkpoint_type: canonical_hf_conversion
+  priority: P1
+  parameter_count_b: 0.58
+  parameter_display: 0.58B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official checkpoint is tagged multilingual, but Persian is not specifically documented.
+  multilingual_scope: Multilingual OCR model; exact supported-language list is not published.
+  outputs:
+  - plain_text
+  - formatted_OCR
+  - fine_grained_OCR
+  - coordinates
+  - color_style_attributes
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers with trust_remote_code
+    device: GPU recommended
+    colab_fit: easy_to_moderate
+    important_settings:
+    - use the official StepFun Hugging Face conversion
+    - pin model and Transformers revisions
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0 on HF card
+  links:
     huggingface: https://huggingface.co/stepfun-ai/GOT-OCR-2.0-hf
     github: https://github.com/Ucas-HaoranWei/GOT-OCR2.0
-    notes: Small document VLM; check VRAM needs in the Colab runtime.
-
-  - id: surya_ocr_2
-    name: Surya OCR 2
-    size: 0.7B
-    parameters: 0.7B
-    category: document_vlm
-    languages: [fa, multilingual]
+    paper: https://arxiv.org/abs/2409.01704
+  strengths:
+  - compact
+  - supports multiple OCR output modes
+  - useful historical specialist baseline
+  risks:
+  - Persian not named
+  - custom code and older dependency constraints
+  - not as strong on full-page structure as newer parsers
+- rank: 8
+  id: surya_ocr_2
+  name: Surya OCR 2
+  category: document_vlm_pipeline
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 0.65
+  parameter_display: ~650M VLM plus a separate small line detector
+  parameter_confidence: exact
+  persian_support:
+    status: explicit_model
+    codes:
+    - fa
+    evidence: The official 91-language benchmark reports Persian (fa) at 82.3% pass rate.
+  multilingual_scope: 91 languages in the official internal benchmark.
+  outputs:
+  - full_page_HTML
+  - layout_JSON
+  - text
+  - reading_order
+  - tables
+  - line_boxes
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - persian_failure_slices
+  - document_structure
+  - operations
+  inference:
+    backend: surya-ocr package with vLLM, llama.cpp, or managed server
+    device: GPU, CPU, or Apple Silicon depending backend
+    colab_fit: moderate
+    important_settings:
+    - record direct VLM and detector-assisted modes
+    - weights have commercial-use restrictions
+    - use official output normalization
+  license:
+    code: Apache-2.0
+    weights: modified AI Pubs OpenRAIL-M; check commercial thresholds in current model card
+  links:
     huggingface: https://huggingface.co/datalab-to/surya-ocr-2
     github: https://github.com/datalab-to/surya
-    notes: End-to-end document OCR; the model card reports multilingual support.
-
-  - id: paddleocr_vl
-    name: PaddleOCR-VL 0.9B
-    size: 0.9B
-    parameters: 0.9B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/lvyufeng/PaddleOCR-VL-0.9B
+    language_results: https://github.com/datalab-to/surya/blob/master/static/docs/multilingual.md
+  strengths:
+  - explicit Persian score
+  - small model
+  - layout, OCR, reading order, and tables in one toolkit
+  risks:
+  - official Persian result is vendor-internal
+  - separate detector complicates total-size and latency comparisons
+  - modified model license
+- rank: 9
+  id: paddleocr_vl_1_6
+  name: PaddleOCR-VL-1.6
+  category: document_vlm_pipeline
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 0.9
+  parameter_display: 0.9B VLM; PP-DocLayoutV3/pipeline components are additional
+  parameter_confidence: exact
+  persian_support:
+    status: explicit_family
+    codes:
+    - fa
+    evidence: The PaddleOCR multilingual family explicitly supports Persian; version 1.6 is the current official
+      compact document parser, but the checkpoint card does not publish a Persian-only score.
+  multilingual_scope: PaddleOCR-VL family advertises 109-language document parsing coverage.
+  outputs:
+  - Markdown
+  - JSON
+  - text_spotting
+  - tables
+  - formulas
+  - charts
+  - seals
+  - layout
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - persian_failure_slices
+  - document_structure
+  - operations
+  inference:
+    backend: PaddleOCR doc_parser; vLLM server supported; Transformers for element-level tasks
+    device: GPU recommended; Paddle pipeline
+    colab_fit: moderate
+    important_settings:
+    - prefer the official PaddleOCR pipeline for page parsing
+    - pin PaddlePaddle 3.2.1+ and PaddleOCR 3.6.0+
+    - record layout model separately
+  license:
+    code: Apache-2.0
+    weights: see official model card
+  links:
+    huggingface: https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.6
     github: https://github.com/PaddlePaddle/PaddleOCR
-    notes: Use the model-card inference path rather than the legacy adapter.
-
-  - id: glm_ocr
-    name: GLM-OCR
-    size: 1B
-    parameters: 1B
-    category: document_vlm
-    languages: [multilingual]
+    paper: https://arxiv.org/abs/2606.03264
+  strengths:
+  - official Persian family support
+  - strong tables/formulas/layout
+  - small
+  - structured Markdown and JSON
+  risks:
+  - family-level Persian claim is not a Persian score for 1.6
+  - pipeline and element-only Transformers paths are not equivalent
+- rank: 10
+  id: glm_ocr
+  name: GLM-OCR
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P2
+  parameter_count_b: 0.9
+  parameter_display: 0.9B
+  parameter_confidence: exact
+  persian_support:
+    status: not_listed
+    codes: []
+    evidence: The official Hugging Face metadata lists eight languages and does not include Persian.
+  multilingual_scope: 'Officially listed languages: Chinese, English, French, Spanish, Russian, German, Japanese,
+    and Korean.'
+  outputs:
+  - Markdown
+  - text
+  - tables
+  - formulas
+  - layout_aware_output
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  inference:
+    backend: Transformers, vLLM, or SGLang
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - treat as a negative-control multilingual parser for Persian
+    - use official prompts and dependency versions
+  license:
+    code: MIT
+    weights: MIT
+  links:
     huggingface: https://huggingface.co/zai-org/GLM-OCR
     github: https://github.com/zai-org/GLM-OCR
-    notes: Requires the current SGLang/Transformers instructions from the model card.
-
-  - id: lightonocr2_1b
-    name: LightOnOCR-2-1B
-    size: 1B
-    parameters: 1B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/lightonai/LightOnOCR-2-1B
-    github: https://github.com/lightonai/LightOnOCR
-    notes: End-to-end document OCR optimized for rendered pages.
-
-  - id: mineru25_pro
-    name: MinerU 2.5 Pro
-    size: 1.2B
-    parameters: 1.2B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B
-    github: https://github.com/opendatalab/MinerU
-    notes: Compare text extraction and layout preservation separately.
-
-  - id: nanonets_ocr2_15b
-    name: Nanonets OCR2
-    size: 1.5B
-    parameters: 1.5B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/nanonets/Nanonets-OCR2-1.5B-exp
-    github: https://github.com/NanoNets/Nanonets-OCR-s
-    notes: Use the official prompt and image-resolution requirements.
-
-  - id: qwen3_vl_persian_arabic_ocr
-    name: Qwen3-VL Persian Arabic OCR
-    size: 2B
-    parameters: 2B
-    category: persian_finetune
-    languages: [fa, ar]
-    huggingface: https://huggingface.co/mohajesmaeili/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0
-    github: https://github.com/QwenLM/Qwen3-VL
-    notes: Persian/Arabic fine-tune; especially relevant to this dataset.
-
-  - id: khanandeh
-    name: Khanandeh Persian OCR
-    size: 2B
-    parameters: 2B
-    category: persian_finetune
-    languages: [fa]
-    huggingface: https://huggingface.co/oddadmix/Khanandeh-0.1-Persian-OCR-2B-Instruct
-    github: https://github.com/oddadmix/Khanandeh
-    notes: Persian-focused instruct model; verify repository availability before use.
-
-  - id: infinity_parser2_flash
-    name: Infinity Parser 2 Flash
-    size: undisclosed
-    parameters: null
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/infly/Infinity-Parser2-Flash
-    github: https://github.com/infly-ai/Infinity
-    notes: Fast variant; record actual memory use in Colab.
-
-  - id: infinity_parser2_pro
-    name: Infinity Parser 2 Pro
-    size: undisclosed
-    parameters: null
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/infly/Infinity-Parser2-Pro
-    github: https://github.com/infly-ai/Infinity
-    notes: Larger quality-oriented variant when GPU memory allows.
-
-  - id: dots_mocr
-    name: dots.mocr
-    size: 3B
-    parameters: 3B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/rednote-hilab/dots.mocr
-    github: https://github.com/rednote-hilab/dots.ocr
-    notes: OCR-focused multimodal model.
-
-  - id: dots_ocr
-    name: dots.ocr
-    size: 3B
-    parameters: 3B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/rednote-hilab/dots.ocr
-    github: https://github.com/rednote-hilab/dots.ocr
-    notes: Compare with dots.mocr using the same prompt and preprocessing.
-
-  - id: falcon_ocr
-    name: Falcon-OCR
-    size: 3B
-    parameters: 3B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/tiiuae/Falcon-OCR
-    github: https://github.com/tiiuae/Falcon
-    notes: Confirm the current serving requirements before allocating a Colab GPU.
-
-  - id: weightedai_persian_ocr
-    name: WeightedAI Persian OCR
-    size: undisclosed
-    parameters: null
-    category: persian_finetune
-    languages: [fa]
-    huggingface: https://huggingface.co/WeightedAI/Persian_OCR
-    github: https://github.com/WeightedAI/Persian_OCR
-    notes: Persian-specific candidate; treat parameter size as unknown until the model card states it.
-
-  - id: deepseek_ocr
-    name: DeepSeek-OCR
-    size: 3B
-    parameters: 3B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/deepseek-ai/DeepSeek-OCR
-    github: https://github.com/deepseek-ai/DeepSeek-OCR
-    notes: Use the official repository environment and prompt.
-
-  - id: deepseek_ocr_2
-    name: DeepSeek-OCR 2
-    size: undisclosed
-    parameters: null
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/deepseek-ai/DeepSeek-OCR-2
-    github: https://github.com/deepseek-ai/DeepSeek-OCR-2
-    notes: Record the exact revision because model requirements may change.
-
-  - id: chandra_ocr_2
-    name: Chandra OCR 2
-    size: 5B
-    parameters: 5B
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/datalab-to/chandra-ocr-2
-    github: https://github.com/datalab-to/chandra
-    notes: Larger document OCR model; use only when Colab memory is sufficient.
-
-  - id: hunyuan_ocr
-    name: HunyuanOCR
-    size: 7B
-    parameters: 7B
-    category: document_vlm
-    languages: [multilingual]
+    paper: https://arxiv.org/abs/2603.10910
+  strengths:
+  - compact
+  - strong document parser on supported languages
+  - permissive license
+  risks:
+  - Persian is outside the official language list
+  - do not promote it based on generic multilingual labels
+- rank: 11
+  id: hunyuanocr_1_5
+  name: HunyuanOCR-1.5
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 1.0
+  parameter_display: 1B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official materials emphasize multilingual and low-resource OCR but do not specifically name Persian.
+  multilingual_scope: Broad multilingual/low-resource OCR training; exact supported-language list is not published
+    in the model card.
+  outputs:
+  - Markdown
+  - HTML_tables
+  - LaTeX
+  - text_spotting
+  - information_extraction
+  - text_image_translation
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: vLLM 0.18.1, vLLM nightly with DFlash, Transformers 5.13, or llama.cpp/GGUF
+    device: GPU; CPU/consumer-GPU path via llama.cpp
+    colab_fit: moderate
+    important_settings:
+    - use mutually compatible official environments
+    - pin task type and official sampling settings
+    - record whether DFlash is enabled
+  license:
+    code: Tencent Hunyuan Community License
+    weights: Tencent Hunyuan Community License
+  links:
     huggingface: https://huggingface.co/tencent/HunyuanOCR
     github: https://github.com/Tencent-Hunyuan/HunyuanOCR
-    notes: High-memory comparison candidate.
-
-  - id: kdl_frontier_parser_nano
-    name: KDL Frontier Parser Nano
-    size: undisclosed
-    parameters: null
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/KDLAI/KDL-Frontier-Parser-nano
-    github: https://github.com/KDLAI/KDL-Frontier-Parser
-    notes: Keep as an optional candidate until its runtime requirements are confirmed.
-
-  - id: unlimited_ocr_gguf
-    name: Unlimited OCR GGUF
-    size: quantized
-    parameters: null
-    category: document_vlm
-    languages: [multilingual]
-    huggingface: https://huggingface.co/sahilchachra/Unlimited-OCR-GGUF
-    github: https://github.com/sahilchachra/Unlimited-OCR
-    notes: Quantized format; compare VRAM and speed separately from model quality.
+    paper: https://arxiv.org/abs/2607.04884
+  strengths:
+  - current 1B release
+  - long-context and 4K upgrades
+  - multiple inference backends
+  - structured OCR tasks
+  risks:
+  - Persian not explicitly named
+  - vendor license
+  - vLLM and Transformers setups require different environments
+- rank: 12
+  id: lightonocr_2_1b
+  name: LightOnOCR-2-1B
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P1
+  parameter_count_b: 1.0
+  parameter_display: 1B
+  parameter_confidence: exact
+  persian_support:
+    status: not_listed
+    codes: []
+    evidence: The model card advertises 11 languages and does not explicitly list Persian; include as a compact
+      multilingual generalization test, not a confirmed Persian model.
+  multilingual_scope: 11 languages in Hugging Face metadata; stronger French, scientific-document, and scan coverage.
+  outputs:
+  - naturally_ordered_text
+  - tables
+  - forms
+  - math
+  - optional_image_bounding_boxes
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers 5 or vLLM
+    device: GPU recommended; CPU/MPS possible
+    colab_fit: moderate
+    important_settings:
+    - render PDFs at 200 DPI
+    - target longest dimension about 1540 px
+    - use the non-bbox flagship unless image boxes are required
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0
+  links:
+    huggingface: https://huggingface.co/lightonai/LightOnOCR-2-1B
+    github: null
+    paper: https://arxiv.org/abs/2601.14251
+  strengths:
+  - small
+  - fast end-to-end OCR
+  - good scans/scientific documents
+  - permissive license
+  risks:
+  - Persian not in official language metadata
+  - preprocessing resolution materially affects results
+  - no dedicated official GitHub repository linked from the model card
+- rank: 13
+  id: mineru_2_5_pro_2605
+  name: MinerU2.5-Pro-2605-1.2B
+  category: document_vlm_pipeline
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 1.2
+  parameter_display: 1.2B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official release describes native multilingual OCR but does not publish a Persian-specific support
+      statement or score.
+  multilingual_scope: Native multilingual OCR/document parsing; exact language list is not clearly enumerated.
+  outputs:
+  - Markdown
+  - layout
+  - tables
+  - formulas
+  - reading_order
+  - images
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: MinerU pipeline and model-specific inference code
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - use the 2605 checkpoint rather than 2604
+    - record pipeline components and PDF renderer
+    - score parser failures separately from OCR errors
+  license:
+    code: see model card/repository
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/opendatalab/MinerU2.5-Pro-2605-1.2B
+    github: https://github.com/opendatalab/MinerU
+  strengths:
+  - compact structured parser
+  - tables and formulas
+  - active production-oriented toolkit
+  risks:
+  - Persian not explicitly named
+  - multi-component pipeline makes strict model-only comparisons harder
+- rank: 14
+  id: nanonets_ocr2_1_5b_exp
+  name: Nanonets-OCR2-1.5B-exp
+  category: document_vlm
+  checkpoint_type: experimental_canonical
+  priority: P0
+  parameter_count_b: 1.5
+  parameter_display: 1.5B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: The model card mentions multilingual/Arabic capabilities but does not specifically guarantee Persian;
+      Nanonets' hosted platform separately lists Persian.
+  multilingual_scope: Multilingual document OCR; model-specific language list is incomplete.
+  outputs:
+  - Markdown
+  - tables
+  - LaTeX
+  - handwriting
+  - signatures
+  - watermarks
+  - checkboxes
+  - semantic_descriptions
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers/vLLM recipes from official repository
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - use the exact official prompt
+    - record image resolution
+    - treat exp suffix as experimental
+  license:
+    code: see model card
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/nanonets/Nanonets-OCR2-1.5B-exp
+    github: https://github.com/NanoNets/Nanonets-OCR2
+    platform_languages: https://docs.nanonets.com/docs/language-supported
+  strengths:
+  - rich structured output
+  - forms and handwriting claims
+  - small enough for local benchmarking
+  risks:
+  - Persian claim is platform-level, not checkpoint-specific
+  - experimental checkpoint
+  - prompt sensitivity
+- rank: 15
+  id: qwen3_vl_2b_persian_arabic_ocr
+  name: Qwen3-VL-2B Persian-Arabic OCR v1.0
+  category: persian_finetune
+  checkpoint_type: community_finetune
+  priority: P0
+  parameter_count_b: 2.0
+  parameter_display: 2B base model
+  parameter_confidence: base_model_only
+  persian_support:
+    status: community_targeted
+    codes:
+    - fa
+    - ar
+    evidence: Community checkpoint explicitly targets Persian and Arabic OCR.
+  multilingual_scope: Persian and Arabic specialization on a multilingual Qwen3-VL base.
+  outputs:
+  - prompted_text_extraction
+  - general_VLM_response
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - persian_failure_slices
+  - document_structure
+  inference:
+    backend: Qwen3-VL Transformers stack
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - inspect whether repository contains full weights or adapter
+    - use the author prompt/template
+    - pin revision and base model
+  license:
+    code: see model card and base model
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/mohajesmaeili/Qwen3-VL-2B-Persian-Arabic-Ocr-v1.0
+    github: https://github.com/QwenLM/Qwen3-VL
+    github_scope: base model only
+  strengths:
+  - directly Persian-targeted
+  - important comparison against generic multilingual models
+  risks:
+  - community checkpoint with limited public evaluation
+  - possible synthetic/domain overfitting
+  - upstream GitHub is not model-specific
+- rank: 16
+  id: khanandeh_0_1_persian_ocr_2b
+  name: Khanandeh 0.1 Persian OCR 2B Instruct
+  category: persian_finetune
+  checkpoint_type: community_adapter_or_finetune
+  priority: P1
+  parameter_count_b: 2.0
+  parameter_display: 2B base model; adapter size may be smaller
+  parameter_confidence: base_model_only
+  persian_support:
+    status: community_targeted
+    codes:
+    - fa
+    evidence: Community model explicitly targets Persian OCR, but public evaluation and documentation are limited.
+  multilingual_scope: Persian-focused.
+  outputs:
+  - prompted_text_extraction
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - persian_failure_slices
+  inference:
+    backend: follow exact Hugging Face repository instructions
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - verify adapter/base compatibility
+    - pin all revisions
+    - do not infer capabilities from the name alone
+  license:
+    code: see model card and base model
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/oddadmix/Khanandeh-0.1-Persian-OCR-2B-Instruct
+    github: null
+  strengths:
+  - Persian-targeted community candidate
+  risks:
+  - no mature public benchmark
+  - model card/reproducibility details are limited
+  - may be an adapter rather than standalone weights
+- rank: 17
+  id: qwen3_vl_2b_instruct
+  name: Qwen3-VL-2B-Instruct
+  category: general_vlm_control
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 2.0
+  parameter_display: 2B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official card claims OCR support for 32 languages but does not enumerate Persian in the retrieved
+      language summary.
+  multilingual_scope: 32-language OCR claim; general-purpose VLM rather than OCR-specialized parser.
+  outputs:
+  - prompted_text_extraction
+  - document_QA
+  - grounding
+  - general_VLM_response
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers, vLLM, or SGLang
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - use deterministic decoding
+    - use identical OCR prompt across general VLM controls
+    - cap image pixels consistently
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0
+  links:
+    huggingface: https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct
+    github: https://github.com/QwenLM/Qwen3-VL
+  strengths:
+  - strong compact general-VLM control
+  - robustness claims for blur/tilt/low light
+  - same base family as Persian community fine-tunes
+  risks:
+  - not OCR-specialized
+  - Persian not explicitly named
+  - prompt can trade transcription fidelity for helpful rewriting
+- rank: 18
+  id: infinity_parser2_flash
+  name: Infinity Parser 2 Flash
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P2
+  parameter_count_b: 2.0
+  parameter_display: 2B
+  parameter_confidence: exact
+  persian_support:
+    status: not_listed
+    codes: []
+    evidence: Official materials emphasize Chinese/English document data and do not claim Persian support.
+  multilingual_scope: Primarily Chinese and English evidence.
+  outputs:
+  - structured_document_parsing
+  - Markdown
+  - tables
+  - formulas
+  - reading_order
+  recommended_tracks:
+  - document_structure
+  - operations
+  inference:
+    backend: official INF-MLLM repository/model-card stack
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - treat as optional non-Persian control
+    - pin repository revision
+  license:
+    code: see model card
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/infly/Infinity-Parser2-Flash
+    github: https://github.com/infly-ai/INF-MLLM
+  strengths:
+  - compact structured parser
+  - useful architecture/control comparison
+  risks:
+  - no Persian claim
+  - Chinese/English-centered evidence
+  - low expected Persian priority
+- rank: 19
+  id: firered_ocr
+  name: FireRed-OCR
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P1
+  parameter_count_b: 2.0
+  parameter_display: ~2B class
+  parameter_confidence: approximate
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official repository does not publish a Persian-specific support statement.
+  multilingual_scope: Document OCR VLM; language coverage is not clearly enumerated.
+  outputs:
+  - Markdown
+  - text
+  - tables
+  - formulas
+  - layout
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: official FireRed-OCR repository
+    device: GPU recommended
+    colab_fit: moderate
+    important_settings:
+    - use official environment and prompt
+    - record model revision
+  license:
+    code: see repository/model card
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/FireRedTeam/FireRed-OCR
+    github: https://github.com/FireRedTeam/FireRed-OCR
+  strengths:
+  - compact modern document parser
+  - useful independent architecture comparison
+  risks:
+  - Persian not documented
+  - less mature Persian evidence than P0 candidates
+- rank: 20
+  id: dots_ocr
+  name: dots.ocr
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 3.0
+  parameter_display: ~3B total; official materials also describe a 1.7B language backbone
+  parameter_confidence: approximate
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official materials emphasize broad multilingual/script coverage, but do not explicitly name Persian.
+  multilingual_scope: Broad multilingual document parsing and script coverage.
+  outputs:
+  - Markdown
+  - layout
+  - reading_order
+  - tables
+  - formulas
+  - text
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: official dots.ocr repository; Transformers/vLLM paths vary by release
+    device: GPU recommended
+    colab_fit: moderate_to_high
+    important_settings:
+    - use the exact official prompt
+    - record whether layout output is enabled
+    - pin model revision
+  license:
+    code: see model card
+    weights: see model card
+  links:
+    huggingface: https://huggingface.co/rednote-hilab/dots.ocr
+    github: https://github.com/rednote-hilab/dots.ocr
+  strengths:
+  - strong page layout and reading order
+  - widely benchmarked open document parser
+  risks:
+  - Persian not explicitly documented
+  - parameter count is reported inconsistently as backbone versus total
+- rank: 21
+  id: dots_mocr
+  name: dots.mocr
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 3.0
+  parameter_display: 3B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official materials position it as multilingual and independent broad-script benchmarks are strong,
+      but Persian is not explicitly named by the model publisher.
+  multilingual_scope: Multilingual OCR/document parsing with broad script generalization.
+  outputs:
+  - Markdown
+  - text
+  - layout_grounding
+  - tables
+  - formulas
+  - structured_graphics
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: official dots.mocr repository/model card
+    device: GPU recommended
+    colab_fit: moderate_to_high
+    important_settings:
+    - do not reuse dots.ocr code blindly
+    - use the separate dots.mocr repository
+    - pin prompt and revision
+  license:
+    code: model-specific; repository includes MIT code and model terms
+    weights: check current model card
+  links:
+    huggingface: https://huggingface.co/rednote-hilab/dots.mocr
+    github: https://github.com/rednote-hilab/dots.mocr
+  strengths:
+  - one of the strongest open multilingual candidates
+  - good text recognition plus structured parsing
+  risks:
+  - Persian not officially named
+  - license terms must be checked separately from code license
+- rank: 22
+  id: deepseek_ocr
+  name: DeepSeek-OCR
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 3.0
+  parameter_display: 3B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official checkpoint is tagged multilingual, but neither the model card nor repository publishes a
+      supported-language list naming Persian.
+  multilingual_scope: Multilingual tag; exact language support unspecified.
+  outputs:
+  - Markdown
+  - text
+  - tables
+  - formulas
+  - document_compression_representation
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: official DeepSeek-OCR repository/Transformers stack
+    device: GPU recommended
+    colab_fit: moderate_to_high
+    important_settings:
+    - use official prompt
+    - pin environment and image resolution
+    - record compression mode
+  license:
+    code: MIT
+    weights: MIT on model card
+  links:
+    huggingface: https://huggingface.co/deepseek-ai/DeepSeek-OCR
+    github: https://github.com/deepseek-ai/DeepSeek-OCR
+  strengths:
+  - important widely used OCR VLM baseline
+  - distinct visual-token compression approach
+  risks:
+  - Persian support unverified
+  - do not equate multilingual tag with fa support
+- rank: 23
+  id: deepseek_ocr_2
+  name: DeepSeek-OCR-2
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 3.0
+  parameter_display: 3B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official checkpoint is tagged multilingual, but Persian/Farsi/fa is not explicitly listed.
+  multilingual_scope: Multilingual tag; official evaluation remains heavily document-benchmark and Chinese/English
+    oriented.
+  outputs:
+  - Markdown
+  - text
+  - tables
+  - formulas
+  - reading_order
+  - structured_document_output
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: official DeepSeek-OCR-2 repository/Transformers stack
+    device: GPU recommended
+    colab_fit: moderate_to_high
+    important_settings:
+    - benchmark separately from v1
+    - pin exact revision and dynamic-resolution settings
+    - use official prompt
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0 on model card
+  links:
+    huggingface: https://huggingface.co/deepseek-ai/DeepSeek-OCR-2
+    github: https://github.com/deepseek-ai/DeepSeek-OCR-2
+  strengths:
+  - improved document reconstruction and reading-order design over v1
+  - important current baseline
+  risks:
+  - Persian support unverified
+  - quality claims may use benchmark configurations unlike your Persian pipeline
+- rank: 24
+  id: chandra_ocr_2
+  name: Chandra OCR 2
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 5.0
+  parameter_display: 5B total parameters on Hugging Face
+  parameter_confidence: exact
+  persian_support:
+    status: explicit_model
+    codes:
+    - fa
+    evidence: 'Official multilingual benchmark publishes a Persian score: 75.1% for the open Chandra 2 checkpoint
+      and 82.2% for the vendor API.'
+  multilingual_scope: 90+ languages; official 43-language table includes Persian.
+  outputs:
+  - Markdown
+  - HTML
+  - JSON
+  - layout
+  - tables
+  - math
+  - forms
+  - checkboxes
+  - handwriting
+  - image_captions
+  recommended_tracks:
+  - raw_recognition
+  - normalized_recognition
+  - persian_failure_slices
+  - document_structure
+  - operations
+  inference:
+    backend: chandra-ocr package with vLLM or Hugging Face Transformers
+    device: GPU strongly recommended
+    colab_fit: high; quantization or large-memory GPU may be needed
+    important_settings:
+    - benchmark the open checkpoint, not API, in the local-model leaderboard
+    - record quantization
+    - use official parser post-processing
+  license:
+    code: Apache-2.0
+    weights: modified OpenRAIL-M; free-use and competitive-use restrictions apply—check current terms
+  links:
+    huggingface: https://huggingface.co/datalab-to/chandra-ocr-2
+    github: https://github.com/datalab-to/chandra
+  strengths:
+  - explicit Persian benchmark
+  - 90+ languages
+  - strong handwriting/forms/tables/layout
+  - high-quality open reference
+  risks:
+  - 5B and comparatively expensive
+  - vendor benchmark
+  - restrictive model-weight license
+  - API score is not the open-weight score
+- rank: 25
+  id: qianfan_ocr
+  name: Qianfan-OCR
+  category: document_vlm
+  checkpoint_type: canonical
+  priority: P0
+  parameter_count_b: 5.0
+  parameter_display: officially called 4B; Hugging Face reports 5B total parameters
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: Official card claims 192 languages including Arabic scripts, but does not specifically name Persian
+      in the retrieved language list.
+  multilingual_scope: 192 languages across Latin, Cyrillic, Arabic, South/Southeast Asian, and CJK scripts.
+  outputs:
+  - Markdown
+  - JSON
+  - HTML
+  - layout
+  - boxes
+  - reading_order
+  - tables
+  - formulas
+  - charts
+  - KIE
+  - document_QA
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers, vLLM, SGLang, or Docker Model Runner
+    device: GPU strongly recommended
+    colab_fit: high; quantization may be needed
+    important_settings:
+    - record Layout-as-Thought on/off
+    - report total HF parameter count and declared 4B class
+    - use W16/BF16 for quality before W8A8 speed testing
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0
+  links:
+    huggingface: https://huggingface.co/baidu/Qianfan-OCR
+    github: https://github.com/baidubce/Qianfan-VL
+    paper: https://arxiv.org/abs/2603.13398
+  strengths:
+  - very broad official language claim
+  - strong end-to-end parser
+  - layout reasoning mode
+  - permissive license
+  risks:
+  - Persian not explicitly named
+  - 4B naming versus 5B HF total can confuse ordering
+  - vendor benchmark results require independent Persian validation
+- rank: 26
+  id: qwen3_vl_8b_instruct
+  name: Qwen3-VL-8B-Instruct
+  category: general_vlm_control
+  checkpoint_type: canonical
+  priority: P1
+  parameter_count_b: 8.0
+  parameter_display: 8B
+  parameter_confidence: exact
+  persian_support:
+    status: broad_multilingual_no_fa
+    codes: []
+    evidence: General multilingual VLM with expanded OCR, but no OCR-specific official Persian guarantee in the
+      retrieved card summary.
+  multilingual_scope: 32-language OCR claim; larger general-purpose VLM control.
+  outputs:
+  - prompted_text_extraction
+  - document_QA
+  - grounding
+  - general_VLM_response
+  recommended_tracks:
+  - raw_recognition
+  - document_structure
+  - operations
+  inference:
+    backend: Transformers, vLLM, or SGLang
+    device: large GPU; quantization likely for standard Colab
+    colab_fit: high
+    important_settings:
+    - match prompt and image pixels to 2B control
+    - report quantization
+    - use deterministic decoding
+  license:
+    code: Apache-2.0
+    weights: Apache-2.0
+  links:
+    huggingface: https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct
+    github: https://github.com/QwenLM/Qwen3-VL
+  strengths:
+  - high-capacity general-VLM ceiling
+  - useful to quantify specialist-versus-generalist tradeoff
+  risks:
+  - costly
+  - not OCR-specialized
+  - Persian not explicitly named
+  - quantization can alter OCR quality
+excluded_or_redundant:
+- id: kraken_generic
+  name: Kraken OCR engine
+  status: EXCLUDE
+  reason: No single canonical, officially maintained Persian checkpoint was pinned in the original catalog. Add
+    only when a specific Persian model, license, and checksum are selected.
+  links:
+    github: https://github.com/mittagessen/kraken
+- id: paddleocr_vl_0_9b_unofficial
+  name: Unofficial PaddleOCR-VL-0.9B mirror
+  status: EXCLUDE
+  reason: Replace the community mirror with the official PaddlePaddle/PaddleOCR-VL-1.6 checkpoint.
+  replacement: paddleocr_vl_1_6
+- id: paddleocr_vl_1_5
+  name: PaddleOCR-VL-1.5
+  status: EXCLUDE
+  reason: Superseded by the architecture-compatible 1.6 release. Retain only for regression/version studies.
+  replacement: paddleocr_vl_1_6
+- id: hunyuanocr_1_0
+  name: HunyuanOCR 1.0
+  status: EXCLUDE
+  reason: Superseded by HunyuanOCR-1.5; use 1.0 only for an explicit version-ablation experiment.
+  replacement: hunyuanocr_1_5
+- id: kdl_frontier_parser_nano
+  name: KDL Frontier Parser Nano
+  status: EXCLUDE
+  reason: Closely derived from/repackaged around MinerU lineage and adds little independent evidence; benchmark
+    canonical MinerU2.5-Pro-2605 instead.
+  replacement: mineru_2_5_pro_2605
+- id: unlimited_ocr_gguf
+  name: Unlimited OCR GGUF
+  status: EXCLUDE
+  reason: A derived quantized distribution is not a distinct quality model. Benchmark the canonical base checkpoint
+    first, then add GGUF as an operations/quantization variant.
+- id: infinity_parser2_pro
+  name: Infinity Parser 2 Pro
+  status: EXCLUDE
+  reason: Approximately 35B and lacks Persian evidence; disproportionately expensive for the first bake-off. Reconsider
+    only after Flash shows useful Persian transfer.
+  links:
+    huggingface: https://huggingface.co/infly/Infinity-Parser2-Pro
+    github: https://github.com/infly-ai/INF-MLLM
+- id: monkeyocr_pro_1_2b
+  name: MonkeyOCR-pro-1.2B
+  status: EXCLUDE
+  reason: Official materials focus on Chinese and English rather than Persian; lower priority than same-size multilingual
+    candidates.
+  links:
+    huggingface: https://huggingface.co/echo840/MonkeyOCR-pro-1.2B
+    github: https://github.com/Yuliang-Liu/MonkeyOCR
+- id: dolphin_2
+  name: Dolphin 2
+  status: EXCLUDE
+  reason: Official evidence is primarily Chinese/English document parsing. Add only as an architecture study, not
+    a Persian contender.
+  links:
+    github: https://github.com/bytedance/Dolphin
+- id: nvidia_nemotron_ocr_v2
+  name: NVIDIA Nemotron OCR v2
+  status: EXCLUDE
+  reason: Official supported-language list does not include Persian.
+- id: olmocr_and_rolmocr
+  name: olmOCR / RolmOCR English-focused checkpoints
+  status: EXCLUDE
+  reason: English-focused training and evaluation make them unsuitable for the main Persian leaderboard; useful
+    only as a negative control.

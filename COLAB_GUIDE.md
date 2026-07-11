@@ -27,7 +27,7 @@ drive.mount("/content/drive")
 If the repository is public, cloning it is equivalent:
 
 ```python
-!git clone https://github.com/OWNER/REPOSITORY.git /content/persian-ocr
+!git clone https://github.com/mshojaei77/persian-ocr-bench.git /content/persian-ocr
 %cd /content/persian-ocr
 ```
 
