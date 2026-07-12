@@ -53,6 +53,7 @@ RECOGNIZER_DIR = MODEL_ROOT / "recognizer"
 DETECTOR_DIR = MODEL_ROOT / "detector"
 DEFAULT_OUTPUT = REPO_ROOT / "bench_runs" / f"{MODEL_ID}.json"
 REQUIRED_MODEL_FILES = {"config.json", "inference.json", "inference.pdiparams"}
+LEADERBOARD_SCHEMA = "persian_ocr_benchmark_v1"
 
 
 @dataclass
@@ -202,6 +203,26 @@ def result_payload(result) -> dict[str, object]:
     payload = json_safe(payload)
     nested = payload.get("res")
     return nested if isinstance(nested, dict) else payload
+
+
+def compact_pipeline_result(payload: dict[str, object]) -> dict[str, object]:
+    """Keep reproducible OCR outputs without embedding image tensors in JSON."""
+    keep = {
+        "input_path",
+        "page_index",
+        "dt_polys",
+        "model_settings",
+        "text_det_params",
+        "text_type",
+        "text_rec_score_thresh",
+        "return_word_box",
+        "rec_texts",
+        "rec_scores",
+        "rec_polys",
+        "textline_orientation_angles",
+        "rec_boxes",
+    }
+    return {key: value for key, value in payload.items() if key in keep}
 
 
 def create_pipeline(device: str):
@@ -389,7 +410,7 @@ def cmd_small_bench(args: argparse.Namespace) -> int:
             punctuation_diagnostics=(
                 {} if error else punctuation_diagnostics(ref_canonical, hyp_canonical)
             ),
-            raw_pipeline_result=raw_result,
+            raw_pipeline_result=compact_pipeline_result(raw_result),
             failure_image_path=None,
             error=error,
         )
@@ -408,8 +429,9 @@ def cmd_small_bench(args: argparse.Namespace) -> int:
     seconds = sorted(result.seconds for result in successful)
     summary = {
         "benchmark": {
+            "schema": LEADERBOARD_SCHEMA,
             "name": "persian_ocr_smoke20",
-            "scope": "full-page detector+recognizer smoke benchmark; not a leaderboard",
+            "scope": "full-page detector+recognizer benchmark; leaderboard-comparable",
             "reference_quality_counts": dict(
                 Counter(result.reference_quality for result in results)
             ),

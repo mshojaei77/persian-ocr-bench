@@ -56,6 +56,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 TESSDATA_ROOT = REPO_ROOT / "tessdata"
 SMALL_BENCH = REPO_ROOT / "small_bench"
 RESULTS_DIR = REPO_ROOT / "bench_runs"
+LEADERBOARD_SCHEMA = "persian_ocr_benchmark_v1"
 RESULTS_PATH = RESULTS_DIR / "tesseract_fas.json"
 
 TESSDATA_URLS = {
@@ -938,8 +939,9 @@ def cmd_small_bench(args) -> int:
     }
     summary = {
         "benchmark": {
+            "schema": LEADERBOARD_SCHEMA,
             "name": "persian_ocr_smoke20",
-            "scope": "smoke and failure diagnosis; not a model leaderboard",
+            "scope": "OCR benchmark; leaderboard-comparable",
             "reference_quality_counts": dict(
                 Counter(
                     dict(
