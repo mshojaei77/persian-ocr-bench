@@ -40,17 +40,6 @@ def load_row(path: Path) -> dict[str, Any]:
     config = summary.get("config", {})
     operations = summary.get("operations", {})
     primary_ops = operations.get("primary_configuration", operations)
-    track_breakdowns = summary.get("track_breakdowns") or summary.get("track_breakdowns_primary_config") or {}
-
-    def track_metric(track_names: tuple[str, ...], *names: str) -> float | None:
-        for track_name in track_names:
-            track = track_breakdowns.get(track_name, {})
-            for name in names:
-                value = number(track.get(name))
-                if value is not None:
-                    return value
-        return None
-
     model_id = model.get("id") or path.stem
     return {
         "rank": None,
@@ -75,11 +64,39 @@ def load_row(path: Path) -> dict[str, Any]:
         ),
         "source": str(path),
         "config": config.get("variant") or config.get("primary_lang"),
-        "typed_cer": track_metric(("printed_smoke", "printed_degraded", "social_media_graphics"), "macro_page_CER_canonical"),
-        "handwritten_cer": track_metric(("handwriting_smoke",), "macro_page_CER_canonical"),
-        "typed_wer": track_metric(("printed_smoke", "printed_degraded", "social_media_graphics"), "mean_WER_canonical"),
-        "handwritten_wer": track_metric(("handwriting_smoke",), "mean_WER_canonical"),
     }
+
+
+def collect_track_rows(input_dir: Path) -> list[dict[str, Any]]:
+    """Aggregate per-image results into typed and hand-written views."""
+    grouped: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for path in sorted(input_dir.glob("*.json")):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        model_id = payload.get("summary", {}).get("model", {}).get("id") or path.stem
+        for result in payload.get("results", []):
+            if result.get("error"):
+                continue
+            track = str(result.get("track", "")).lower()
+            category = "hand-written" if "hand" in track else "typed"
+            grouped.setdefault((model_id, category), []).append(result)
+    rows = []
+    for (model_id, category), results in sorted(grouped.items()):
+        cers = [number(item.get("cer_grapheme_canonical")) for item in results]
+        wers = [number(item.get("wer_canonical")) for item in results]
+        cers = [value for value in cers if value is not None]
+        wers = [value for value in wers if value is not None]
+        rows.append({
+            "model_id": model_id,
+            "category": category,
+            "n_images": len(results),
+            "cer": sum(cers) / len(cers) if cers else None,
+            "wer": sum(wers) / len(wers) if wers else None,
+            "mean_seconds": sum(float(item["seconds"]) for item in results) / len(results),
+        })
+    return rows
 
 
 def collect(input_dir: Path) -> list[dict[str, Any]]:
@@ -95,7 +112,7 @@ def collect(input_dir: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def write_artifacts(rows: list[dict[str, Any]], output_dir: Path) -> None:
+def write_artifacts(rows: list[dict[str, Any]], track_rows: list[dict[str, Any]], output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     fields = list(rows[0]) if rows else ["rank", "model_id", "cer"]
     with (output_dir / "leaderboard.csv").open("w", newline="", encoding="utf-8") as handle:
@@ -106,14 +123,18 @@ def write_artifacts(rows: list[dict[str, Any]], output_dir: Path) -> None:
         json.dumps({"schema": "persian_ocr_leaderboard_v1", "rows": rows}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    track_fields = ["rank", "model_id", "artifact", "typed_cer", "typed_wer", "handwritten_cer", "handwritten_wer"]
-    with (output_dir / "leaderboard_by_track.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=track_fields)
-        writer.writeheader()
-        writer.writerows({field: row.get(field) for field in track_fields} for row in rows)
+    (output_dir / "leaderboard_by_type.json").write_text(
+        json.dumps({"schema": "persian_ocr_leaderboard_v1", "rows": track_rows}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    if track_rows:
+        with (output_dir / "leaderboard_by_type.csv").open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(track_rows[0]))
+            writer.writeheader()
+            writer.writerows(track_rows)
 
 
-def write_charts(rows: list[dict[str, Any]], output_dir: Path) -> None:
+def write_charts(rows: list[dict[str, Any]], track_rows: list[dict[str, Any]], output_dir: Path) -> None:
     import matplotlib.pyplot as plt
 
     valid = [row for row in rows if row["cer"] is not None]
@@ -140,6 +161,19 @@ def write_charts(rows: list[dict[str, Any]], output_dir: Path) -> None:
         fig.savefig(output_dir / "leaderboard_latency.png", dpi=160)
         plt.close(fig)
 
+    for category in ("typed", "hand-written"):
+        category_rows = [row for row in track_rows if row["category"] == category and row["cer"] is not None]
+        if not category_rows:
+            continue
+        category_rows.sort(key=lambda row: row["cer"], reverse=True)
+        fig, ax = plt.subplots(figsize=(10, max(3.5, len(category_rows) * 0.55)))
+        ax.barh([row["model_id"] for row in category_rows], [row["cer"] for row in category_rows], color="#2f6f9f")
+        ax.set(title=f"{category.title()} benchmark leaderboard", xlabel="Mean page CER (lower is better)", xlim=(0, max(1.0, max(row["cer"] for row in category_rows) * 1.12)))
+        ax.grid(axis="x", alpha=0.25)
+        fig.tight_layout()
+        fig.savefig(output_dir / f"leaderboard_{category.replace('-', '_')}.png", dpi=160)
+        plt.close(fig)
+
     if len(valid) >= 2 and timed:
         fig, ax = plt.subplots(figsize=(7, 5))
         for row in valid:
@@ -152,35 +186,6 @@ def write_charts(rows: list[dict[str, Any]], output_dir: Path) -> None:
         fig.savefig(output_dir / "leaderboard_accuracy_latency.png", dpi=160)
         plt.close(fig)
 
-    track_rows = [row for row in rows if row["typed_cer"] is not None or row["handwritten_cer"] is not None]
-    if track_rows:
-        labels = [row["model_id"] for row in track_rows]
-        positions = list(range(len(labels)))
-        width = 0.36
-        fig, ax = plt.subplots(figsize=(10, max(4, len(labels) * 0.7)))
-        typed = [row["typed_cer"] or 0 for row in track_rows]
-        handwritten = [row["handwritten_cer"] or 0 for row in track_rows]
-        ax.bar([p - width / 2 for p in positions], typed, width, label="Typed", color="#2f6f9f")
-        ax.bar([p + width / 2 for p in positions], handwritten, width, label="Hand-written", color="#c58a32")
-        ax.set(title="Benchmark CER by writing type", ylabel="Macro page CER (lower is better)", xticks=positions, xticklabels=labels)
-        ax.legend(frameon=False)
-        ax.grid(axis="y", alpha=0.25)
-        fig.tight_layout()
-        fig.savefig(output_dir / "leaderboard_typed_vs_handwritten_cer.png", dpi=160)
-        plt.close(fig)
-
-        fig, ax = plt.subplots(figsize=(10, max(4, len(labels) * 0.7)))
-        typed = [row["typed_wer"] or 0 for row in track_rows]
-        handwritten = [row["handwritten_wer"] or 0 for row in track_rows]
-        ax.bar([p - width / 2 for p in positions], typed, width, label="Typed", color="#2f6f9f")
-        ax.bar([p + width / 2 for p in positions], handwritten, width, label="Hand-written", color="#c58a32")
-        ax.set(title="Benchmark WER by writing type", ylabel="Mean WER (lower is better)", xticks=positions, xticklabels=labels)
-        ax.legend(frameon=False)
-        ax.grid(axis="y", alpha=0.25)
-        fig.tight_layout()
-        fig.savefig(output_dir / "leaderboard_typed_vs_handwritten_wer.png", dpi=160)
-        plt.close(fig)
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -188,8 +193,9 @@ def main() -> int:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
     rows = collect(args.input)
-    write_artifacts(rows, args.output)
-    write_charts(rows, args.output)
+    track_rows = collect_track_rows(args.input)
+    write_artifacts(rows, track_rows, args.output)
+    write_charts(rows, track_rows, args.output)
     print(f"Loaded {len(rows)} benchmark(s) from {args.input}")
     print(f"Artifacts: {args.output}")
     print("\nRank  Model                              CER       WER       sec/image  OK/total")
@@ -198,6 +204,9 @@ def main() -> int:
         wer = "-" if row["wer"] is None else f"{row['wer']:.4f}"
         seconds = "-" if row["mean_seconds"] is None else f"{row['mean_seconds']:.2f}"
         print(f"{row['rank']:>4}  {row['model_id'][:34]:<34} {cer:>8} {wer:>8} {seconds:>10}  {row['n_ok']}/{row['n_images']}")
+    print("\nBy input type")
+    for row in track_rows:
+        print(f"  {row['category']:<12} {row['model_id'][:30]:<30} CER={row['cer']:.4f}  n={row['n_images']}")
     return 0
 
 
