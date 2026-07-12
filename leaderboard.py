@@ -40,6 +40,17 @@ def load_row(path: Path) -> dict[str, Any]:
     config = summary.get("config", {})
     operations = summary.get("operations", {})
     primary_ops = operations.get("primary_configuration", operations)
+    track_breakdowns = summary.get("track_breakdowns") or summary.get("track_breakdowns_primary_config") or {}
+
+    def track_metric(track_names: tuple[str, ...], *names: str) -> float | None:
+        for track_name in track_names:
+            track = track_breakdowns.get(track_name, {})
+            for name in names:
+                value = number(track.get(name))
+                if value is not None:
+                    return value
+        return None
+
     model_id = model.get("id") or path.stem
     return {
         "rank": None,
@@ -64,6 +75,10 @@ def load_row(path: Path) -> dict[str, Any]:
         ),
         "source": str(path),
         "config": config.get("variant") or config.get("primary_lang"),
+        "typed_cer": track_metric(("printed_smoke", "printed_degraded", "social_media_graphics"), "macro_page_CER_canonical"),
+        "handwritten_cer": track_metric(("handwriting_smoke",), "macro_page_CER_canonical"),
+        "typed_wer": track_metric(("printed_smoke", "printed_degraded", "social_media_graphics"), "mean_WER_canonical"),
+        "handwritten_wer": track_metric(("handwriting_smoke",), "mean_WER_canonical"),
     }
 
 
@@ -91,6 +106,11 @@ def write_artifacts(rows: list[dict[str, Any]], output_dir: Path) -> None:
         json.dumps({"schema": "persian_ocr_leaderboard_v1", "rows": rows}, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    track_fields = ["rank", "model_id", "artifact", "typed_cer", "typed_wer", "handwritten_cer", "handwritten_wer"]
+    with (output_dir / "leaderboard_by_track.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=track_fields)
+        writer.writeheader()
+        writer.writerows({field: row.get(field) for field in track_fields} for row in rows)
 
 
 def write_charts(rows: list[dict[str, Any]], output_dir: Path) -> None:
@@ -130,6 +150,35 @@ def write_charts(rows: list[dict[str, Any]], output_dir: Path) -> None:
         ax.grid(alpha=0.25)
         fig.tight_layout()
         fig.savefig(output_dir / "leaderboard_accuracy_latency.png", dpi=160)
+        plt.close(fig)
+
+    track_rows = [row for row in rows if row["typed_cer"] is not None or row["handwritten_cer"] is not None]
+    if track_rows:
+        labels = [row["model_id"] for row in track_rows]
+        positions = list(range(len(labels)))
+        width = 0.36
+        fig, ax = plt.subplots(figsize=(10, max(4, len(labels) * 0.7)))
+        typed = [row["typed_cer"] or 0 for row in track_rows]
+        handwritten = [row["handwritten_cer"] or 0 for row in track_rows]
+        ax.bar([p - width / 2 for p in positions], typed, width, label="Typed", color="#2f6f9f")
+        ax.bar([p + width / 2 for p in positions], handwritten, width, label="Hand-written", color="#c58a32")
+        ax.set(title="Benchmark CER by writing type", ylabel="Macro page CER (lower is better)", xticks=positions, xticklabels=labels)
+        ax.legend(frameon=False)
+        ax.grid(axis="y", alpha=0.25)
+        fig.tight_layout()
+        fig.savefig(output_dir / "leaderboard_typed_vs_handwritten_cer.png", dpi=160)
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(10, max(4, len(labels) * 0.7)))
+        typed = [row["typed_wer"] or 0 for row in track_rows]
+        handwritten = [row["handwritten_wer"] or 0 for row in track_rows]
+        ax.bar([p - width / 2 for p in positions], typed, width, label="Typed", color="#2f6f9f")
+        ax.bar([p + width / 2 for p in positions], handwritten, width, label="Hand-written", color="#c58a32")
+        ax.set(title="Benchmark WER by writing type", ylabel="Mean WER (lower is better)", xticks=positions, xticklabels=labels)
+        ax.legend(frameon=False)
+        ax.grid(axis="y", alpha=0.25)
+        fig.tight_layout()
+        fig.savefig(output_dir / "leaderboard_typed_vs_handwritten_wer.png", dpi=160)
         plt.close(fig)
 
 
