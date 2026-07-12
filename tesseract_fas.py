@@ -163,11 +163,24 @@ def _safe_mean(values) -> Optional[float]:
 # ---------- tesseract utilities ----------
 
 def require_tesseract_binary() -> str:
+    configured = os.environ.get("TESSERACT_CMD", "").strip()
+    if configured:
+        configured_path = Path(configured).expanduser()
+        if not configured_path.is_file():
+            sys.exit(f"ERROR: TESSERACT_CMD does not exist: {configured_path}")
+        return str(configured_path.resolve())
+
     tcmd = shutil.which("tesseract")
     if not tcmd and os.name == "nt":
+        roots = [
+            os.environ.get("ProgramFiles"),
+            os.environ.get("ProgramFiles(x86)"),
+            os.environ.get("LOCALAPPDATA"),
+        ]
         candidates = [
-            Path(os.environ.get("ProgramFiles", "")) / "Tesseract-OCR" / "tesseract.exe",
-            Path(os.environ.get("ProgramFiles(x86)", "")) / "Tesseract-OCR" / "tesseract.exe",
+            Path(root) / "Tesseract-OCR" / "tesseract.exe"
+            for root in roots
+            if root
         ]
         tcmd = next((str(path) for path in candidates if path.is_file()), None)
     if not tcmd:
@@ -179,6 +192,13 @@ def require_tesseract_binary() -> str:
             "  Linux:   sudo apt install tesseract-ocr"
         )
     return tcmd
+
+
+def configure_pytesseract(binary: str) -> None:
+    """Point the Python wrapper at the exact executable found by preflight."""
+    require_pytesseract()
+    assert pytesseract is not None
+    pytesseract.pytesseract.tesseract_cmd = binary
 
 
 def require_pytesseract() -> None:
@@ -248,7 +268,6 @@ def tesseract_version(binary: str) -> str:
 
 def cmd_pull(args) -> int:
     binary = require_tesseract_binary()
-    require_pytesseract()
 
     base = TESSDATA_FAST_BASE if args.variant == "fast" else TESSDATA_BASE
     targets = ["fas.traineddata"]
@@ -292,10 +311,10 @@ class ImageResult:
     oem: int
     psm: int
     seconds: float
-    cer_raw: float
-    wer_raw: float
-    cer_norm: float
-    wer_norm: float
+    cer_raw: Optional[float]
+    wer_raw: Optional[float]
+    cer_norm: Optional[float]
+    wer_norm: Optional[float]
     exact_line_accuracy: Optional[float]
     yeh_acc: Optional[float]
     kaf_acc: Optional[float]
@@ -308,21 +327,27 @@ def load_ground_truth(md_path: Path) -> str:
 
 
 def run_tesseract(
-    image_path: Path, lang: str, oem: int, psm: int
+    image_path: Path, lang: str, oem: int, psm: int, timeout: float
 ) -> tuple[str, float, Optional[str]]:
     if pytesseract is None or Image is None:
         return "", 0.0, "pytesseract not available"
     try:
-        img = Image.open(image_path)
+        with Image.open(image_path) as source:
+            img = source.convert("RGB")
     except Exception as e:  # noqa: BLE001
         return "", 0.0, f"image open failed: {e}"
     t0 = time.perf_counter()
     try:
         text = pytesseract.image_to_string(
-            img, lang=lang, config=f"--oem {oem} --psm {psm}"
+            img,
+            lang=lang,
+            config=f"--oem {oem} --psm {psm}",
+            timeout=timeout,
         )
     except pytesseract.TesseractError as e:
         return "", time.perf_counter() - t0, f"tesseract error: {e}"
+    except RuntimeError as e:
+        return "", time.perf_counter() - t0, f"tesseract timeout: {e}"
     except Exception as e:  # noqa: BLE001
         return "", time.perf_counter() - t0, f"inference failed: {e}"
     return text, time.perf_counter() - t0, None
@@ -331,19 +356,35 @@ def run_tesseract(
 def cmd_small_bench(args) -> int:
     require_pytesseract()
     binary = require_tesseract_binary()
+    configure_pytesseract(binary)
 
     if not SMALL_BENCH.exists():
         sys.exit(f"ERROR: small_bench directory not found at {SMALL_BENCH}")
 
     langs = [s.strip() for s in args.langs.split(",") if s.strip()]
-    psms = [int(s) for s in args.psm.split(",")]
+    try:
+        psms = [int(s.strip()) for s in args.psm.split(",") if s.strip()]
+    except ValueError:
+        sys.exit("ERROR: --psm must be a comma-separated list of integers.")
+    if not langs:
+        sys.exit("ERROR: --langs must contain at least one language.")
+    if not psms or any(psm < 0 or psm > 13 for psm in psms):
+        sys.exit("ERROR: --psm values must be integers from 0 through 13.")
+    if args.timeout <= 0:
+        sys.exit("ERROR: --timeout must be greater than zero.")
+    if args.limit is not None and args.limit <= 0:
+        sys.exit("ERROR: --limit must be greater than zero.")
     oem = args.oem
 
     # Collect all unique lang codes and make sure traineddata exists
     ensure_tessdata(langs)
 
     print(f"tesseract:           {tesseract_version(binary)}")
-    print(f"Configuration:       langs={langs}  oem={oem}  psms={psms}")
+    print(f"Executable:          {binary}")
+    print(
+        f"Configuration:       langs={langs}  oem={oem}  psms={psms}  "
+        f"timeout={args.timeout}s"
+    )
     print(f"Small bench:         {SMALL_BENCH}")
     print(f"Results output:      {RESULTS_PATH}")
     print()
@@ -359,60 +400,95 @@ def cmd_small_bench(args) -> int:
     n_ok = 0
     n_err = 0
 
-    for sub in subdirs:
-        for img_path in sorted(sub.glob("*.jpg")):
-            md_path = img_path.with_suffix(".md")
-            if not md_path.exists():
-                print(f"[skip] {sub.name}/{img_path.name}: no .md ground truth")
-                continue
-            ref_raw = load_ground_truth(md_path)
-            ref_norm = normalize_fa(ref_raw)
-            ref_lines = [ln for ln in ref_raw.splitlines() if ln.strip()]
-            for lang in langs:
-                for psm in psms:
-                    hyp_raw, secs, err = run_tesseract(img_path, lang, oem, psm)
-                    hyp_norm = normalize_fa(hyp_raw)
-                    hyp_lines = [ln for ln in hyp_raw.splitlines() if ln.strip()]
-                    ela = (
-                        sum(1 for r, h in zip(ref_lines, hyp_lines) if r == h)
-                        / len(ref_lines)
-                        if ref_lines
-                        else None
+    image_paths = [
+        (sub, img_path)
+        for sub in subdirs
+        for img_path in sorted(
+            sub.glob("*.jpg"),
+            key=lambda path: (
+                0 if path.stem.isdigit() else 1,
+                int(path.stem) if path.stem.isdigit() else path.stem.casefold(),
+            ),
+        )
+    ]
+    if args.limit is not None:
+        image_paths = image_paths[:args.limit]
+    if not image_paths:
+        sys.exit("ERROR: no JPG benchmark images matched the selected inputs.")
+
+    for sub, img_path in image_paths:
+        md_path = img_path.with_suffix(".md")
+        if not md_path.exists():
+            print(f"[skip] {sub.name}/{img_path.name}: no .md ground truth")
+            continue
+        ref_raw = load_ground_truth(md_path)
+        ref_norm = normalize_fa(ref_raw)
+        ref_lines = [ln for ln in ref_raw.splitlines() if ln.strip()]
+        for lang in langs:
+            for psm in psms:
+                hyp_raw, secs, err = run_tesseract(
+                    img_path, lang, oem, psm, args.timeout
+                )
+                hyp_norm = normalize_fa(hyp_raw)
+                hyp_lines = [ln for ln in hyp_raw.splitlines() if ln.strip()]
+                ela = (
+                    sum(1 for r, h in zip(ref_lines, hyp_lines) if r == h)
+                    / len(ref_lines)
+                    if ref_lines
+                    else None
+                )
+                res = ImageResult(
+                    subdir=sub.name,
+                    image=img_path.name,
+                    lang=lang,
+                    oem=oem,
+                    psm=psm,
+                    seconds=round(secs, 4),
+                    cer_raw=None if err else round(cer(ref_raw, hyp_raw), 4),
+                    wer_raw=None if err else round(wer(ref_raw, hyp_raw), 4),
+                    cer_norm=None if err else round(cer(ref_norm, hyp_norm), 4),
+                    wer_norm=None if err else round(wer(ref_norm, hyp_norm), 4),
+                    exact_line_accuracy=(
+                        None if err or ela is None else round(ela, 4)
+                    ),
+                    yeh_acc=None if err else yeh_accuracy_raw(hyp_raw),
+                    kaf_acc=None if err else kaf_accuracy_raw(hyp_raw),
+                    zwnj_acc=None if err else zwnj_accuracy(ref_raw, hyp_raw),
+                    error=err,
+                )
+                results.append(res)
+                if err:
+                    n_err += 1
+                else:
+                    n_ok += 1
+                tag = "OK " if not err else "ERR"
+                if err:
+                    print(
+                        f"  [{tag}] {sub.name}/{img_path.name}  "
+                        f"lang={lang:<8} psm={psm}  t={secs:.2f}s\n"
+                        f"        {err}"
                     )
-                    res = ImageResult(
-                        subdir=sub.name,
-                        image=img_path.name,
-                        lang=lang,
-                        oem=oem,
-                        psm=psm,
-                        seconds=round(secs, 4),
-                        cer_raw=round(cer(ref_raw, hyp_raw), 4),
-                        wer_raw=round(wer(ref_raw, hyp_raw), 4),
-                        cer_norm=round(cer(ref_norm, hyp_norm), 4),
-                        wer_norm=round(wer(ref_norm, hyp_norm), 4),
-                        exact_line_accuracy=round(ela, 4) if ela is not None else None,
-                        yeh_acc=None if err else yeh_accuracy_raw(hyp_raw),
-                        kaf_acc=None if err else kaf_accuracy_raw(hyp_raw),
-                        zwnj_acc=None if err else zwnj_accuracy(ref_raw, hyp_raw),
-                        error=err,
-                    )
-                    results.append(res)
-                    if err:
-                        n_err += 1
-                    else:
-                        n_ok += 1
-                    tag = "OK " if not err else "ERR"
+                else:
                     print(
                         f"  [{tag}] {sub.name}/{img_path.name}  "
                         f"lang={lang:<8} psm={psm}  "
-                        f"CER_raw={res.cer_raw:.3f} CER_norm={res.cer_norm:.3f}  "
-                        f"t={secs:.2f}s"
+                        f"CER_raw={res.cer_raw:.3f} "
+                        f"CER_norm={res.cer_norm:.3f}  t={secs:.2f}s"
                     )
 
     ok = [r for r in results if not r.error]
     mean_secs = statistics.mean([r.seconds for r in ok]) if ok else 0.0
     summary = {
-        "config": {"langs": langs, "oem": oem, "psms": psms},
+        "config": {
+            "langs": langs,
+            "oem": oem,
+            "psms": psms,
+            "timeout_seconds": args.timeout,
+            "limit": args.limit,
+            "tesseract_executable": binary,
+            "tesseract_version": tesseract_version(binary),
+            "tessdata_dir": str(TESSDATA_DIR),
+        },
         "n_images": len({(r.subdir, r.image) for r in results}),
         "n_runs": len(results),
         "n_ok": n_ok,
@@ -473,6 +549,9 @@ def cmd_small_bench(args) -> int:
                 f"  {r.subdir}/{r.image}  lang={r.lang} psm={r.psm}  "
                 f"CER_norm={r.cer_norm:.3f}  WER_norm={r.wer_norm:.3f}"
             )
+    if results and not ok:
+        print("\nERROR: every OCR run failed; inspect the errors above.", file=sys.stderr)
+        return 2
     return 0
 
 
@@ -528,6 +607,14 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--show-failures", action="store_true",
         help="Print the worst-scoring runs after benchmarking.",
+    )
+    p.add_argument(
+        "--timeout", type=float, default=60.0,
+        help="Maximum seconds allowed for each OCR run.",
+    )
+    p.add_argument(
+        "--limit", type=int, default=None,
+        help="Benchmark only the first N images (useful for smoke runs).",
     )
     return p
 
