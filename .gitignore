@@ -11,4 +11,3 @@ wheels/
 .env
 models
 tessdata
-bench_runs
