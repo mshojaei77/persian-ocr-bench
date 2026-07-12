@@ -22,6 +22,7 @@ from collections import Counter
 import json
 import os
 import platform
+import random
 import re
 import shutil
 import statistics
@@ -36,6 +37,7 @@ from pathlib import Path
 from typing import Optional
 
 import regex
+from rapidfuzz.distance import Levenshtein
 
 try:
     import pytesseract
@@ -66,6 +68,7 @@ ARABIC_KAF = "ك"    # U+0643
 ZWNJ = "‌"           # U+200C (zero-width non-joiner)
 ARABIC_DIGITS = "٠١٢٣٤٥٦٧٨٩"
 PERSIAN_DIGITS = "۰۱۲۳۴۵۶۷۸۹"
+ASCII_DIGITS = "0123456789"
 
 
 # ---------- text utilities ----------
@@ -111,6 +114,15 @@ def graphemes(text: str) -> list[str]:
     return regex.findall(r"\X", text or "")
 
 
+def diagnostic_units(text: str) -> list[str]:
+    """Base code points plus standalone ZWNJ for orthographic diagnostics."""
+    text = unicodedata.normalize("NFC", text or "")
+    return [
+        ch for ch in text
+        if ch == ZWNJ or not unicodedata.category(ch).startswith("M")
+    ]
+
+
 def normalize_fa(text: str, policy: str = "canonical") -> str:
     """Apply an explicit scoring policy; preserve ZWNJ in all policies."""
     text = unicodedata.normalize("NFC", text or "")
@@ -128,30 +140,15 @@ def normalize_fa(text: str, policy: str = "canonical") -> str:
 
 
 def normalize_digits_optional(text: str) -> str:
-    """Optional Arabic-digit -> Persian-digit normalization."""
-    return "".join(
-        PERSIAN_DIGITS[ARABIC_DIGITS.index(ch)] if ch in ARABIC_DIGITS else ch
-        for ch in (text or "")
+    """Canonicalize Arabic-Indic, Persian and ASCII digits to ASCII."""
+    return (text or "").translate(
+        str.maketrans(ARABIC_DIGITS + PERSIAN_DIGITS, ASCII_DIGITS + ASCII_DIGITS)
     )
 
 
 def edit_distance(a, b) -> int:
-    """Levenshtein distance over any sequence (chars or words)."""
-    n, m = len(a), len(b)
-    if n == 0:
-        return m
-    if m == 0:
-        return n
-    prev = list(range(m + 1))
-    curr = [0] * (m + 1)
-    for i in range(1, n + 1):
-        curr[0] = i
-        ai = a[i - 1]
-        for j in range(1, m + 1):
-            cost = 0 if ai == b[j - 1] else 1
-            curr[j] = min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost)
-        prev, curr = curr, prev
-    return prev[m]
+    """Levenshtein distance over strings or arbitrary hashable sequences."""
+    return int(Levenshtein.distance(a, b))
 
 
 def cer(ref: str, hyp: str, *, unit: str = "grapheme") -> float:
@@ -170,39 +167,32 @@ def wer(ref: str, hyp: str) -> float:
     return edit_distance(rw, hw) / len(rw)
 
 
-def _aligned_units(ref: str, hyp: str) -> list[tuple[Optional[str], Optional[str]]]:
-    a, b = graphemes(ref), graphemes(hyp)
-    rows, cols = len(a) + 1, len(b) + 1
-    distance = [[0] * cols for _ in range(rows)]
-    for i in range(rows):
-        distance[i][0] = i
-    for j in range(cols):
-        distance[0][j] = j
-    for i in range(1, rows):
-        for j in range(1, cols):
-            distance[i][j] = min(
-                distance[i - 1][j] + 1,
-                distance[i][j - 1] + 1,
-                distance[i - 1][j - 1] + (a[i - 1] != b[j - 1]),
-            )
+def _aligned_units(
+    ref: str,
+    hyp: str,
+    unit_fn=graphemes,
+) -> list[tuple[Optional[str], Optional[str]]]:
+    a, b = unit_fn(ref), unit_fn(hyp)
     aligned: list[tuple[Optional[str], Optional[str]]] = []
-    i, j = len(a), len(b)
-    while i or j:
-        if i and j and distance[i][j] == distance[i - 1][j - 1] + (a[i - 1] != b[j - 1]):
-            aligned.append((a[i - 1], b[j - 1]))
-            i, j = i - 1, j - 1
-        elif i and distance[i][j] == distance[i - 1][j] + 1:
-            aligned.append((a[i - 1], None))
-            i -= 1
+    for tag, i1, i2, j1, j2 in Levenshtein.opcodes(a, b):
+        if tag == "equal" or tag == "replace":
+            width = max(i2 - i1, j2 - j1)
+            aligned.extend(
+                zip(
+                    a[i1:i2] + [None] * (width - (i2 - i1)),
+                    b[j1:j2] + [None] * (width - (j2 - j1)),
+                )
+            )
+        elif tag == "delete":
+            aligned.extend((item, None) for item in a[i1:i2])
         else:
-            aligned.append((None, b[j - 1]))
-            j -= 1
-    return list(reversed(aligned))
+            aligned.extend((None, item) for item in b[j1:j2])
+    return aligned
 
 
 def orthographic_diagnostics(ref: str, hyp: str) -> dict[str, Optional[float] | int]:
     """Reference-grounded Yeh/Kaf substitution, deletion and insertion rates."""
-    aligned = _aligned_units(ref, hyp)
+    aligned = _aligned_units(ref, hyp, diagnostic_units)
     out: dict[str, Optional[float] | int] = {}
     for name, target, alternate in (
         ("yeh", PERSIAN_YEH, ARABIC_YEH),
@@ -239,15 +229,44 @@ def _safe_mean(values) -> Optional[float]:
     return round(statistics.mean(vs), 4) if vs else None
 
 
-def summarize_records(records: list[ImageResult]) -> dict[str, Optional[float] | int]:
+def edit_statistics(ref: str, hyp: str) -> dict[str, int]:
+    aligned = _aligned_units(ref, hyp, graphemes)
+    substitutions = sum(1 for r, h in aligned if r is not None and h is not None and r != h)
+    deletions = sum(1 for r, h in aligned if r is not None and h is None)
+    insertions = sum(1 for r, h in aligned if r is None and h is not None)
+    return {
+        "ref_graphemes": sum(1 for r, _ in aligned if r is not None),
+        "hyp_graphemes": sum(1 for _, h in aligned if h is not None),
+        "insertions": insertions,
+        "deletions": deletions,
+        "substitutions": substitutions,
+        "edit_distance": insertions + deletions + substitutions,
+    }
+
+
+def bootstrap_ci(values: list[float], *, seed: int = 20260712) -> Optional[list[float]]:
+    if len(values) < 2:
+        return None
+    rng = random.Random(seed)
+    samples = [
+        statistics.mean(rng.choices(values, k=len(values)))
+        for _ in range(2000)
+    ]
+    samples.sort()
+    return [round(samples[40], 4), round(samples[1959], 4)]
+
+
+def summarize_records(records: list[ImageResult]) -> dict[str, object]:
     successful = [r for r in records if not r.error]
     values = [r.cer_grapheme_canonical for r in successful]
+    edit_distance_total = sum(r.canonical_edit_distance or 0 for r in successful)
+    ref_total = sum(r.canonical_ref_graphemes or 0 for r in successful)
     return {
         "n_runs": len(records),
         "n_ok": len(successful),
         "n_err": len(records) - len(successful),
-        "mean_grapheme_CER_canonical": _safe_mean(values),
-        "median_grapheme_CER_canonical": (
+        "macro_page_CER_canonical": _safe_mean(values),
+        "median_page_CER_canonical": (
             round(statistics.median([v for v in values if v is not None]), 4)
             if values and any(v is not None for v in values)
             else None
@@ -258,6 +277,10 @@ def summarize_records(records: list[ImageResult]) -> dict[str, Optional[float] |
         "mean_WER_canonical": _safe_mean(
             [r.wer_canonical for r in successful]
         ),
+        "micro_corpus_CER_canonical": (
+            round(edit_distance_total / ref_total, 4) if ref_total else None
+        ),
+        "page_bootstrap_95ci": bootstrap_ci([v for v in values if v is not None]),
     }
 
 
@@ -411,6 +434,7 @@ class ImageResult:
     image: str
     reference_source: str
     reference_quality: str
+    page_metadata: dict[str, object]
     lang: str
     oem: int
     psm: int
@@ -422,11 +446,17 @@ class ImageResult:
     cer_grapheme_canonical: Optional[float]
     cer_grapheme_search: Optional[float]
     wer_canonical: Optional[float]
+    canonical_ref_graphemes: Optional[int]
+    canonical_hyp_graphemes: Optional[int]
+    canonical_insertions: Optional[int]
+    canonical_deletions: Optional[int]
+    canonical_substitutions: Optional[int]
+    canonical_edit_distance: Optional[int]
     diagnostics: dict[str, Optional[float] | int]
     error: Optional[str] = None
 
 
-def load_ground_truth(md_path: Path) -> tuple[str, str, str]:
+def load_ground_truth(md_path: Path) -> tuple[str, str, str, dict[str, object]]:
     """Load reviewed JSON text when available, otherwise legacy Markdown.
 
     Sidecar schema: ``{"text": "...", "quality": "reviewed"}``.
@@ -441,13 +471,19 @@ def load_ground_truth(md_path: Path) -> tuple[str, str, str]:
             quality = payload.get("quality", "reviewed")
             if not isinstance(text, str):
                 raise ValueError("text must be a string")
-            return text, str(sidecar), str(quality)
+            metadata = {
+                key: value
+                for key, value in payload.items()
+                if key not in {"text", "quality"}
+            }
+            return text, str(sidecar), str(quality), metadata
         except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
             sys.exit(f"ERROR: invalid reference sidecar {sidecar}: {exc}")
     return (
         strip_markdown(md_path.read_text(encoding="utf-8")),
         str(md_path),
         "unreviewed_markdown",
+        {},
     )
 
 
@@ -547,13 +583,32 @@ def cmd_small_bench(args) -> int:
         image_paths = image_paths[:args.limit]
     if not image_paths:
         sys.exit("ERROR: no JPG benchmark images matched the selected inputs.")
+    if args.require_reviewed:
+        invalid_references = []
+        for _, img_path in image_paths:
+            sidecar = img_path.with_suffix(".reference.json")
+            if not sidecar.exists():
+                invalid_references.append(f"{sidecar} (missing)")
+                continue
+            try:
+                payload = json.loads(sidecar.read_text(encoding="utf-8"))
+                if payload.get("quality") not in {"reviewed", "double_reviewed"}:
+                    invalid_references.append(f"{sidecar} (quality is not reviewed)")
+            except (OSError, json.JSONDecodeError, AttributeError):
+                invalid_references.append(f"{sidecar} (invalid JSON)")
+        if invalid_references:
+            sys.exit(
+                "ERROR: reviewed reference sidecars are required; missing "
+                f"or invalid {len(invalid_references)} file(s), "
+                f"first: {invalid_references[0]}"
+            )
 
     for sub, img_path in image_paths:
         md_path = img_path.with_suffix(".md")
         if not md_path.exists():
             print(f"[skip] {sub.name}/{img_path.name}: no .md ground truth")
             continue
-        ref_raw, reference_source, reference_quality = load_ground_truth(md_path)
+        ref_raw, reference_source, reference_quality, page_metadata = load_ground_truth(md_path)
         ref_strict = normalize_fa(ref_raw, "strict")
         ref_canonical = normalize_fa(ref_raw, "canonical")
         ref_search = normalize_fa(ref_raw, "search")
@@ -568,12 +623,14 @@ def cmd_small_bench(args) -> int:
                 diagnostics = (
                     {} if err else orthographic_diagnostics(ref_canonical, hyp_canonical)
                 )
+                edits = {} if err else edit_statistics(ref_canonical, hyp_canonical)
                 res = ImageResult(
                     subdir=sub.name,
-                    track=track_for_subdir(sub.name),
+                    track=str(page_metadata.get("track", track_for_subdir(sub.name))),
                     image=img_path.name,
                     reference_source=reference_source,
                     reference_quality=reference_quality,
+                    page_metadata=page_metadata,
                     lang=lang,
                     oem=oem,
                     psm=psm,
@@ -595,6 +652,12 @@ def cmd_small_bench(args) -> int:
                     wer_canonical=(
                         None if err else round(wer(ref_canonical, hyp_canonical), 4)
                     ),
+                    canonical_ref_graphemes=edits.get("ref_graphemes"),
+                    canonical_hyp_graphemes=edits.get("hyp_graphemes"),
+                    canonical_insertions=edits.get("insertions"),
+                    canonical_deletions=edits.get("deletions"),
+                    canonical_substitutions=edits.get("substitutions"),
+                    canonical_edit_distance=edits.get("edit_distance"),
                     diagnostics=diagnostics,
                     error=err,
                 )
@@ -660,6 +723,7 @@ def cmd_small_bench(args) -> int:
             "tessdata_dir": str(TESSDATA_DIR),
             "primary_lang": primary_lang,
             "primary_psm": primary_psm,
+            "require_reviewed": args.require_reviewed,
         },
         "n_images": len({(r.subdir, r.image) for r in results}),
         "n_runs": len(results),
@@ -791,6 +855,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--limit", type=int, default=None,
         help="Benchmark only the first N images (useful for smoke runs).",
+    )
+    p.add_argument(
+        "--require-reviewed", action="store_true",
+        help="Fail unless every selected image has a .reference.json sidecar.",
     )
     return p
 
