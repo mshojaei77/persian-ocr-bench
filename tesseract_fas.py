@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+import hashlib
+from importlib.metadata import PackageNotFoundError, version as package_version
 import json
 import os
 import platform
@@ -38,6 +40,7 @@ from typing import Optional
 
 import regex
 from rapidfuzz.distance import Levenshtein
+from tesseract_preprocess import PROFILES, preprocess_image
 
 try:
     import pytesseract
@@ -50,13 +53,16 @@ except ImportError:  # validated by require_pytesseract before use
 # ---------- paths ----------
 
 REPO_ROOT = Path(__file__).resolve().parent
-TESSDATA_DIR = REPO_ROOT / "tessdata"
+TESSDATA_ROOT = REPO_ROOT / "tessdata"
 SMALL_BENCH = REPO_ROOT / "small_bench"
 RESULTS_DIR = REPO_ROOT / "bench_runs"
 RESULTS_PATH = RESULTS_DIR / "tesseract_fas.json"
 
-TESSDATA_BASE = "https://github.com/tesseract-ocr/tessdata_best/raw/main"
-TESSDATA_FAST_BASE = "https://github.com/tesseract-ocr/tessdata_fast/raw/main"
+TESSDATA_URLS = {
+    "best": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_best/main",
+    "fast": "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/main",
+}
+IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
 
 
 # ---------- Persian / Arabic constants ----------
@@ -123,9 +129,15 @@ def diagnostic_units(text: str) -> list[str]:
     ]
 
 
+def normalize_transport(text: str) -> str:
+    text = (text or "").replace("\r\n", "\n").replace("\r", "\n")
+    text = text.replace("\f", "")
+    return unicodedata.normalize("NFC", text).strip()
+
+
 def normalize_fa(text: str, policy: str = "canonical") -> str:
     """Apply an explicit scoring policy; preserve ZWNJ in all policies."""
-    text = unicodedata.normalize("NFC", text or "")
+    text = normalize_transport(text)
     if policy == "strict":
         return text
     if policy not in {"canonical", "search"}:
@@ -224,6 +236,35 @@ def orthographic_diagnostics(ref: str, hyp: str) -> dict[str, Optional[float] | 
     return out
 
 
+def unicode_variant_diagnostics(ref: str, hyp: str) -> dict[str, Optional[float] | int]:
+    aligned = _aligned_units(ref, hyp, diagnostic_units)
+    output_yeh = [h for _, h in aligned if h in {PERSIAN_YEH, ARABIC_YEH}]
+    output_kaf = [h for _, h in aligned if h in {PERSIAN_KAF, ARABIC_KAF}]
+    return {
+        "output_yeh_count": len(output_yeh),
+        "persian_yeh_fraction": (
+            output_yeh.count(PERSIAN_YEH) / len(output_yeh) if output_yeh else None
+        ),
+        "output_kaf_count": len(output_kaf),
+        "persian_kaf_fraction": (
+            output_kaf.count(PERSIAN_KAF) / len(output_kaf) if output_kaf else None
+        ),
+    }
+
+
+def punctuation_diagnostics(ref: str, hyp: str) -> dict[str, dict[str, int]]:
+    aligned = _aligned_units(ref, hyp, diagnostic_units)
+    return {
+        mark: {
+            "ref": sum(r == mark for r, _ in aligned),
+            "correct": sum(r == mark and h == mark for r, h in aligned),
+            "missed": sum(r == mark and h != mark for r, h in aligned),
+            "inserted": sum(r != mark and h == mark for r, h in aligned),
+        }
+        for mark in ("،", "؛", "؟", "«", "»", "(", ")")
+    }
+
+
 def _safe_mean(values) -> Optional[float]:
     vs = [v for v in values if v is not None]
     return round(statistics.mean(vs), 4) if vs else None
@@ -244,16 +285,25 @@ def edit_statistics(ref: str, hyp: str) -> dict[str, int]:
     }
 
 
-def bootstrap_ci(values: list[float], *, seed: int = 20260712) -> Optional[list[float]]:
+def percentile(values: list[float], probability: float) -> float:
+    return values[round((len(values) - 1) * probability)]
+
+
+def bootstrap_ci(
+    values: list[float], *, iterations: int = 10_000, seed: int = 20260712
+) -> Optional[list[float]]:
     if len(values) < 2:
         return None
     rng = random.Random(seed)
     samples = [
         statistics.mean(rng.choices(values, k=len(values)))
-        for _ in range(2000)
+        for _ in range(iterations)
     ]
     samples.sort()
-    return [round(samples[40], 4), round(samples[1959], 4)]
+    return [
+        round(percentile(samples, 0.025), 4),
+        round(percentile(samples, 0.975), 4),
+    ]
 
 
 def summarize_records(records: list[ImageResult]) -> dict[str, object]:
@@ -282,6 +332,32 @@ def summarize_records(records: list[ImageResult]) -> dict[str, object]:
         ),
         "page_bootstrap_95ci": bootstrap_ci([v for v in values if v is not None]),
     }
+
+
+def metadata_breakdowns(records: list[ImageResult]) -> dict[str, dict[str, object]]:
+    breakdowns: dict[str, dict[str, object]] = {}
+    for key in (
+        "font",
+        "font_size",
+        "background",
+        "capture",
+        "layout",
+        "degradations",
+        "mixed_language",
+        "handwriting_support",
+    ):
+        values: dict[str, list[ImageResult]] = {}
+        for record in records:
+            raw = record.page_metadata.get(key)
+            items = raw if isinstance(raw, list) else [raw]
+            for item in items:
+                if item is not None:
+                    values.setdefault(str(item), []).append(record)
+        if values:
+            breakdowns[key] = {
+                value: summarize_records(group) for value, group in sorted(values.items())
+            }
+    return breakdowns
 
 
 # ---------- tesseract utilities ----------
@@ -351,27 +427,34 @@ def download(url: str, dest: Path) -> None:
     print(f"  -> {dest} ({len(data) / 1024:.1f} KB)")
 
 
-def ensure_tessdata(lang_codes: list[str]) -> None:
+def tessdata_dir_for(variant: str) -> Path:
+    return TESSDATA_ROOT / variant
+
+
+def ensure_tessdata(lang_codes: list[str], variant: str) -> dict[str, Path]:
     """Make sure required .traineddata files exist locally; auto-pull if not."""
-    TESSDATA_DIR.mkdir(parents=True, exist_ok=True)
-    # pytesseract respects TESSDATA_PREFIX (note trailing separator)
-    os.environ["TESSDATA_PREFIX"] = str(TESSDATA_DIR) + os.sep
-    needed: set[str] = set()
+    tessdata_dir = tessdata_dir_for(variant)
+    tessdata_dir.mkdir(parents=True, exist_ok=True)
+    os.environ["TESSDATA_PREFIX"] = str(tessdata_dir) + os.sep
+    files: dict[str, Path] = {}
     for lang in lang_codes:
         for code in lang.split("+"):
             code = code.strip()
-            if code and not (TESSDATA_DIR / f"{code}.traineddata").exists():
-                needed.add(f"{code}.traineddata")
-    for name in sorted(needed):
-        download(f"{TESSDATA_BASE}/{name}", TESSDATA_DIR / name)
+            if not code:
+                continue
+            destination = tessdata_dir / f"{code}.traineddata"
+            if not destination.exists():
+                download(f"{TESSDATA_URLS[variant]}/{destination.name}", destination)
+            files[code] = destination
+    return files
 
 
-def verify_langs(binary: str, langs: list[str]) -> dict[str, bool]:
+def verify_langs(binary: str, langs: list[str], tessdata_dir: Path) -> dict[str, bool]:
     try:
         out = subprocess.run(
             [binary, "--list-langs"],
             capture_output=True, text=True, check=True,
-            env={**os.environ, "TESSDATA_PREFIX": str(TESSDATA_DIR) + os.sep},
+            env={**os.environ, "TESSDATA_PREFIX": str(tessdata_dir) + os.sep},
         ).stdout
     except subprocess.CalledProcessError:
         return {lang: False for lang in langs}
@@ -379,13 +462,32 @@ def verify_langs(binary: str, langs: list[str]) -> dict[str, bool]:
     return {lang: lang in available for lang in langs}
 
 
-def tesseract_version(binary: str) -> str:
+def tesseract_version(binary: str, *, full: bool = False) -> str:
     try:
-        return subprocess.run(
+        output = subprocess.run(
             [binary, "--version"], capture_output=True, text=True, check=True
-        ).stdout.splitlines()[0]
+        ).stdout.strip()
+        return output if full else output.splitlines()[0]
     except subprocess.CalledProcessError:
         return "(unknown)"
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as file:
+        for block in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def installed_versions(names: list[str]) -> dict[str, Optional[str]]:
+    versions: dict[str, Optional[str]] = {}
+    for name in names:
+        try:
+            versions[name] = package_version(name)
+        except PackageNotFoundError:
+            versions[name] = None
+    return versions
 
 
 # ---------- cmd: --pull ----------
@@ -393,18 +495,19 @@ def tesseract_version(binary: str) -> str:
 def cmd_pull(args) -> int:
     binary = require_tesseract_binary()
 
-    base = TESSDATA_FAST_BASE if args.variant == "fast" else TESSDATA_BASE
+    tessdata_dir = tessdata_dir_for(args.variant)
+    base = TESSDATA_URLS[args.variant]
     targets = ["fas.traineddata"]
     if args.with_eng:
         targets.append("eng.traineddata")
 
-    print(f"Project tessdata dir: {TESSDATA_DIR}")
+    print(f"Project tessdata dir: {tessdata_dir}")
     print(f"Variant:              {args.variant}")
     print(f"Targets:              {', '.join(targets)}")
     print()
 
     for name in targets:
-        dest = TESSDATA_DIR / name
+        dest = tessdata_dir / name
         url = f"{base}/{name}"
         if dest.exists() and not args.force:
             print(f"  already present: {dest}")
@@ -415,7 +518,7 @@ def cmd_pull(args) -> int:
     print(f"tesseract version: {tesseract_version(binary)}")
     print("Verifying languages:")
     wanted = ["fas"] + (["eng"] if args.with_eng else [])
-    for lang, ok in verify_langs(binary, wanted).items():
+    for lang, ok in verify_langs(binary, wanted, tessdata_dir).items():
         print(f"  {lang:>4}: {'OK' if ok else 'MISSING'}")
 
     print(
@@ -438,7 +541,11 @@ class ImageResult:
     lang: str
     oem: int
     psm: int
+    preprocess: str
+    tesseract_config: str
     seconds: float
+    image_sha256: str
+    reference_sha256: str
     text_raw: str
     text_canonical: str
     cer_codepoint_strict: Optional[float]
@@ -453,24 +560,29 @@ class ImageResult:
     canonical_substitutions: Optional[int]
     canonical_edit_distance: Optional[int]
     diagnostics: dict[str, Optional[float] | int]
+    unicode_form_diagnostics: dict[str, Optional[float] | int]
+    punctuation_diagnostics: dict[str, dict[str, int]]
+    tsv_diagnostics: Optional[dict[str, object]]
+    failure_image_path: Optional[str]
     error: Optional[str] = None
 
 
-def load_ground_truth(md_path: Path) -> tuple[str, str, str, dict[str, object]]:
+def load_ground_truth(image_path: Path) -> tuple[str, str, str, dict[str, object]]:
     """Load reviewed JSON text when available, otherwise legacy Markdown.
 
     Sidecar schema: ``{"text": "...", "quality": "reviewed"}``.
     ``ignore`` regions are reserved for a future layout track and are not
     silently treated as recognition text.
     """
-    sidecar = md_path.with_suffix(".reference.json")
+    sidecar = image_path.with_suffix(".reference.json")
+    legacy_md = image_path.with_suffix(".md")
     if sidecar.exists():
         try:
             payload = json.loads(sidecar.read_text(encoding="utf-8"))
             text = payload["text"]
             quality = payload.get("quality", "reviewed")
-            if not isinstance(text, str):
-                raise ValueError("text must be a string")
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError("text must be a non-empty string")
             metadata = {
                 key: value
                 for key, value in payload.items()
@@ -479,12 +591,14 @@ def load_ground_truth(md_path: Path) -> tuple[str, str, str, dict[str, object]]:
             return text, str(sidecar), str(quality), metadata
         except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
             sys.exit(f"ERROR: invalid reference sidecar {sidecar}: {exc}")
-    return (
-        strip_markdown(md_path.read_text(encoding="utf-8")),
-        str(md_path),
-        "unreviewed_markdown",
-        {},
-    )
+    if legacy_md.exists():
+        return (
+            strip_markdown(legacy_md.read_text(encoding="utf-8")),
+            str(legacy_md),
+            "unreviewed_markdown",
+            {},
+        )
+    raise FileNotFoundError(f"No reference for {image_path}")
 
 
 def track_for_subdir(subdir: str) -> str:
@@ -494,16 +608,42 @@ def track_for_subdir(subdir: str) -> str:
     }.get(subdir, "unclassified")
 
 
+def load_manifest(path: Path) -> list[tuple[Path, dict[str, object]]]:
+    entries: list[tuple[Path, dict[str, object]]] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            payload = json.loads(line)
+            image = Path(payload.pop("image"))
+            if not image.is_absolute():
+                image = REPO_ROOT / image
+            if not image.is_file():
+                raise ValueError(f"image does not exist: {image}")
+            entries.append((image, payload))
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+            sys.exit(f"ERROR: invalid manifest {path}:{line_number}: {exc}")
+    if not entries:
+        sys.exit(f"ERROR: manifest contains no images: {path}")
+    return entries
+
+
 def run_tesseract(
-    image_path: Path, lang: str, oem: int, psm: int, timeout: float
-) -> tuple[str, float, Optional[str]]:
+    image_path: Path,
+    lang: str,
+    oem: int,
+    psm: int,
+    timeout: float,
+    preprocess_name: str,
+    save_tsv: bool,
+) -> tuple[str, Optional[dict[str, object]], float, Optional[str]]:
     if pytesseract is None or Image is None:
-        return "", 0.0, "pytesseract not available"
+        return "", None, 0.0, "pytesseract not available"
     try:
         with Image.open(image_path) as source:
-            img = source.convert("RGB")
+            img = preprocess_image(source, PROFILES[preprocess_name])
     except Exception as e:  # noqa: BLE001
-        return "", 0.0, f"image open failed: {e}"
+        return "", None, 0.0, f"image/preprocessing failed: {e}"
     t0 = time.perf_counter()
     try:
         text = pytesseract.image_to_string(
@@ -512,13 +652,42 @@ def run_tesseract(
             config=f"--oem {oem} --psm {psm}",
             timeout=timeout,
         )
+        tsv_diagnostics = None
+        if save_tsv:
+            data = pytesseract.image_to_data(
+                img,
+                lang=lang,
+                config=f"--oem {oem} --psm {psm}",
+                timeout=timeout,
+                output_type=pytesseract.Output.DICT,
+            )
+            confidences = [
+                float(conf)
+                for conf, token in zip(data["conf"], data["text"])
+                if str(token).strip() and float(conf) >= 0
+            ]
+            tsv_diagnostics = {
+                "mean_word_confidence": (
+                    round(statistics.mean(confidences), 4) if confidences else None
+                ),
+                "recognized_words": len(confidences),
+                "detected_blocks": len(
+                    {
+                        block
+                        for block, token in zip(data["block_num"], data["text"])
+                        if str(token).strip()
+                    }
+                ),
+                "tsv": data,
+                "extra_tesseract_pass": True,
+            }
     except pytesseract.TesseractError as e:
-        return "", time.perf_counter() - t0, f"tesseract error: {e}"
+        return "", None, time.perf_counter() - t0, f"tesseract error: {e}"
     except RuntimeError as e:
-        return "", time.perf_counter() - t0, f"tesseract timeout: {e}"
+        return "", None, time.perf_counter() - t0, f"tesseract timeout: {e}"
     except Exception as e:  # noqa: BLE001
-        return "", time.perf_counter() - t0, f"inference failed: {e}"
-    return text, time.perf_counter() - t0, None
+        return "", None, time.perf_counter() - t0, f"inference failed: {e}"
+    return text, tsv_diagnostics, time.perf_counter() - t0, None
 
 
 def cmd_small_bench(args) -> int:
@@ -542,10 +711,23 @@ def cmd_small_bench(args) -> int:
         sys.exit("ERROR: --timeout must be greater than zero.")
     if args.limit is not None and args.limit <= 0:
         sys.exit("ERROR: --limit must be greater than zero.")
+    if args.failure_cer_threshold < 0:
+        sys.exit("ERROR: --failure-cer-threshold must be non-negative.")
     oem = args.oem
+    if oem != 1:
+        sys.exit("ERROR: tessdata_best and tessdata_fast require --oem 1.")
+    results_path = Path(args.output)
+    if not results_path.is_absolute():
+        results_path = REPO_ROOT / results_path
 
     # Collect all unique lang codes and make sure traineddata exists
-    ensure_tessdata(langs)
+    traineddata_files = ensure_tessdata(langs, args.variant)
+    tessdata_dir = tessdata_dir_for(args.variant)
+    language_codes = sorted(traineddata_files)
+    availability = verify_langs(binary, language_codes, tessdata_dir)
+    missing_languages = [code for code, available in availability.items() if not available]
+    if missing_languages:
+        sys.exit(f"ERROR: Tesseract could not load languages: {missing_languages}")
 
     print(f"tesseract:           {tesseract_version(binary)}")
     print(f"Executable:          {binary}")
@@ -554,38 +736,46 @@ def cmd_small_bench(args) -> int:
         f"timeout={args.timeout}s"
     )
     print(f"Small bench:         {SMALL_BENCH}")
-    print(f"Results output:      {RESULTS_PATH}")
+    print(f"Traineddata variant: {args.variant}")
+    print(f"Preprocessing:       {args.preprocess}")
+    print(f"Results output:      {results_path}")
     print()
-
-    subdirs = sorted(d for d in SMALL_BENCH.iterdir() if d.is_dir())
-    if args.subdir:
-        wanted = set(args.subdir)
-        subdirs = [d for d in subdirs if d.name in wanted]
-        if not subdirs:
-            sys.exit(f"ERROR: no matching subdirs in {SMALL_BENCH}")
 
     results: list[ImageResult] = []
     n_ok = 0
     n_err = 0
 
-    image_paths = [
-        (sub, img_path)
-        for sub in subdirs
-        for img_path in sorted(
-            sub.glob("*.jpg"),
-            key=lambda path: (
-                0 if path.stem.isdigit() else 1,
-                int(path.stem) if path.stem.isdigit() else path.stem.casefold(),
-            ),
-        )
-    ]
+    manifest_path = Path(args.manifest)
+    if not manifest_path.is_absolute():
+        manifest_path = REPO_ROOT / manifest_path
+    if manifest_path.exists():
+        image_paths = [
+            (image.parent, image, metadata)
+            for image, metadata in load_manifest(manifest_path)
+        ]
+    else:
+        subdirs = sorted(d for d in SMALL_BENCH.iterdir() if d.is_dir())
+        image_paths = [
+            (sub, img_path, {})
+            for sub in subdirs
+            for img_path in sorted(
+                (path for path in sub.iterdir() if path.suffix.lower() in IMAGE_EXTENSIONS),
+                key=lambda path: (
+                    0 if path.stem.isdigit() else 1,
+                    int(path.stem) if path.stem.isdigit() else path.stem.casefold(),
+                ),
+            )
+        ]
+    if args.subdir:
+        wanted = set(args.subdir)
+        image_paths = [item for item in image_paths if item[0].name in wanted]
     if args.limit is not None:
         image_paths = image_paths[:args.limit]
     if not image_paths:
-        sys.exit("ERROR: no JPG benchmark images matched the selected inputs.")
+        sys.exit("ERROR: no benchmark images matched the selected inputs.")
     if args.require_reviewed:
         invalid_references = []
-        for _, img_path in image_paths:
+        for _, img_path, _ in image_paths:
             sidecar = img_path.with_suffix(".reference.json")
             if not sidecar.exists():
                 invalid_references.append(f"{sidecar} (missing)")
@@ -603,19 +793,25 @@ def cmd_small_bench(args) -> int:
                 f"first: {invalid_references[0]}"
             )
 
-    for sub, img_path in image_paths:
-        md_path = img_path.with_suffix(".md")
-        if not md_path.exists():
-            print(f"[skip] {sub.name}/{img_path.name}: no .md ground truth")
-            continue
-        ref_raw, reference_source, reference_quality, page_metadata = load_ground_truth(md_path)
+    for sub, img_path, manifest_metadata in image_paths:
+        try:
+            ref_raw, reference_source, reference_quality, page_metadata = load_ground_truth(img_path)
+            page_metadata = {**manifest_metadata, **page_metadata}
+        except FileNotFoundError as exc:
+            sys.exit(f"ERROR: {exc}")
         ref_strict = normalize_fa(ref_raw, "strict")
         ref_canonical = normalize_fa(ref_raw, "canonical")
         ref_search = normalize_fa(ref_raw, "search")
         for lang in langs:
             for psm in psms:
-                hyp_raw, secs, err = run_tesseract(
-                    img_path, lang, oem, psm, args.timeout
+                hyp_raw, tsv_diagnostics, secs, err = run_tesseract(
+                    img_path,
+                    lang,
+                    oem,
+                    psm,
+                    args.timeout,
+                    args.preprocess,
+                    args.save_tsv,
                 )
                 hyp_strict = normalize_fa(hyp_raw, "strict")
                 hyp_canonical = normalize_fa(hyp_raw, "canonical")
@@ -623,7 +819,20 @@ def cmd_small_bench(args) -> int:
                 diagnostics = (
                     {} if err else orthographic_diagnostics(ref_canonical, hyp_canonical)
                 )
+                unicode_diagnostics = (
+                    {}
+                    if err
+                    else unicode_variant_diagnostics(
+                        normalize_transport(ref_raw), normalize_transport(hyp_raw)
+                    )
+                )
+                punctuation = (
+                    {}
+                    if err
+                    else punctuation_diagnostics(ref_canonical, hyp_canonical)
+                )
                 edits = {} if err else edit_statistics(ref_canonical, hyp_canonical)
+                config_string = f"--oem {oem} --psm {psm}"
                 res = ImageResult(
                     subdir=sub.name,
                     track=str(page_metadata.get("track", track_for_subdir(sub.name))),
@@ -634,7 +843,11 @@ def cmd_small_bench(args) -> int:
                     lang=lang,
                     oem=oem,
                     psm=psm,
+                    preprocess=args.preprocess,
+                    tesseract_config=config_string,
                     seconds=round(secs, 4),
+                    image_sha256=sha256_file(img_path),
+                    reference_sha256=sha256_file(Path(reference_source)),
                     text_raw=hyp_raw,
                     text_canonical=hyp_canonical,
                     cer_codepoint_strict=(
@@ -659,8 +872,30 @@ def cmd_small_bench(args) -> int:
                     canonical_substitutions=edits.get("substitutions"),
                     canonical_edit_distance=edits.get("edit_distance"),
                     diagnostics=diagnostics,
+                    unicode_form_diagnostics=unicode_diagnostics,
+                    punctuation_diagnostics=punctuation,
+                    tsv_diagnostics=tsv_diagnostics,
+                    failure_image_path=None,
                     error=err,
                 )
+                if args.save_failure_images and (
+                    err
+                    or (
+                        res.cer_grapheme_canonical is not None
+                        and res.cer_grapheme_canonical >= args.failure_cer_threshold
+                    )
+                ):
+                    failure_dir = results_path.parent / "failure_images"
+                    failure_dir.mkdir(parents=True, exist_ok=True)
+                    failure_path = failure_dir / (
+                        f"{sub.name}_{img_path.stem}_{lang.replace('+', '-')}_"
+                        f"psm{psm}_{args.preprocess}.png"
+                    )
+                    with Image.open(img_path) as source:
+                        preprocess_image(source, PROFILES[args.preprocess]).save(
+                            failure_path
+                        )
+                    res.failure_image_path = str(failure_path)
                 results.append(res)
                 if err:
                     n_err += 1
@@ -682,12 +917,14 @@ def cmd_small_bench(args) -> int:
                     )
 
     ok = [r for r in results if not r.error]
-    mean_secs = statistics.mean([r.seconds for r in ok]) if ok else 0.0
     primary_lang = langs[0]
     primary_psm = psms[0]
     primary = [
         r for r in results if r.lang == primary_lang and r.psm == primary_psm
     ]
+    primary_ok = [r for r in primary if not r.error]
+    primary_seconds = sorted(r.seconds for r in primary_ok)
+    all_seconds = sorted(r.seconds for r in ok)
     config_breakdowns = {
         f"{lang}|psm={psm}": summarize_records(
             [r for r in results if r.lang == lang and r.psm == psm]
@@ -718,14 +955,29 @@ def cmd_small_bench(args) -> int:
             "psms": psms,
             "timeout_seconds": args.timeout,
             "limit": args.limit,
+            "manifest": str(manifest_path) if manifest_path.exists() else None,
             "tesseract_executable": binary,
-            "tesseract_version": tesseract_version(binary),
-            "tessdata_dir": str(TESSDATA_DIR),
+            "tesseract_version": tesseract_version(binary, full=True),
+            "variant": args.variant,
+            "tessdata_dir": str(tessdata_dir),
+            "traineddata": {
+                code: {
+                    "path": str(path),
+                    "size_bytes": path.stat().st_size,
+                    "sha256": sha256_file(path),
+                    "variant": args.variant,
+                }
+                for code, path in sorted(traineddata_files.items())
+            },
             "primary_lang": primary_lang,
             "primary_psm": primary_psm,
+            "preprocess": PROFILES[args.preprocess].to_dict(),
+            "tesseract_config": f"--oem {oem} --psm {primary_psm}",
+            "save_tsv": args.save_tsv,
             "require_reviewed": args.require_reviewed,
         },
         "n_images": len({(r.subdir, r.image) for r in results}),
+        "n_skipped": 0,
         "n_runs": len(results),
         "n_ok": n_ok,
         "n_err": n_err,
@@ -733,8 +985,10 @@ def cmd_small_bench(args) -> int:
         "primary_results": summarize_records(primary),
         "config_breakdowns": config_breakdowns,
         "track_breakdowns_primary_config": track_breakdowns,
+        "metadata_breakdowns_primary_config": metadata_breakdowns(primary),
         "metrics_policy": {
-            "strict": "NFC only; grapheme CER and codepoint CER are both reported",
+            "transport": "line-ending/form-feed cleanup, NFC and outer trim",
+            "strict": "transport cleanup only; grapheme and codepoint CER reported",
             "canonical": "NFC plus explicit Persian yeh/kaf and bidi-control removal",
             "search": "canonical plus digit canonicalization, tatweel removal and whitespace collapse",
             "line_accuracy": "removed; visual line segmentation is not annotated",
@@ -743,10 +997,21 @@ def cmd_small_bench(args) -> int:
             "platform": platform.platform(),
             "python": platform.python_version(),
             "cpu_count": os.cpu_count(),
+            "packages": installed_versions(
+                ["Pillow", "pytesseract", "rapidfuzz", "regex", "numpy", "opencv-python-headless"]
+            ),
         },
         "operations": {
-            "mean_seconds_per_page": round(mean_secs, 4) if ok else None,
-            "pages_per_second": round(1.0 / mean_secs, 4) if mean_secs else None,
+            "all_configurations": {
+                "mean_seconds_per_run": round(statistics.mean(all_seconds), 4) if all_seconds else None,
+                "median_seconds_per_run": round(statistics.median(all_seconds), 4) if all_seconds else None,
+                "p95_seconds_per_run": round(percentile(all_seconds, 0.95), 4) if all_seconds else None,
+            },
+            "primary_configuration": {
+                "mean_seconds_per_run": round(statistics.mean(primary_seconds), 4) if primary_seconds else None,
+                "median_seconds_per_run": round(statistics.median(primary_seconds), 4) if primary_seconds else None,
+                "p95_seconds_per_run": round(percentile(primary_seconds, 0.95), 4) if primary_seconds else None,
+            },
             "peak_VRAM_GB": None,
             "peak_RAM_GB": None,
             "cold_start_seconds": None,
@@ -765,8 +1030,8 @@ def cmd_small_bench(args) -> int:
         else:
             print(f"  {section:>30}: {payload}")
 
-    RESULTS_DIR.mkdir(exist_ok=True)
-    RESULTS_PATH.write_text(
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    results_path.write_text(
         json.dumps(
             {"summary": summary, "results": [asdict(r) for r in results]},
             ensure_ascii=False,
@@ -774,7 +1039,7 @@ def cmd_small_bench(args) -> int:
         ),
         encoding="utf-8",
     )
-    print(f"\nResults saved to: {RESULTS_PATH}")
+    print(f"\nResults saved to: {results_path}")
 
     if args.show_failures and ok:
         worst = sorted(
@@ -845,8 +1110,32 @@ def build_parser() -> argparse.ArgumentParser:
         help="Restrict benchmark to specific small_bench subdirectories.",
     )
     p.add_argument(
+        "--manifest", default="small_bench/manifest.jsonl",
+        help="Authoritative JSONL image list; falls back to folder discovery if absent.",
+    )
+    p.add_argument(
         "--show-failures", action="store_true",
         help="Print worst primary-configuration runs after benchmarking.",
+    )
+    p.add_argument(
+        "--preprocess", choices=sorted(PROFILES), default="raw",
+        help="Named preprocessing profile; each profile is a separate configuration.",
+    )
+    p.add_argument(
+        "--save-tsv", action="store_true",
+        help="Store word confidence/geometry TSV diagnostics (runs Tesseract twice).",
+    )
+    p.add_argument(
+        "--save-failure-images", action="store_true",
+        help="Save the exact preprocessed input for OCR errors/high-CER runs.",
+    )
+    p.add_argument(
+        "--failure-cer-threshold", type=float, default=0.5,
+        help="Canonical CER threshold used by --save-failure-images.",
+    )
+    p.add_argument(
+        "--output", default=str(RESULTS_PATH.relative_to(REPO_ROOT)),
+        help="JSON output path, relative to the repository root by default.",
     )
     p.add_argument(
         "--timeout", type=float, default=60.0,
