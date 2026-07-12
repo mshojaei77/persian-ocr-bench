@@ -1,0 +1,41 @@
+{
+  "schema": "persian_ocr_leaderboard_v1",
+  "rows": [
+    {
+      "rank": 1,
+      "model_id": "tesseract_fas",
+      "artifact": "tesseract_fas.json",
+      "schema": "persian_ocr_benchmark_v1",
+      "benchmark": "persian_ocr_smoke20",
+      "scope": "OCR benchmark; leaderboard-comparable",
+      "n_images": 20,
+      "n_ok": 20,
+      "n_err": 0,
+      "cer": 0.5126,
+      "wer": 0.7434,
+      "micro_cer": 0.4483,
+      "mean_seconds": 0.7761,
+      "median_seconds": 0.571,
+      "source": "C:\\my_projects\\05_train_models_datasets\\persian-ocr\\bench_runs\\tesseract_fas.json",
+      "config": "best"
+    },
+    {
+      "rank": 2,
+      "model_id": "ppocrv5_arabic_mobile_rec",
+      "artifact": "ppocrv5_arabic_mobile_rec.json",
+      "schema": "persian_ocr_benchmark_v1",
+      "benchmark": "persian_ocr_smoke20",
+      "scope": "full-page detector+recognizer benchmark; leaderboard-comparable",
+      "n_images": 20,
+      "n_ok": 20,
+      "n_err": 0,
+      "cer": 0.5655,
+      "wer": 0.8152,
+      "micro_cer": 0.5494,
+      "mean_seconds": 8.9027,
+      "median_seconds": 6.3982,
+      "source": "C:\\my_projects\\05_train_models_datasets\\persian-ocr\\bench_runs\\ppocrv5_arabic_mobile_rec.json",
+      "config": null
+    }
+  ]
+}
