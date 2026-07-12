@@ -18,8 +18,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 import os
+import platform
 import re
 import shutil
 import statistics
@@ -32,6 +34,8 @@ import urllib.request
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Optional
+
+import regex
 
 try:
     import pytesseract
@@ -70,24 +74,57 @@ _MD_HEADING = re.compile(r"^#+\s*", flags=re.MULTILINE)
 _MD_BOLD = re.compile(r"\*\*([^*]+)\*\*")
 _MD_ITALIC_STAR = re.compile(r"(?<!\*)\*([^*]+)\*(?!\*)")
 _MD_RULE = re.compile(r"^[-*_]{3,}\s*$", flags=re.MULTILINE)
+_HTML_TAG = re.compile(r"<[^>]+>")
+_TABLE_SEPARATOR = re.compile(
+    r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$"
+)
 
 
 def strip_markdown(text: str) -> str:
-    """Remove markdown markers but preserve Persian text and ZWNJ."""
+    """Remove formatting syntax, not bracketed annotation text.
+
+    Bracketed descriptions are intentionally preserved because code cannot know
+    whether brackets are visible in the source image. Such regions require a
+    human-reviewed annotation sidecar.
+    """
     text = _MD_HEADING.sub("", text)
     text = _MD_BOLD.sub(r"\1", text)
     text = _MD_ITALIC_STAR.sub(r"\1", text)
     text = _MD_RULE.sub("", text)
-    return text.strip()
+    text = text.replace("<br>", "\n").replace("<br/>", "\n")
+    text = _HTML_TAG.sub("", text).replace("`", "")
+    lines = []
+    for line in text.splitlines():
+        if _TABLE_SEPARATOR.match(line):
+            continue
+        if line.count("|") >= 2:
+            line = line.strip().strip("|").replace("|", " ")
+        lines.append(line)
+    return "\n".join(lines).strip()
 
 
-def normalize_fa(text: str) -> str:
-    """Persian normalization per the catalog benchmark_protocol."""
+_BIDI_CONTROLS = re.compile(r"[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]")
+
+
+def graphemes(text: str) -> list[str]:
+    """Return user-perceived Unicode characters, including combining marks."""
+    return regex.findall(r"\X", text or "")
+
+
+def normalize_fa(text: str, policy: str = "canonical") -> str:
+    """Apply an explicit scoring policy; preserve ZWNJ in all policies."""
     text = unicodedata.normalize("NFC", text or "")
+    if policy == "strict":
+        return text
+    if policy not in {"canonical", "search"}:
+        raise ValueError(f"unknown normalization policy: {policy}")
+    text = _BIDI_CONTROLS.sub("", text)
     text = text.replace(ARABIC_YEH, PERSIAN_YEH)
     text = text.replace(ARABIC_KAF, PERSIAN_KAF)
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    if policy == "search":
+        text = normalize_digits_optional(text)
+        text = text.replace("ـ", "")
+    return re.sub(r"\s+", " ", text).strip()
 
 
 def normalize_digits_optional(text: str) -> str:
@@ -117,10 +154,12 @@ def edit_distance(a, b) -> int:
     return prev[m]
 
 
-def cer(ref: str, hyp: str) -> float:
-    if not ref:
-        return 0.0 if not hyp else 1.0
-    return edit_distance(list(ref), list(hyp)) / len(ref)
+def cer(ref: str, hyp: str, *, unit: str = "grapheme") -> float:
+    ref_units = graphemes(ref) if unit == "grapheme" else list(ref)
+    hyp_units = graphemes(hyp) if unit == "grapheme" else list(hyp)
+    if not ref_units:
+        return 0.0 if not hyp_units else 1.0
+    return edit_distance(ref_units, hyp_units) / len(ref_units)
 
 
 def wer(ref: str, hyp: str) -> float:
@@ -131,33 +170,95 @@ def wer(ref: str, hyp: str) -> float:
     return edit_distance(rw, hw) / len(rw)
 
 
-def yeh_accuracy_raw(hyp: str) -> Optional[float]:
-    """Fraction of yeh-like chars in raw hypothesis that are Persian."""
-    yeh_like = [ch for ch in hyp if ch in (PERSIAN_YEH, ARABIC_YEH)]
-    if not yeh_like:
-        return None
-    return sum(1 for ch in yeh_like if ch == PERSIAN_YEH) / len(yeh_like)
+def _aligned_units(ref: str, hyp: str) -> list[tuple[Optional[str], Optional[str]]]:
+    a, b = graphemes(ref), graphemes(hyp)
+    rows, cols = len(a) + 1, len(b) + 1
+    distance = [[0] * cols for _ in range(rows)]
+    for i in range(rows):
+        distance[i][0] = i
+    for j in range(cols):
+        distance[0][j] = j
+    for i in range(1, rows):
+        for j in range(1, cols):
+            distance[i][j] = min(
+                distance[i - 1][j] + 1,
+                distance[i][j - 1] + 1,
+                distance[i - 1][j - 1] + (a[i - 1] != b[j - 1]),
+            )
+    aligned: list[tuple[Optional[str], Optional[str]]] = []
+    i, j = len(a), len(b)
+    while i or j:
+        if i and j and distance[i][j] == distance[i - 1][j - 1] + (a[i - 1] != b[j - 1]):
+            aligned.append((a[i - 1], b[j - 1]))
+            i, j = i - 1, j - 1
+        elif i and distance[i][j] == distance[i - 1][j] + 1:
+            aligned.append((a[i - 1], None))
+            i -= 1
+        else:
+            aligned.append((None, b[j - 1]))
+            j -= 1
+    return list(reversed(aligned))
 
 
-def kaf_accuracy_raw(hyp: str) -> Optional[float]:
-    """Fraction of kaf-like chars in raw hypothesis that are Persian."""
-    kaf_like = [ch for ch in hyp if ch in (PERSIAN_KAF, ARABIC_KAF)]
-    if not kaf_like:
-        return None
-    return sum(1 for ch in kaf_like if ch == PERSIAN_KAF) / len(kaf_like)
-
-
-def zwnj_accuracy(ref: str, hyp: str) -> Optional[float]:
-    """Fraction of ZWNJs in the reference preserved in the hypothesis."""
-    rz = ref.count(ZWNJ)
-    if rz == 0:
-        return None
-    return min(hyp.count(ZWNJ), rz) / rz
+def orthographic_diagnostics(ref: str, hyp: str) -> dict[str, Optional[float] | int]:
+    """Reference-grounded Yeh/Kaf substitution, deletion and insertion rates."""
+    aligned = _aligned_units(ref, hyp)
+    out: dict[str, Optional[float] | int] = {}
+    for name, target, alternate in (
+        ("yeh", PERSIAN_YEH, ARABIC_YEH),
+        ("kaf", PERSIAN_KAF, ARABIC_KAF),
+    ):
+        ref_count = sum(1 for r, _ in aligned if r == target)
+        correct = sum(1 for r, h in aligned if r == target and h == target)
+        substitutions = sum(
+            1 for r, h in aligned if r == target and h not in {target, None}
+        )
+        deletions = sum(1 for r, h in aligned if r == target and h is None)
+        insertions = sum(1 for r, h in aligned if r is None and h in {target, alternate})
+        out[f"{name}_ref_count"] = ref_count
+        out[f"{name}_correct"] = correct
+        out[f"{name}_substitutions"] = substitutions
+        out[f"{name}_deletions"] = deletions
+        out[f"{name}_insertions"] = insertions
+        out[f"{name}_recall"] = correct / ref_count if ref_count else None
+    tp = sum(1 for r, h in aligned if r == ZWNJ and h == ZWNJ)
+    fp = sum(1 for r, h in aligned if r != ZWNJ and h == ZWNJ)
+    fn = sum(1 for r, h in aligned if r == ZWNJ and h != ZWNJ)
+    out.update(
+        zwnj_ref_count=tp + fn,
+        zwnj_pred_count=tp + fp,
+        zwnj_precision=tp / (tp + fp) if tp + fp else None,
+        zwnj_recall=tp / (tp + fn) if tp + fn else None,
+        zwnj_f1=2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else None,
+    )
+    return out
 
 
 def _safe_mean(values) -> Optional[float]:
     vs = [v for v in values if v is not None]
     return round(statistics.mean(vs), 4) if vs else None
+
+
+def summarize_records(records: list[ImageResult]) -> dict[str, Optional[float] | int]:
+    successful = [r for r in records if not r.error]
+    values = [r.cer_grapheme_canonical for r in successful]
+    return {
+        "n_runs": len(records),
+        "n_ok": len(successful),
+        "n_err": len(records) - len(successful),
+        "mean_grapheme_CER_canonical": _safe_mean(values),
+        "median_grapheme_CER_canonical": (
+            round(statistics.median([v for v in values if v is not None]), 4)
+            if values and any(v is not None for v in values)
+            else None
+        ),
+        "mean_grapheme_CER_strict": _safe_mean(
+            [r.cer_grapheme_strict for r in successful]
+        ),
+        "mean_WER_canonical": _safe_mean(
+            [r.wer_canonical for r in successful]
+        ),
+    }
 
 
 # ---------- tesseract utilities ----------
@@ -306,24 +407,55 @@ def cmd_pull(args) -> int:
 @dataclass
 class ImageResult:
     subdir: str
+    track: str
     image: str
+    reference_source: str
+    reference_quality: str
     lang: str
     oem: int
     psm: int
     seconds: float
-    cer_raw: Optional[float]
-    wer_raw: Optional[float]
-    cer_norm: Optional[float]
-    wer_norm: Optional[float]
-    exact_line_accuracy: Optional[float]
-    yeh_acc: Optional[float]
-    kaf_acc: Optional[float]
-    zwnj_acc: Optional[float]
+    text_raw: str
+    text_canonical: str
+    cer_codepoint_strict: Optional[float]
+    cer_grapheme_strict: Optional[float]
+    cer_grapheme_canonical: Optional[float]
+    cer_grapheme_search: Optional[float]
+    wer_canonical: Optional[float]
+    diagnostics: dict[str, Optional[float] | int]
     error: Optional[str] = None
 
 
-def load_ground_truth(md_path: Path) -> str:
-    return strip_markdown(md_path.read_text(encoding="utf-8"))
+def load_ground_truth(md_path: Path) -> tuple[str, str, str]:
+    """Load reviewed JSON text when available, otherwise legacy Markdown.
+
+    Sidecar schema: ``{"text": "...", "quality": "reviewed"}``.
+    ``ignore`` regions are reserved for a future layout track and are not
+    silently treated as recognition text.
+    """
+    sidecar = md_path.with_suffix(".reference.json")
+    if sidecar.exists():
+        try:
+            payload = json.loads(sidecar.read_text(encoding="utf-8"))
+            text = payload["text"]
+            quality = payload.get("quality", "reviewed")
+            if not isinstance(text, str):
+                raise ValueError("text must be a string")
+            return text, str(sidecar), str(quality)
+        except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+            sys.exit(f"ERROR: invalid reference sidecar {sidecar}: {exc}")
+    return (
+        strip_markdown(md_path.read_text(encoding="utf-8")),
+        str(md_path),
+        "unreviewed_markdown",
+    )
+
+
+def track_for_subdir(subdir: str) -> str:
+    return {
+        "typed": "printed_smoke",
+        "hand-written": "handwriting_smoke",
+    }.get(subdir, "unclassified")
 
 
 def run_tesseract(
@@ -421,39 +553,49 @@ def cmd_small_bench(args) -> int:
         if not md_path.exists():
             print(f"[skip] {sub.name}/{img_path.name}: no .md ground truth")
             continue
-        ref_raw = load_ground_truth(md_path)
-        ref_norm = normalize_fa(ref_raw)
-        ref_lines = [ln for ln in ref_raw.splitlines() if ln.strip()]
+        ref_raw, reference_source, reference_quality = load_ground_truth(md_path)
+        ref_strict = normalize_fa(ref_raw, "strict")
+        ref_canonical = normalize_fa(ref_raw, "canonical")
+        ref_search = normalize_fa(ref_raw, "search")
         for lang in langs:
             for psm in psms:
                 hyp_raw, secs, err = run_tesseract(
                     img_path, lang, oem, psm, args.timeout
                 )
-                hyp_norm = normalize_fa(hyp_raw)
-                hyp_lines = [ln for ln in hyp_raw.splitlines() if ln.strip()]
-                ela = (
-                    sum(1 for r, h in zip(ref_lines, hyp_lines) if r == h)
-                    / len(ref_lines)
-                    if ref_lines
-                    else None
+                hyp_strict = normalize_fa(hyp_raw, "strict")
+                hyp_canonical = normalize_fa(hyp_raw, "canonical")
+                hyp_search = normalize_fa(hyp_raw, "search")
+                diagnostics = (
+                    {} if err else orthographic_diagnostics(ref_canonical, hyp_canonical)
                 )
                 res = ImageResult(
                     subdir=sub.name,
+                    track=track_for_subdir(sub.name),
                     image=img_path.name,
+                    reference_source=reference_source,
+                    reference_quality=reference_quality,
                     lang=lang,
                     oem=oem,
                     psm=psm,
                     seconds=round(secs, 4),
-                    cer_raw=None if err else round(cer(ref_raw, hyp_raw), 4),
-                    wer_raw=None if err else round(wer(ref_raw, hyp_raw), 4),
-                    cer_norm=None if err else round(cer(ref_norm, hyp_norm), 4),
-                    wer_norm=None if err else round(wer(ref_norm, hyp_norm), 4),
-                    exact_line_accuracy=(
-                        None if err or ela is None else round(ela, 4)
+                    text_raw=hyp_raw,
+                    text_canonical=hyp_canonical,
+                    cer_codepoint_strict=(
+                        None if err else round(cer(ref_strict, hyp_strict, unit="codepoint"), 4)
                     ),
-                    yeh_acc=None if err else yeh_accuracy_raw(hyp_raw),
-                    kaf_acc=None if err else kaf_accuracy_raw(hyp_raw),
-                    zwnj_acc=None if err else zwnj_accuracy(ref_raw, hyp_raw),
+                    cer_grapheme_strict=(
+                        None if err else round(cer(ref_strict, hyp_strict), 4)
+                    ),
+                    cer_grapheme_canonical=(
+                        None if err else round(cer(ref_canonical, hyp_canonical), 4)
+                    ),
+                    cer_grapheme_search=(
+                        None if err else round(cer(ref_search, hyp_search), 4)
+                    ),
+                    wer_canonical=(
+                        None if err else round(wer(ref_canonical, hyp_canonical), 4)
+                    ),
+                    diagnostics=diagnostics,
                     error=err,
                 )
                 results.append(res)
@@ -472,13 +614,41 @@ def cmd_small_bench(args) -> int:
                     print(
                         f"  [{tag}] {sub.name}/{img_path.name}  "
                         f"lang={lang:<8} psm={psm}  "
-                        f"CER_raw={res.cer_raw:.3f} "
-                        f"CER_norm={res.cer_norm:.3f}  t={secs:.2f}s"
+                        f"CER_canonical={res.cer_grapheme_canonical:.3f} "
+                        f"t={secs:.2f}s"
                     )
 
     ok = [r for r in results if not r.error]
     mean_secs = statistics.mean([r.seconds for r in ok]) if ok else 0.0
+    primary_lang = langs[0]
+    primary_psm = psms[0]
+    primary = [
+        r for r in results if r.lang == primary_lang and r.psm == primary_psm
+    ]
+    config_breakdowns = {
+        f"{lang}|psm={psm}": summarize_records(
+            [r for r in results if r.lang == lang and r.psm == psm]
+        )
+        for lang in langs
+        for psm in psms
+    }
+    track_breakdowns = {
+        track: summarize_records([r for r in primary if r.track == track])
+        for track in sorted({r.track for r in primary})
+    }
     summary = {
+        "benchmark": {
+            "name": "persian_ocr_smoke20",
+            "scope": "smoke and failure diagnosis; not a model leaderboard",
+            "reference_quality_counts": dict(
+                Counter(
+                    dict(
+                        ((r.subdir, r.image), r.reference_quality)
+                        for r in results
+                    ).values()
+                )
+            ),
+        },
         "config": {
             "langs": langs,
             "oem": oem,
@@ -488,33 +658,34 @@ def cmd_small_bench(args) -> int:
             "tesseract_executable": binary,
             "tesseract_version": tesseract_version(binary),
             "tessdata_dir": str(TESSDATA_DIR),
+            "primary_lang": primary_lang,
+            "primary_psm": primary_psm,
         },
         "n_images": len({(r.subdir, r.image) for r in results}),
         "n_runs": len(results),
         "n_ok": n_ok,
         "n_err": n_err,
         "failure_rate": round(n_err / len(results), 4) if results else None,
-        "raw_recognition": {
-            "mean_CER_raw": _safe_mean([r.cer_raw for r in ok]),
-            "mean_WER_raw": _safe_mean([r.wer_raw for r in ok]),
-            "mean_exact_line_accuracy": _safe_mean(
-                [r.exact_line_accuracy for r in ok]
-            ),
+        "primary_results": summarize_records(primary),
+        "config_breakdowns": config_breakdowns,
+        "track_breakdowns_primary_config": track_breakdowns,
+        "metrics_policy": {
+            "strict": "NFC only; grapheme CER and codepoint CER are both reported",
+            "canonical": "NFC plus explicit Persian yeh/kaf and bidi-control removal",
+            "search": "canonical plus digit canonicalization, tatweel removal and whitespace collapse",
+            "line_accuracy": "removed; visual line segmentation is not annotated",
         },
-        "normalized_recognition": {
-            "mean_CER_norm": _safe_mean([r.cer_norm for r in ok]),
-            "mean_WER_norm": _safe_mean([r.wer_norm for r in ok]),
-        },
-        "persian_failure_slices": {
-            "yeh_accuracy_macro": _safe_mean([r.yeh_acc for r in ok]),
-            "kaf_accuracy_macro": _safe_mean([r.kaf_acc for r in ok]),
-            "zwnj_accuracy_macro": _safe_mean([r.zwnj_acc for r in ok]),
+        "system": {
+            "platform": platform.platform(),
+            "python": platform.python_version(),
+            "cpu_count": os.cpu_count(),
         },
         "operations": {
             "mean_seconds_per_page": round(mean_secs, 4) if ok else None,
             "pages_per_second": round(1.0 / mean_secs, 4) if mean_secs else None,
-            "peak_VRAM_GB": 0.0,        # CPU only
-            "cold_start_seconds": None,  # not measured per page
+            "peak_VRAM_GB": None,
+            "peak_RAM_GB": None,
+            "cold_start_seconds": None,
         },
     }
 
@@ -542,12 +713,17 @@ def cmd_small_bench(args) -> int:
     print(f"\nResults saved to: {RESULTS_PATH}")
 
     if args.show_failures and ok:
-        worst = sorted(ok, key=lambda r: r.cer_norm, reverse=True)[:5]
-        print("\nWorst CER_norm runs:")
+        worst = sorted(
+            [r for r in primary if r.cer_grapheme_canonical is not None],
+            key=lambda r: r.cer_grapheme_canonical,
+            reverse=True,
+        )[:5]
+        print("\nWorst primary-configuration runs:")
         for r in worst:
             print(
                 f"  {r.subdir}/{r.image}  lang={r.lang} psm={r.psm}  "
-                f"CER_norm={r.cer_norm:.3f}  WER_norm={r.wer_norm:.3f}"
+                f"CER_canonical={r.cer_grapheme_canonical:.3f}  "
+                f"WER={r.wer_canonical:.3f}"
             )
     if results and not ok:
         print("\nERROR: every OCR run failed; inspect the errors above.", file=sys.stderr)
@@ -589,16 +765,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     p.add_argument(
-        "--langs", default="fas,fas+eng",
-        help="Comma-separated lang strings to test.",
+        "--langs", default="fas",
+        help="Comma-separated lang strings; the first is the primary configuration.",
     )
     p.add_argument(
         "--oem", type=int, default=1,
         help="OCR Engine Mode (1 = LSTM only, recommended).",
     )
     p.add_argument(
-        "--psm", default="3,4,6",
-        help="Comma-separated Page Segmentation Modes.",
+        "--psm", default="6",
+        help="Comma-separated Page Segmentation Modes; the first is primary.",
     )
     p.add_argument(
         "--subdir", nargs="*", default=None,
@@ -606,7 +782,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--show-failures", action="store_true",
-        help="Print the worst-scoring runs after benchmarking.",
+        help="Print worst primary-configuration runs after benchmarking.",
     )
     p.add_argument(
         "--timeout", type=float, default=60.0,
