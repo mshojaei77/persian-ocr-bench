@@ -40,7 +40,7 @@ from typing import Optional
 
 import regex
 from rapidfuzz.distance import Levenshtein
-from tesseract_preprocess import PROFILES, preprocess_image
+from .tesseract_preprocess import PROFILES, preprocess_image
 
 try:
     import pytesseract
@@ -52,7 +52,7 @@ except ImportError:  # validated by require_pytesseract before use
 
 # ---------- paths ----------
 
-REPO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 TESSDATA_ROOT = REPO_ROOT / "tessdata"
 SMALL_BENCH = REPO_ROOT / "small_bench"
 RESULTS_DIR = REPO_ROOT / "bench_runs"

@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "persian-ocr"
 version = "0.1.0"
@@ -13,4 +17,15 @@ dependencies = [
     "pytesseract>=0.3.13",
     "rapidfuzz>=3.14.5",
     "regex>=2026.7.10",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/persian_ocr"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/persian_ocr",
+    "models.yaml",
+    "pyproject.toml",
+    "small_bench",
 ]

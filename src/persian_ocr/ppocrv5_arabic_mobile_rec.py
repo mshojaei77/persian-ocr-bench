@@ -24,7 +24,7 @@ from typing import Optional
 import numpy as np
 from PIL import Image
 
-from tesseract_fas import (
+from .tesseract_fas import (
     IMAGE_EXTENSIONS,
     REPO_ROOT,
     edit_statistics,
@@ -42,7 +42,7 @@ from tesseract_fas import (
     cer,
     wer,
 )
-from tesseract_preprocess import PROFILES, preprocess_image
+from .tesseract_preprocess import PROFILES, preprocess_image
 
 
 MODEL_ID = "ppocrv5_arabic_mobile_rec"
