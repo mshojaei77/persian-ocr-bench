@@ -36,7 +36,7 @@ from typing import Optional
 try:
     import pytesseract
     from PIL import Image
-except ImportError:  # auto-installed by --pull if missing
+except ImportError:  # validated by require_pytesseract before use
     pytesseract = None  # type: ignore[assignment]
     Image = None  # type: ignore[assignment]
 
@@ -182,17 +182,12 @@ def require_tesseract_binary() -> str:
 
 
 def require_pytesseract() -> None:
-    global pytesseract, Image
     if pytesseract is None or Image is None:
-        print("Installing pytesseract + Pillow ...")
-        subprocess.check_call(
-            [sys.executable, "-m", "pip", "install", "pytesseract", "Pillow"],
-            stdout=subprocess.DEVNULL,
+        sys.exit(
+            "ERROR: Python dependencies are not installed.\n"
+            "  Run: uv sync\n"
+            "  Then: uv run python tesseract_fas.py --pull"
         )
-        import pytesseract as _p
-        from PIL import Image as _I
-        pytesseract = _p
-        Image = _I
 
 
 def download(url: str, dest: Path) -> None:
