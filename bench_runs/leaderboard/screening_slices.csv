@@ -1,7 +1,0 @@
-model_id,split,content_type,expected,ok,error,coverage,macro_page_cer_canonical,page_cer_ci95
-easyocr_fa,phase1_screening,handwritten,9,9,0,1.0,0.627311,"[0.561661,0.697664]"
-easyocr_fa,phase1_screening,printed,11,11,0,1.0,0.311126,"[0.214918,0.408362]"
-ppocrv5_arabic_mobile_rec,phase1_screening,handwritten,9,9,0,1.0,0.714062,"[0.572115,0.83755]"
-ppocrv5_arabic_mobile_rec,phase1_screening,printed,11,11,0,1.0,0.424052,"[0.266194,0.601301]"
-tesseract_fas,phase1_screening,handwritten,9,9,0,1.0,0.723626,"[0.634562,0.817014]"
-tesseract_fas,phase1_screening,printed,11,11,0,1.0,0.411845,"[0.22439,0.609231]"
