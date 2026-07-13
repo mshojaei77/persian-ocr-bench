@@ -141,6 +141,15 @@ def run_model(model_id: str, command: list[str]) -> int:
         return process.wait()
 
 
+def capture_provenance() -> None:
+    """Persist commands and environment metadata inside the archivable run root."""
+    subprocess.run(
+        [sys.executable, "scripts/capture_benchmark_provenance.py"],
+        cwd=REPO_ROOT,
+        check=True,
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -226,6 +235,7 @@ def main() -> int:
             failed = True
             if not args.continue_on_error:
                 break
+    capture_provenance()
     return 1 if failed else 0
 
 
