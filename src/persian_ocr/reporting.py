@@ -1234,8 +1234,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
             [
                 "This 20-image phase is a viability screen, not a general Persian OCR ranking.",
                 "",
-                "| Decision | Model | Coverage | Macro CER (95% CI) | P90 CER | Worst-quartile CER | Exact pages | Mean sec/image |",
-                "|---|---|---:|---:|---:|---:|---:|---:|",
+                "| Decision | Model | Coverage | CER | P90 CER | Worst Q CER | WER | Exact pages | Yeh recall | Kaf recall | ZWNJ F1 | Mean sec | P95 sec |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in report["rows"]:
@@ -1255,8 +1255,31 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 else f"{row['mean_seconds_per_image']:.3f}"
             )
             lines.append(
-                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {cer} | {row.get('p90_page_cer_canonical') or '-'} | {row.get('worst_quartile_page_cer_canonical') or '-'} | {row.get('exact_page_rate') or '-'} | {seconds} |"
+                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {cer} | {row.get('p90_page_cer_canonical') or '-'} | {row.get('worst_quartile_page_cer_canonical') or '-'} | {row.get('mean_wer_canonical') or '-'} | {row.get('exact_page_rate') or '-'} | {row.get('yeh_recall') or '-'} | {row.get('kaf_recall') or '-'} | {row.get('zwnj_f1') or '-'} | {seconds} | {row.get('p95_seconds_per_image') or '-'} |"
             )
+        lines.extend(
+            [
+                "",
+                "## Metric glossary",
+                "",
+                "All rows use the same dataset, protocol, scorer, and capability class. Values are not a final ranking until the human-review and large-benchmark gates pass.",
+                "",
+                "| Metric | Meaning | Direction |",
+                "|---|---|---|",
+                "| Coverage | Successful pages divided by expected pages. | Higher is better; complete coverage is required. |",
+                "| CER | Macro page character error rate after canonical Persian normalization. | Lower is better. |",
+                "| P90 CER | 90th-percentile page CER; exposes difficult-page failures. | Lower is better. |",
+                "| Worst Q CER | Mean CER of the worst 25% of successful pages. | Lower is better. |",
+                "| WER | Mean canonical word error rate. | Lower is better. |",
+                "| Exact pages | Fraction of pages with zero canonical CER. | Higher is better. |",
+                "| Yeh recall | Recall of Persian yeh characters in the orthographic slice. | Higher is better. |",
+                "| Kaf recall | Recall of Persian kaf characters in the orthographic slice. | Higher is better. |",
+                "| ZWNJ F1 | F1 score for zero-width non-joiner placement. | Higher is better. |",
+                "| Mean/P95 sec | Average and 95th-percentile end-to-end seconds per page. | Lower is better. |",
+                "",
+                "Interpretation: use CER/WER for general transcription quality, P90 and Worst Q for reliability on hard pages, orthographic metrics for Persian-specific errors, and latency metrics for operational trade-offs. Do not select a winner from one metric alone.",
+            ]
+        )
     else:
         lines.extend(
             [
@@ -1481,7 +1504,6 @@ def write_report(report: Mapping[str, Any], output_dir: Path) -> list[str]:
     _write_csv(output_dir / slice_name, report["slices"])
     (output_dir / md_name).write_text(_markdown(report), encoding="utf-8")
     generated = [json_name, csv_name, slice_name, md_name]
-    generated.extend(_write_charts(report, output_dir))
     if report["mode"] == "screening":
         # Keep the historical filenames usable by dashboards and notebooks while
         # making their contents come from the current v2 screening report.
@@ -1490,17 +1512,6 @@ def write_report(report: Mapping[str, Any], output_dir: Path) -> list[str]:
             "leaderboard.csv": csv_name,
             "leaderboard_by_type.csv": slice_name,
             "leaderboard_by_type.json": json_name,
-            "leaderboard_cer.png": "screening_coverage.png",
-            "leaderboard_hand_written.png": "screening_coverage.png",
-            "leaderboard_latency.png": next(
-                (name for name in generated if name.startswith("screening_quality_latency_")),
-                None,
-            ),
-            "leaderboard_typed.png": "screening_coverage.png",
-            "leaderboard_accuracy_latency.png": next(
-                (name for name in generated if name.startswith("screening_quality_latency_")),
-                None,
-            ),
         }
         for alias, source in aliases.items():
             if source and (output_dir / source).is_file():
