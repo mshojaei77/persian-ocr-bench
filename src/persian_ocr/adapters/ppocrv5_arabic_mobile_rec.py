@@ -180,6 +180,13 @@ def compact_pipeline_result(payload: dict[str, object]) -> dict[str, object]:
 
 
 def create_pipeline(device: str):
+    # On Windows, Paddle's native DLL bootstrap can shadow a Torch dependency
+    # used indirectly by ModelScope/PaddleX. Import Torch first so its DLL
+    # directory is registered before Paddle changes the process search path.
+    try:
+        import torch  # noqa: F401
+    except ImportError:
+        pass
     try:
         from paddleocr import PaddleOCR
     except ImportError as exc:
@@ -205,6 +212,12 @@ def create_pipeline(device: str):
 def prepare_runtime(args: argparse.Namespace) -> tuple[object, dict[str, object], float]:
     identity = ensure_models()
     started = time.perf_counter()
+    # Must happen before resolve_paddle_device() imports Paddle and registers
+    # its Windows DLL directory; ModelScope later imports Torch indirectly.
+    try:
+        import torch  # noqa: F401
+    except ImportError:
+        pass
     resolved_device = resolve_paddle_device(args.device)
     pipeline = create_pipeline(args.device)
     identity["runtime_device"] = resolved_device

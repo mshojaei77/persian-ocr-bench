@@ -2,26 +2,14 @@
   "schema": "persian_ocr_screening_report_v1",
   "mode": "screening",
   "report_identity": {
-    "target_contract": {
-      "schema": "persian_ocr_benchmark_v2",
-      "phase": "phase1_screening",
-      "benchmark_id": "phase1_screening",
-      "protocol_version": "2.1",
-      "protocol_track": "full_page_ocr",
-      "protocol_hash": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72",
-      "dataset_id": "smoke20-v1",
-      "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7"
-    },
-    "run_hashes": [
-      "0137369a0dfa984d49e5df0d5e934f4f05f970c96d60df95476bd08561940516",
-      "e364dec8a161717a8149db4be093be94e6ea58d4ebb7c515096a81432796d9f8"
-    ],
+    "target_contract": null,
+    "run_hashes": [],
     "artifact_hashes": {
-      "bench_runs/smoke20-v1/easyocr_fa.json": "11e3dd729cb5bc06b343a62cf1c48b5210cfdc2c34ea83f18b2c5cef2bba0fbc",
-      "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "1508e69cc052eda17158ea61ea3bdb57f43e24595e41105e42cbab02473c3049",
-      "bench_runs/smoke20-v1/tesseract_fas.json": "c616d3a742d385c5f6f1becca30560a7a2e7e0ea3ff8967b7af7a7509f59d13e"
+      "bench_runs/smoke20-v1/easyocr_fa.json": "5021782797ebbd232b46659b5f397e3144e5db72ad2487547c68f57cc90cf08c",
+      "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "2d007c5c5843b4b9036bdea16cc006d2aa48527228bfab12cb9f02c055ff3a86",
+      "bench_runs/smoke20-v1/tesseract_fas.json": "3c068940c69a47210af798c5b9c45438078d0a1fe9100d0523f0afd7a9c48980"
     },
-    "report_sha256": "977a848bd77ff91863698802d66b0738e84928bfebf99728906753207f58b59c"
+    "report_sha256": "8216c0a2f8ed420de8072a02b80abeefb85c4a238dcd6f5723e69ab718758db8"
   },
   "rows": [
     {
@@ -34,47 +22,57 @@
       "dataset_id": "smoke20-v1",
       "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7",
       "protocol_hash": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72",
-      "run_hash": "0137369a0dfa984d49e5df0d5e934f4f05f970c96d60df95476bd08561940516",
-      "config_hash": "a69a589489edfd416fcd4a89cc9e5c1084c69c905ae9f52d0b427b424bfa91c9",
+      "run_hash": "d4bc637111e43e4814fd3ac17932a40fdecc9df4c636fd3e1a091e3a3e2c1436",
+      "config_hash": "f91c181d312cc3fee765e041b442e2cf4109d54d5ec9f9e6045c024d23530618",
       "environment_hash": "d137b8ccca7400bce28a5ff3593e4b2996ad358c3c21a9f8477f8a62f2965c25",
       "expected": 20,
-      "attempted": 1,
-      "ok": 1,
+      "attempted": 20,
+      "ok": 20,
       "error": 0,
-      "coverage": 0.05,
-      "attempt_coverage": 0.05,
-      "macro_page_cer_canonical": 0.552365,
-      "micro_corpus_cer_canonical": 0.552365,
-      "mean_wer_canonical": 0.946903,
-      "mean_raw_unicode_cer": 0.604341,
-      "mean_raw_unicode_wer": 0.946903,
-      "mean_exact_token_rate": 0.053097,
+      "coverage": 1.0,
+      "attempt_coverage": 1.0,
+      "macro_page_cer_canonical": 0.459823,
+      "micro_corpus_cer_canonical": 0.395503,
+      "mean_wer_canonical": 0.834228,
+      "mean_raw_unicode_cer": 0.49881,
+      "mean_raw_unicode_wer": 0.849863,
+      "mean_exact_token_rate": 0.210113,
       "exact_line_rate": 0.0,
-      "faithfulness_precision": 0.076087,
-      "faithfulness_recall": 0.061947,
-      "faithfulness_f1": 0.068293,
-      "bag_of_words_wer": 1.690265,
+      "faithfulness_precision": 0.249447,
+      "faithfulness_recall": 0.235545,
+      "faithfulness_f1": 0.241238,
+      "bag_of_words_wer": 1.402408,
       "reading_order_gap": 0.0,
-      "page_cer_ci95_low": null,
-      "page_cer_ci95_high": null,
-      "mean_seconds_per_image": 10.304377,
-      "median_seconds_per_image": 10.304377,
+      "page_cer_ci95_low": 0.356301,
+      "page_cer_ci95_high": 0.559848,
+      "mean_seconds_per_image": 11.639032,
+      "median_seconds_per_image": 10.508811,
       "p95_seconds_per_image": null,
-      "p90_page_cer_canonical": 0.552365,
-      "worst_quartile_page_cer_canonical": 0.552365,
+      "p90_page_cer_canonical": 0.707317,
+      "worst_quartile_page_cer_canonical": 0.703858,
       "exact_page_rate": 0.0,
-      "yeh_recall": 0.512195,
-      "kaf_recall": 0.2,
+      "yeh_recall": 0.513506,
+      "kaf_recall": 0.508996,
       "zwnj_f1": 0.0,
-      "decision": "Hold",
+      "decision": "Blocked",
       "decision_reasons": [
-        "incomplete coverage prevents advancement"
+        "artifact validation failed"
       ],
       "validation_issues": [
         {
-          "severity": "warning",
-          "code": "artifact_incomplete",
-          "message": "artifact contains 1/20 expected sample rows"
+          "severity": "error",
+          "code": "result_cer_missing",
+          "message": "successful results[15] requires non-negative canonical CER"
+        },
+        {
+          "severity": "error",
+          "code": "result_cer_missing",
+          "message": "successful results[16] requires non-negative canonical CER"
+        },
+        {
+          "severity": "error",
+          "code": "result_cer_missing",
+          "message": "successful results[18] requires non-negative canonical CER"
         }
       ]
     },
@@ -88,43 +86,59 @@
       "dataset_id": "smoke20-v1",
       "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7",
       "protocol_hash": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72",
-      "run_hash": "e364dec8a161717a8149db4be093be94e6ea58d4ebb7c515096a81432796d9f8",
+      "run_hash": "b577365e8c66e4577224c6b152bfd1ce9157551d0e721654f4b615641cf7c6d2",
       "config_hash": "52a0c1337e6e1b690957c0dbbedf14bf162d71018a40e56f667eb8912deb4c85",
       "environment_hash": "a17e2e505ffa938df8852b6f70e7273d4a8536945c040701c954c75b5de88ed9",
       "expected": 20,
       "attempted": 20,
-      "ok": 0,
-      "error": 20,
-      "coverage": 0.0,
+      "ok": 20,
+      "error": 0,
+      "coverage": 1.0,
       "attempt_coverage": 1.0,
-      "macro_page_cer_canonical": null,
-      "micro_corpus_cer_canonical": null,
-      "mean_wer_canonical": null,
-      "mean_raw_unicode_cer": null,
-      "mean_raw_unicode_wer": null,
-      "mean_exact_token_rate": null,
-      "exact_line_rate": null,
-      "faithfulness_precision": null,
-      "faithfulness_recall": null,
-      "faithfulness_f1": null,
-      "bag_of_words_wer": null,
-      "reading_order_gap": null,
-      "page_cer_ci95_low": null,
-      "page_cer_ci95_high": null,
-      "mean_seconds_per_image": null,
-      "median_seconds_per_image": null,
+      "macro_page_cer_canonical": 0.588812,
+      "micro_corpus_cer_canonical": 0.539183,
+      "mean_wer_canonical": 0.841573,
+      "mean_raw_unicode_cer": 0.618809,
+      "mean_raw_unicode_wer": 0.895786,
+      "mean_exact_token_rate": 0.199127,
+      "exact_line_rate": 0.0,
+      "faithfulness_precision": 0.262274,
+      "faithfulness_recall": 0.211189,
+      "faithfulness_f1": 0.227477,
+      "bag_of_words_wer": 1.160315,
+      "reading_order_gap": 0.0,
+      "page_cer_ci95_low": 0.442249,
+      "page_cer_ci95_high": 0.730579,
+      "mean_seconds_per_image": 11.196988,
+      "median_seconds_per_image": 6.511913,
       "p95_seconds_per_image": null,
-      "p90_page_cer_canonical": null,
-      "worst_quartile_page_cer_canonical": null,
-      "exact_page_rate": null,
-      "yeh_recall": null,
-      "kaf_recall": null,
-      "zwnj_f1": null,
-      "decision": "Reject",
+      "p90_page_cer_canonical": 0.905882,
+      "worst_quartile_page_cer_canonical": 0.894338,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.393237,
+      "kaf_recall": 0.492916,
+      "zwnj_f1": 0.0,
+      "decision": "Blocked",
       "decision_reasons": [
-        "all attempted pages failed"
+        "artifact validation failed"
       ],
-      "validation_issues": []
+      "validation_issues": [
+        {
+          "severity": "error",
+          "code": "result_cer_missing",
+          "message": "successful results[15] requires non-negative canonical CER"
+        },
+        {
+          "severity": "error",
+          "code": "result_cer_missing",
+          "message": "successful results[16] requires non-negative canonical CER"
+        },
+        {
+          "severity": "error",
+          "code": "result_cer_missing",
+          "message": "successful results[18] requires non-negative canonical CER"
+        }
+      ]
     },
     {
       "model_id": "tesseract_fas",
@@ -136,7 +150,7 @@
       "dataset_id": "smoke20-v1",
       "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7",
       "protocol_hash": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72",
-      "run_hash": "072ae7bb81817e78910f30fe462db1a95b06cacc960bd447d3f478705a23112c",
+      "run_hash": "9381692a5ba8cd1e1bf60b3e8a0bcc100a369cfa38c0fb57668774e1fb2c1f55",
       "config_hash": "1cfb4560bff47538c623841cf814925448c026118cd63404e6dc658cd29ac35b",
       "environment_hash": "6b2fabb42ec575567d900e208199ce2cebd8a20f97e95282d64b5afd09884a35",
       "expected": 20,
@@ -159,8 +173,8 @@
       "reading_order_gap": 0.0,
       "page_cer_ci95_low": 0.426225,
       "page_cer_ci95_high": 0.712808,
-      "mean_seconds_per_image": 0.706101,
-      "median_seconds_per_image": 0.453273,
+      "mean_seconds_per_image": 0.693401,
+      "median_seconds_per_image": 0.507205,
       "p95_seconds_per_image": null,
       "p90_page_cer_canonical": 1.0,
       "worst_quartile_page_cer_canonical": 0.898026,
@@ -191,51 +205,17 @@
       ]
     }
   ],
-  "slices": [
-    {
-      "model_id": "easyocr_fa",
-      "split": "phase1_screening",
-      "content_type": "handwritten",
-      "expected": 1,
-      "ok": 1,
-      "error": 0,
-      "coverage": 1.0,
-      "macro_page_cer_canonical": 0.552365,
-      "page_cer_ci95": null
-    },
-    {
-      "model_id": "ppocrv5_arabic_mobile_rec",
-      "split": "phase1_screening",
-      "content_type": "handwritten",
-      "expected": 9,
-      "ok": 0,
-      "error": 9,
-      "coverage": 0.0,
-      "macro_page_cer_canonical": null,
-      "page_cer_ci95": null
-    },
-    {
-      "model_id": "ppocrv5_arabic_mobile_rec",
-      "split": "phase1_screening",
-      "content_type": "printed",
-      "expected": 11,
-      "ok": 0,
-      "error": 11,
-      "coverage": 0.0,
-      "macro_page_cer_canonical": null,
-      "page_cer_ci95": null
-    }
-  ],
+  "slices": [],
   "excluded": [],
   "ranking_policy": null,
   "validation_summary": {
     "artifacts_seen": 3,
-    "artifacts_valid": 2,
-    "artifacts_compatible": 2,
-    "artifacts_unique": 2,
+    "artifacts_valid": 0,
+    "artifacts_compatible": 0,
+    "artifacts_unique": 0,
     "artifacts_complete": 0,
     "duplicate_runs": 0,
-    "errors": 3,
-    "warnings": 1
+    "errors": 9,
+    "warnings": 0
   }
 }

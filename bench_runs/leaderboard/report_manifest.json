@@ -1,7 +1,7 @@
 {
   "schema": "persian_ocr_report_manifest_v1",
   "mode": "screening",
-  "report_sha256": "977a848bd77ff91863698802d66b0738e84928bfebf99728906753207f58b59c",
+  "report_sha256": "8216c0a2f8ed420de8072a02b80abeefb85c4a238dcd6f5723e69ab718758db8",
   "generated_files": [
     "leaderboard.csv",
     "leaderboard.json",

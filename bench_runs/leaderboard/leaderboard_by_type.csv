@@ -1,4 +1,1 @@
-model_id,split,content_type,expected,ok,error,coverage,macro_page_cer_canonical,page_cer_ci95
-easyocr_fa,phase1_screening,handwritten,1,1,0,1.0,0.552365,
-ppocrv5_arabic_mobile_rec,phase1_screening,handwritten,9,0,9,0.0,,
-ppocrv5_arabic_mobile_rec,phase1_screening,printed,11,0,11,0.0,,
+model_id
