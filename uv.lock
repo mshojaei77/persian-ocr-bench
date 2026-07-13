@@ -1642,43 +1642,75 @@ wheels = [
 
 [[package]]
 name = "persian-ocr"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
-    { name = "huggingface-hub" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-    { name = "opencv-python-headless" },
-    { name = "paddleocr" },
-    { name = "paddlepaddle" },
     { name = "pillow" },
-    { name = "pytesseract" },
     { name = "pyyaml" },
     { name = "rapidfuzz" },
     { name = "regex" },
 ]
 
 [package.optional-dependencies]
+all = [
+    { name = "easyocr" },
+    { name = "huggingface-hub" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "opencv-python-headless" },
+    { name = "paddleocr" },
+    { name = "paddlepaddle" },
+    { name = "pytesseract" },
+]
 easyocr = [
     { name = "easyocr" },
+    { name = "numpy" },
+    { name = "opencv-python-headless" },
+]
+paddle = [
+    { name = "huggingface-hub" },
+    { name = "numpy" },
+    { name = "opencv-python-headless" },
+    { name = "paddleocr" },
+    { name = "paddlepaddle" },
+]
+plots = [
+    { name = "matplotlib" },
+]
+tesseract = [
+    { name = "numpy" },
+    { name = "opencv-python-headless" },
+    { name = "pytesseract" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "easyocr", marker = "extra == 'all'", specifier = "==1.7.2" },
     { name = "easyocr", marker = "extra == 'easyocr'", specifier = "==1.7.2" },
-    { name = "huggingface-hub", specifier = "==1.23.0" },
-    { name = "matplotlib", specifier = ">=3.11.0" },
-    { name = "numpy", specifier = ">=1.24,<2.4" },
-    { name = "opencv-python-headless", specifier = ">=5.0.0.93" },
-    { name = "paddleocr", specifier = "==3.7.0" },
-    { name = "paddlepaddle", specifier = "==3.3.1" },
+    { name = "huggingface-hub", marker = "extra == 'all'", specifier = "==1.23.0" },
+    { name = "huggingface-hub", marker = "extra == 'paddle'", specifier = "==1.23.0" },
+    { name = "matplotlib", marker = "extra == 'all'", specifier = ">=3.11.0" },
+    { name = "matplotlib", marker = "extra == 'plots'", specifier = ">=3.11.0" },
+    { name = "numpy", marker = "extra == 'all'", specifier = ">=1.24,<2.4" },
+    { name = "numpy", marker = "extra == 'easyocr'", specifier = ">=1.24,<2.4" },
+    { name = "numpy", marker = "extra == 'paddle'", specifier = ">=1.24,<2.4" },
+    { name = "numpy", marker = "extra == 'tesseract'", specifier = ">=1.24,<2.4" },
+    { name = "opencv-python-headless", marker = "extra == 'all'", specifier = ">=5.0.0.93" },
+    { name = "opencv-python-headless", marker = "extra == 'easyocr'", specifier = ">=5.0.0.93" },
+    { name = "opencv-python-headless", marker = "extra == 'paddle'", specifier = ">=5.0.0.93" },
+    { name = "opencv-python-headless", marker = "extra == 'tesseract'", specifier = ">=5.0.0.93" },
+    { name = "paddleocr", marker = "extra == 'all'", specifier = "==3.7.0" },
+    { name = "paddleocr", marker = "extra == 'paddle'", specifier = "==3.7.0" },
+    { name = "paddlepaddle", marker = "extra == 'all'", specifier = "==3.3.1" },
+    { name = "paddlepaddle", marker = "extra == 'paddle'", specifier = "==3.3.1" },
     { name = "pillow", specifier = ">=12.3.0" },
-    { name = "pytesseract", specifier = ">=0.3.13" },
+    { name = "pytesseract", marker = "extra == 'all'", specifier = ">=0.3.13" },
+    { name = "pytesseract", marker = "extra == 'tesseract'", specifier = ">=0.3.13" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "rapidfuzz", specifier = ">=3.14.5" },
     { name = "regex", specifier = ">=2026.7.10" },
 ]
-provides-extras = ["easyocr"]
+provides-extras = ["tesseract", "paddle", "easyocr", "plots", "all"]
 
 [[package]]
 name = "pillow"
