@@ -185,14 +185,12 @@ uv run python scripts/build_screening_report.py `
   --strict
 ```
 
-Current outputs include:
+Current outputs are table-only; PNG visuals are intentionally not generated:
 
 ```text
 bench_runs/leaderboard/leaderboard.json
 bench_runs/leaderboard/leaderboard.csv
 bench_runs/leaderboard/leaderboard_by_type.csv
-bench_runs/leaderboard/leaderboard_cer.png
-bench_runs/leaderboard/leaderboard_accuracy_latency.png
 bench_runs/leaderboard/screening_report.md
 bench_runs/leaderboard/report_manifest.json
 ```
