@@ -18,6 +18,7 @@ import math
 from pathlib import Path, PurePosixPath
 import random
 import re
+import shutil
 import statistics
 import sys
 from typing import Any, Iterable, Mapping, Sequence
@@ -1481,6 +1482,23 @@ def write_report(report: Mapping[str, Any], output_dir: Path) -> list[str]:
     (output_dir / md_name).write_text(_markdown(report), encoding="utf-8")
     generated = [json_name, csv_name, slice_name, md_name]
     generated.extend(_write_charts(report, output_dir))
+    if report["mode"] == "screening":
+        # Keep the historical filenames usable by dashboards and notebooks while
+        # making their contents come from the current v2 screening report.
+        aliases = {
+            "leaderboard.json": json_name,
+            "leaderboard.csv": csv_name,
+            "leaderboard_by_type.csv": slice_name,
+            "leaderboard_cer.png": "screening_coverage.png",
+            "leaderboard_accuracy_latency.png": next(
+                (name for name in generated if name.startswith("screening_quality_latency_")),
+                None,
+            ),
+        }
+        for alias, source in aliases.items():
+            if source and (output_dir / source).is_file():
+                shutil.copyfile(output_dir / source, output_dir / alias)
+                generated.append(alias)
     manifest_payload = {
         "schema": "persian_ocr_report_manifest_v1",
         "mode": report["mode"],

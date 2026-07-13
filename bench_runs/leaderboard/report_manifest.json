@@ -3,6 +3,11 @@
   "mode": "screening",
   "report_sha256": "5bbd6438d6933b7ed3f9af7afc7594a406c11ed98f7a1241e7bf79dfe8f2a864",
   "generated_files": [
+    "leaderboard.csv",
+    "leaderboard.json",
+    "leaderboard_accuracy_latency.png",
+    "leaderboard_by_type.csv",
+    "leaderboard_cer.png",
     "screening_coverage.png",
     "screening_quality_latency_6b2fabb4.png",
     "screening_quality_latency_a17e2e50.png",
