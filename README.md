@@ -34,6 +34,15 @@ uv sync --extra easyocr
 uv sync --extra plots
 ```
 
+Neural adapters use `--device auto` by default: they choose CUDA first (then
+Apple MPS where supported) and fall back to CPU. This policy can only use a
+GPU when the installed framework is a GPU-enabled build. The locked Paddle
+extra currently provides the portable CPU build; for GPU runs install the
+Paddle GPU wheel matching the host CUDA version from the [official installer]
+before running the adapter. Verify the active runtime with the commands below.
+
+[official installer]: https://www.paddlepaddle.org.cn/install/quick
+
 Use `uv sync --extra all` only when the same environment genuinely needs every
 implemented engine and plotting support. Exact resolved versions remain in
 `uv.lock`.
@@ -124,9 +133,9 @@ Each adapter downloads missing weights, runs the selected images, and writes a
 portable v2 artifact. `--limit 1` is the cheapest initialization smoke check.
 
 ```powershell
-uv run --extra tesseract python src/tesseract_fas.py --small_bench --limit 1 --device cpu
-uv run --extra paddle python src/ppocrv5_arabic_mobile_rec.py --small_bench --limit 1 --device cpu
-uv run --extra easyocr python src/easyocr_fa.py --small_bench --limit 1 --device cpu
+uv run --extra tesseract python src/tesseract_fas.py --small_bench --limit 1
+uv run --extra paddle python src/ppocrv5_arabic_mobile_rec.py --small_bench --limit 1 --device auto
+uv run --extra easyocr python src/easyocr_fa.py --small_bench --limit 1 --device auto
 ```
 
 ### Run the complete Phase 1 screen
@@ -148,7 +157,14 @@ uv run python scripts/run_phase1.py --model easyocr_fa --force
 # Cheap one-page smoke run for every adapter
 uv run python scripts/run_phase1.py --limit 1 --continue-on-error
 
-# Use a specific device for neural adapters
+# Neural adapters use GPU first (CUDA, then MPS), with CPU fallback.
+uv run python scripts/run_phase1.py --device auto
+
+# Verify the installed runtimes expose a GPU (without running OCR)
+uv run python -c "import torch; print('torch:', torch.__version__, 'cuda:', torch.cuda.is_available())"
+uv run --extra paddle python -c "import paddle; print('paddle:', paddle.__version__, 'cuda:', paddle.device.is_compiled_with_cuda(), 'gpus:', paddle.device.cuda.device_count())"
+
+# Force CPU when needed
 uv run python scripts/run_phase1.py --device cpu
 ```
 

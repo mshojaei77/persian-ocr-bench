@@ -13,6 +13,7 @@ from typing import Any, Optional
 from PIL import Image
 
 from persian_ocr.artifacts import sha256_file
+from persian_ocr.devices import DEFAULT_DEVICE, resolve_paddle_device
 from persian_ocr.paths import REPO_ROOT, logical_path
 from persian_ocr.preprocessing import PROFILES
 
@@ -185,6 +186,7 @@ def create_pipeline(device: str):
         raise RuntimeError(
             "Install the adapter with `uv sync --extra paddle` before running PaddleOCR"
         ) from exc
+    resolved_device = resolve_paddle_device(device)
     return PaddleOCR(
         text_detection_model_name="PP-OCRv5_mobile_det",
         text_detection_model_dir=str(DETECTOR_DIR),
@@ -195,15 +197,17 @@ def create_pipeline(device: str):
         use_textline_orientation=True,
         # PaddlePaddle 3.3.1's CPU oneDNN/PIR path cannot load these graph
         # attributes. Plain CPU inference is the proven compatibility fallback.
-        enable_mkldnn=False if device.startswith("cpu") else None,
-        device=device,
+        enable_mkldnn=False if resolved_device.startswith("cpu") else None,
+        device=resolved_device,
     )
 
 
 def prepare_runtime(args: argparse.Namespace) -> tuple[object, dict[str, object], float]:
     identity = ensure_models()
     started = time.perf_counter()
+    resolved_device = resolve_paddle_device(args.device)
     pipeline = create_pipeline(args.device)
+    identity["runtime_device"] = resolved_device
     return pipeline, identity, time.perf_counter() - started
 
 
@@ -258,6 +262,7 @@ def adapter(args: argparse.Namespace) -> Phase1Adapter:
         predict=predict_page,
         config={
             "device": args.device,
+            "device_policy": "gpu_first_auto" if args.device == DEFAULT_DEVICE else "explicit",
             "preprocess": PROFILES[args.preprocess].to_dict(),
             "ordering_policy": "PaddleOCR pipeline output order",
             "recognizer_repo": RECOGNIZER_REPO,
@@ -280,7 +285,11 @@ def build_parser() -> argparse.ArgumentParser:
     mode.add_argument("--pull", action="store_true")
     mode.add_argument("--small_bench", action="store_true")
     parser.add_argument("--force", action="store_true", help="Force model re-download.")
-    parser.add_argument("--device", default="cpu", help="PaddleOCR device, e.g. cpu or gpu:0.")
+    parser.add_argument(
+        "--device",
+        default=DEFAULT_DEVICE,
+        help="auto (GPU first, then CPU), cpu, or gpu:0.",
+    )
     parser.add_argument("--preprocess", choices=sorted(PROFILES), default="raw")
     parser.add_argument("--manifest", default="small_bench/manifest.jsonl")
     parser.add_argument("--subdir", nargs="*", default=None)

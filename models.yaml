@@ -210,7 +210,7 @@ models:
   - operations
   inference:
     backend: PaddleOCR/PaddlePaddle
-    device: CPU or GPU
+    device: GPU first; CPU fallback when no CUDA build/device is available
     colab_fit: easy
     important_settings:
     - pin PaddleOCR and PaddlePaddle versions
@@ -261,7 +261,7 @@ models:
   - operations
   inference:
     backend: PyTorch/EasyOCR
-    device: CPU or GPU
+    device: GPU first (CUDA, then MPS where supported); CPU fallback
     colab_fit: easy
     important_settings:
     - record detector and recognizer versions

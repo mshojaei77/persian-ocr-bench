@@ -40,7 +40,7 @@ MODEL_COMMANDS: dict[str, list[str]] = {
         "src/ppocrv5_arabic_mobile_rec.py",
         "--small_bench",
         "--device",
-        "cpu",
+        "auto",
         "--preprocess",
         "raw",
         "--require-reviewed",
@@ -49,7 +49,7 @@ MODEL_COMMANDS: dict[str, list[str]] = {
         "src/easyocr_fa.py",
         "--small_bench",
         "--device",
-        "cpu",
+        "auto",
         "--preprocess",
         "raw",
         "--ordering",
@@ -133,7 +133,11 @@ def parse_args() -> argparse.Namespace:
         help="Model to run; repeat the option. Defaults to every implemented adapter.",
     )
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--device", default="cpu", help="Device for neural adapters.")
+    parser.add_argument(
+        "--device",
+        default="auto",
+        help="Device for neural adapters: auto (GPU first, then CPU), or explicit device.",
+    )
     parser.add_argument("--force", action="store_true", help="Rerun successful models.")
     parser.add_argument(
         "--continue-on-error", action="store_true", help="Continue after a failed adapter."

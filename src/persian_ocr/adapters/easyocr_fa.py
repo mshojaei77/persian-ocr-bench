@@ -13,6 +13,7 @@ from typing import Any, Optional
 from PIL import Image
 
 from persian_ocr.artifacts import sha256_file
+from persian_ocr.devices import DEFAULT_DEVICE, resolve_torch_device
 from persian_ocr.paths import REPO_ROOT
 from persian_ocr.preprocessing import PROFILES
 
@@ -60,9 +61,10 @@ def create_reader(
             "Install the adapter with `uv sync --extra easyocr` before running EasyOCR"
         ) from exc
     MODEL_ROOT.mkdir(parents=True, exist_ok=True)
+    resolved_device = resolve_torch_device(device)
     return easyocr.Reader(
         languages,
-        gpu=device_argument(device),
+        gpu=device_argument(resolved_device),
         model_storage_directory=str(MODEL_ROOT),
         download_enabled=download_enabled,
         detect_network=detector,
@@ -190,14 +192,16 @@ def prepare_runtime(args: argparse.Namespace) -> tuple[object, dict[str, object]
     languages = parse_languages(args.langs)
     download_enabled = not list(MODEL_ROOT.glob("*.pth"))
     started = time.perf_counter()
+    resolved_device = resolve_torch_device(args.device)
     reader = create_reader(
         languages=languages,
-        device=args.device,
+        device=resolved_device,
         detector=args.detector,
         download_enabled=download_enabled,
     )
     elapsed = time.perf_counter() - started
     identity = model_identity(reader, languages, args.detector)
+    identity["runtime_device"] = resolved_device
     write_identity(identity)
     return reader, identity, elapsed
 
@@ -268,6 +272,7 @@ def adapter(args: argparse.Namespace) -> Phase1Adapter:
         config={
             "languages": languages,
             "device": args.device,
+            "device_policy": "gpu_first_auto" if args.device == DEFAULT_DEVICE else "explicit",
             "detector": args.detector,
             "decoder": args.decoder,
             "beam_width": args.beam_width,
@@ -293,7 +298,11 @@ def build_parser() -> argparse.ArgumentParser:
     mode.add_argument("--pull", action="store_true", help="Download and verify EasyOCR weights.")
     mode.add_argument("--small_bench", action="store_true", help="Run the Phase 1 smoke screen.")
     parser.add_argument("--langs", default="fa,en", help="Comma-separated EasyOCR language codes.")
-    parser.add_argument("--device", default="cpu", help="cpu, auto, cuda, cuda:0, or mps.")
+    parser.add_argument(
+        "--device",
+        default=DEFAULT_DEVICE,
+        help="auto (CUDA, MPS, then CPU), cpu, cuda, cuda:0, or mps.",
+    )
     parser.add_argument("--detector", choices=["craft", "dbnet18"], default="craft")
     parser.add_argument(
         "--decoder", choices=["greedy", "beamsearch", "wordbeamsearch"], default="greedy"
