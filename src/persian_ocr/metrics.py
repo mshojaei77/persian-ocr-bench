@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Mapping, Sequence
 import random
 import statistics
@@ -42,6 +43,49 @@ def wer(reference: str, prediction: str) -> float:
     if not ref_words:
         return 0.0 if not hyp_words else 1.0
     return edit_distance(ref_words, hyp_words) / len(ref_words)
+
+
+def bag_of_words_wer(reference: str, prediction: str) -> float:
+    """Order-insensitive token error rate, used only as an order diagnostic."""
+    reference_counts = Counter((reference or "").split())
+    prediction_counts = Counter((prediction or "").split())
+    reference_total = sum(reference_counts.values())
+    if not reference_total:
+        return 0.0 if not prediction_counts else 1.0
+    return sum(
+        abs(reference_counts[token] - prediction_counts[token])
+        for token in reference_counts.keys() | prediction_counts.keys()
+    ) / reference_total
+
+
+def token_faithfulness(reference: str, prediction: str) -> dict[str, float | int]:
+    """Report omission/insertion balance without hiding repeated OCR tokens."""
+    reference_counts = Counter((reference or "").split())
+    prediction_counts = Counter((prediction or "").split())
+    true_positive = sum((reference_counts & prediction_counts).values())
+    omitted = sum((reference_counts - prediction_counts).values())
+    inserted = sum((prediction_counts - reference_counts).values())
+    precision = true_positive / (true_positive + inserted) if true_positive + inserted else 1.0
+    recall = true_positive / (true_positive + omitted) if true_positive + omitted else 1.0
+    return {
+        "token_true_positive": true_positive,
+        "omitted_tokens": omitted,
+        "inserted_tokens": inserted,
+        "duplicated_tokens": inserted,
+        "precision": round(precision, 6),
+        "recall": round(recall, 6),
+        "f1": round(2 * precision * recall / (precision + recall), 6) if precision + recall else 0.0,
+    }
+
+
+def exact_token_rate(reference: str, prediction: str) -> float:
+    """Aligned exact-token accuracy; page/line exactness is reported separately."""
+    reference_words = (reference or "").split()
+    prediction_words = (prediction or "").split()
+    if not reference_words:
+        return 1.0 if not prediction_words else 0.0
+    aligned = _aligned_units(reference, prediction, lambda value: value.split())
+    return sum(ref == hyp for ref, hyp in aligned if ref is not None) / len(reference_words)
 
 
 def _aligned_units(
@@ -180,12 +224,27 @@ def score_text(reference: str, prediction: str) -> dict[str, Any]:
     hyp_canonical = normalize_fa(prediction, "canonical")
     hyp_search = normalize_fa(prediction, "search")
     edits = edit_statistics(ref_canonical, hyp_canonical)
+    canonical_wer = wer(ref_canonical, hyp_canonical)
+    bow_wer = bag_of_words_wer(ref_canonical, hyp_canonical)
     return {
+        "raw_unicode_cer": round(cer(ref_strict, hyp_strict, unit="codepoint"), 6),
+        "persian_normalized_cer": round(cer(ref_canonical, hyp_canonical), 6),
+        "raw_unicode_wer": round(wer(ref_strict, hyp_strict), 6),
+        "persian_normalized_wer": round(canonical_wer, 6),
         "cer_codepoint_strict": round(cer(ref_strict, hyp_strict, unit="codepoint"), 6),
         "cer_grapheme_strict": round(cer(ref_strict, hyp_strict), 6),
         "cer_grapheme_canonical": round(cer(ref_canonical, hyp_canonical), 6),
         "cer_grapheme_search": round(cer(ref_search, hyp_search), 6),
-        "wer_canonical": round(wer(ref_canonical, hyp_canonical), 6),
+        "wer_canonical": round(canonical_wer, 6),
+        "exact_token_rate": round(exact_token_rate(ref_canonical, hyp_canonical), 6),
+        "exact_line": ref_canonical == hyp_canonical,
+        "exact_page": ref_canonical == hyp_canonical,
+        "faithfulness": token_faithfulness(ref_canonical, hyp_canonical),
+        "reading_order": {
+            "sequential_wer": round(canonical_wer, 6),
+            "bag_of_words_wer": round(bow_wer, 6),
+            "order_gap": round(max(0.0, canonical_wer - bow_wer), 6),
+        },
         "canonical_ref_graphemes": edits["ref_graphemes"],
         "canonical_hyp_graphemes": edits["hyp_graphemes"],
         "canonical_insertions": edits["insertions"],
@@ -230,6 +289,13 @@ def _field(record: Any, name: str, default: Any = None) -> Any:
         metrics = record.get("metrics")
         if isinstance(metrics, Mapping) and name in metrics:
             return metrics[name]
+        if "." in name:
+            current: Any = metrics if isinstance(metrics, Mapping) else record
+            for part in name.split("."):
+                if not isinstance(current, Mapping) or part not in current:
+                    return default
+                current = current[part]
+            return current
         return default
     return getattr(record, name, default)
 
@@ -268,6 +334,33 @@ def summarize_records(records: Sequence[Any]) -> dict[str, object]:
         "mean_WER_canonical": _safe_mean(
             [_field(record, "wer_canonical") for record in successful]
         ),
+        "mean_raw_unicode_CER": _safe_mean(
+            [_field(record, "raw_unicode_cer") for record in successful]
+        ),
+        "mean_raw_unicode_WER": _safe_mean(
+            [_field(record, "raw_unicode_wer") for record in successful]
+        ),
+        "mean_exact_token_rate": _safe_mean(
+            [_field(record, "exact_token_rate") for record in successful]
+        ),
+        "exact_line_rate": _safe_mean(
+            [1.0 if _field(record, "exact_line") else 0.0 for record in successful]
+        ),
+        "mean_faithfulness_precision": _safe_mean(
+            [_field(record, "faithfulness.precision") for record in successful]
+        ),
+        "mean_faithfulness_recall": _safe_mean(
+            [_field(record, "faithfulness.recall") for record in successful]
+        ),
+        "mean_faithfulness_f1": _safe_mean(
+            [_field(record, "faithfulness.f1") for record in successful]
+        ),
+        "mean_bag_of_words_WER": _safe_mean(
+            [_field(record, "reading_order.bag_of_words_wer") for record in successful]
+        ),
+        "mean_reading_order_gap": _safe_mean(
+            [_field(record, "reading_order.order_gap") for record in successful]
+        ),
         "micro_corpus_CER_canonical": (
             round(edit_distance_total / ref_total, 6) if ref_total else None
         ),
@@ -304,15 +397,18 @@ def metadata_breakdowns(records: Sequence[Any]) -> dict[str, dict[str, object]]:
 
 __all__ = [
     "bootstrap_ci",
+    "bag_of_words_wer",
     "cer",
     "edit_distance",
     "edit_statistics",
+    "exact_token_rate",
     "metadata_breakdowns",
     "orthographic_diagnostics",
     "percentile",
     "punctuation_diagnostics",
     "score_text",
     "summarize_records",
+    "token_faithfulness",
     "unicode_variant_diagnostics",
     "wer",
 ]

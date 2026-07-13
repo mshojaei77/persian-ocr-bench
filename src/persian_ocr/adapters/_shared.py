@@ -178,10 +178,15 @@ def run_phase1(args: argparse.Namespace, adapter: Phase1Adapter) -> int:
         "phase1_screening",
         phase="phase1_screening",
         track="full_page_ocr",
-        version="2.0",
+        version="2.1",
         purpose="viability_screen_only",
         ranking_policy="none",
         dataset="smoke20-v1",
+        metric_contract="fa_ir_phase1_metrics_v1",
+        metric_scope=(
+            "raw_unicode_cer,persian_normalized_cer,wer,faithfulness,"
+            "reading_order,exactness,orthographic,operations"
+        ),
     )
     model = dict(adapter.model)
     runtime: object | None = None

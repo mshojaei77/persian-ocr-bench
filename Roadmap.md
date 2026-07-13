@@ -10,6 +10,9 @@ that screen is not a final ranking.
 - [x] Validate the smoke20 manifest, content hashes, and dataset identity.
 - [x] Run Tesseract, PP-OCRv5 Arabic, and EasyOCR through the shared v2 artifact contract.
 - [x] Generate the three-model Phase 1 screening report with portable paths and a manifest.
+- [x] Add raw Unicode versus Persian-normalized scores, faithfulness, reading-order,
+  exactness, and operational diagnostics to the Phase 1 metric contract.
+- [x] Add an archive-first `--reset` path before rerunning smoke20-v1.
 - [ ] Resolve the three catalog status warnings: change the first-wave entries from
   `adapter_ready` to `benchmarked` in `models.yaml`.
 - [ ] Keep `bench_runs/smoke20-v1/` artifacts archived with the exact command,

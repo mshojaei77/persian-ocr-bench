@@ -150,6 +150,9 @@ uv run python scripts/run_phase1.py --dry-run
 # Run all implemented adapters over smoke20-v1
 uv run python scripts/run_phase1.py
 
+# Archive any previous Phase 1 state/artifacts and rerun the screen from scratch
+uv run python scripts/run_phase1.py --reset --continue-on-error
+
 # Run one adapter, or rerun it from scratch
 uv run python scripts/run_phase1.py --model easyocr_fa
 uv run python scripts/run_phase1.py --model easyocr_fa --force
@@ -170,6 +173,12 @@ uv run python scripts/run_phase1.py --device cpu
 
 Artifacts are written to `bench_runs/smoke20-v1/`; resumable state is in
 `bench_runs/smoke20-v1/state.json` and adapter logs are in its `logs/` folder.
+`--reset` preserves an existing run under `bench_runs/archives/` before creating
+the fresh state. The Phase 1 report adds raw Unicode and Persian-normalized
+CER/WER, token faithfulness (precision/recall/F1), bag-of-words WER and its
+reading-order gap, exact-token/line/page rates, Persian orthography diagnostics,
+coverage/failure rates, and latency. These remain diagnostics only: smoke20-v1
+does not assign numerical ranks or an official winner.
 
 ### Build the screening leaderboard/report
 

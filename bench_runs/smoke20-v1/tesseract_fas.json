@@ -1,0 +1,3070 @@
+{
+  "schema": "persian_ocr_benchmark_v2",
+  "run_id": "813660439b61f3e7ce55853fc9b4e5857d4098104537f025eac912677a3486c3",
+  "run_identity": {
+    "schema": "persian_ocr_run_identity_v2",
+    "protocol": {
+      "schema": "persian_ocr_protocol_identity_v2",
+      "id": "phase1_screening",
+      "phase": "phase1_screening",
+      "track": "full_page_ocr",
+      "version": "2.1",
+      "purpose": "viability_screen_only",
+      "ranking_policy": "none",
+      "dataset": "smoke20-v1",
+      "metric_contract": "fa_ir_phase1_metrics_v1",
+      "metric_scope": "raw_unicode_cer,persian_normalized_cer,wer,faithfulness,reading_order,exactness,orthographic,operations",
+      "digest": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72"
+    },
+    "dataset": {
+      "schema": "persian_ocr_dataset_identity_v2",
+      "id": "smoke20-v1",
+      "version": "1.0.0",
+      "digest": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe",
+      "dataset_sha256": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe",
+      "manifest": "small_bench/manifest.jsonl",
+      "manifest_sha256": "978e1bd5e5479886811a060d530fab640cea4b1ad95a727610d903c536c98ec5",
+      "reference_corpora_sha256": {
+        "small_bench/hand-written.json": "9ce73bb50b85b8a7569c711fda1e61b9a2e52c88ff109885d759523e68495131",
+        "small_bench/typed.json": "0aa9d6d1121571b5301653bc096fe67e04269e760ac552866e16143a8279ef7e"
+      },
+      "images_sha256": {
+        "small_bench/hand-written/1.jpg": "55a7d83155ddd3f0a4cea3cf2e2ab74ab72795dd67c1e93f91ff5bb1c3ccd7bf",
+        "small_bench/hand-written/2.jpg": "9dafa5ec7a68548e8c4c69c9428e8549beb3fc844f2b01ca2bb10af38815df9f",
+        "small_bench/hand-written/3.jpg": "f86219a20a3d7ad496f115dcece9004d9453c0cb255c22057122e7fa92ec55cb",
+        "small_bench/hand-written/4.jpg": "e121d7b1c92cac1f4b0191416a0e3c6854580fef9cea7a5c79181d8f27dbcce7",
+        "small_bench/hand-written/5.jpg": "3a33d14f4b290ee8b0dbb71a4305083ef619298ad2d40d3027b3f12a8a5e0d0a",
+        "small_bench/hand-written/6.jpg": "184250b913a26ae3864f92ca3c5b930d8fabaadf2d0f8e6a5ad4f8e4441fdd4c",
+        "small_bench/hand-written/7.jpg": "8b419952966c958181adada2890c45115e343df94dae8ffc5c222cca81fe6e3e",
+        "small_bench/hand-written/8.jpg": "a368ee5e708b71b13f671b75ab678952ee327ce3a463a4bfe5e5ae4171239daf",
+        "small_bench/hand-written/9.jpg": "1227ea325bb64da524867a9984304cff2d390043fbd354dd559f1e3edb75e391",
+        "small_bench/hand-written/10.jpg": "2a5ff134a27a52c5a5cd9b4450e995271d44ce5bd58c1ca78e6eab0a5f80f797",
+        "small_bench/typed/1.jpg": "927f1dd02a368869568d6edfbf12412cfef14c3bcf861ac9819e261ca44a6ad1",
+        "small_bench/typed/2.jpg": "971d296d209f24dce85da6c242af1127202c4b78790c654cc0d652be3025b907",
+        "small_bench/typed/3.jpg": "d1de98144d15724c55264794a18768ca5370dab6c27745e6843d2e357f72a839",
+        "small_bench/typed/4.jpg": "ace0bc6e4b7dcae2009d27928aee32cbef966d93aa234dfd507860a0f038a321",
+        "small_bench/typed/5.jpg": "6798fa4eb78542a9679f01e900af134714fb49e28be0b65a4fa1f2347e977818",
+        "small_bench/typed/6.jpg": "394fc7fa4e3e50ca7cbefe0a3a8b269b9ec820b9fffb86cf0a1ff9265f8facfd",
+        "small_bench/typed/7.jpg": "75dfa0328e61459a15fd3d9089a94e9f4385e070ec48a275a9b95ed57f4b598e",
+        "small_bench/typed/8.jpg": "0bfa9c943ac89c24787435b3469f5b133ac1aa41572731e2de050b6cb117e58a",
+        "small_bench/typed/9.jpg": "09933594dab8e5f26e0867507fd7a0bd3937cfd73b0bd569e394a763cf9f97cd",
+        "small_bench/typed/10.jpg": "e8485e1ebe14e8d9e02146bd96e0b712d69a23cbf35cb099e447aa4bc6059553"
+      },
+      "samples": [
+        {
+          "sample_id": "hand-written-001",
+          "image_sha256": "55a7d83155ddd3f0a4cea3cf2e2ab74ab72795dd67c1e93f91ff5bb1c3ccd7bf",
+          "reference_sha256": "a36f6a2a6665f70d6b380e15cfeccdb5db5cb7a920e9945c2f887116ae5c2ab1"
+        },
+        {
+          "sample_id": "hand-written-002",
+          "image_sha256": "9dafa5ec7a68548e8c4c69c9428e8549beb3fc844f2b01ca2bb10af38815df9f",
+          "reference_sha256": "71c26b46085e571da161d891db42028f45ffc4400d8cae5c1efc57933ea8150d"
+        },
+        {
+          "sample_id": "hand-written-003",
+          "image_sha256": "f86219a20a3d7ad496f115dcece9004d9453c0cb255c22057122e7fa92ec55cb",
+          "reference_sha256": "5db49db2d341b4f4af2ac9ed6e2cd987fa19ecb8c84259caf310bdacfd7dd946"
+        },
+        {
+          "sample_id": "hand-written-004",
+          "image_sha256": "e121d7b1c92cac1f4b0191416a0e3c6854580fef9cea7a5c79181d8f27dbcce7",
+          "reference_sha256": "34783df79720ede168829b2e782dddae20b53ef0ef4a542aeed48ab3f53277c4"
+        },
+        {
+          "sample_id": "hand-written-005",
+          "image_sha256": "3a33d14f4b290ee8b0dbb71a4305083ef619298ad2d40d3027b3f12a8a5e0d0a",
+          "reference_sha256": "667209124c4cf720a9212278197e5408aa7d0302e075b6625fd98edd35c995ce"
+        },
+        {
+          "sample_id": "hand-written-006",
+          "image_sha256": "184250b913a26ae3864f92ca3c5b930d8fabaadf2d0f8e6a5ad4f8e4441fdd4c",
+          "reference_sha256": "de17d258e9093472ea8521af2271050c7c7e1c28b94da668e683d71aa84d847e"
+        },
+        {
+          "sample_id": "hand-written-007",
+          "image_sha256": "8b419952966c958181adada2890c45115e343df94dae8ffc5c222cca81fe6e3e",
+          "reference_sha256": "9d81a8ad6b48feca96d59dfbf39673096f8c268485b2f0cd9ee4ce16bf8f298b"
+        },
+        {
+          "sample_id": "hand-written-008",
+          "image_sha256": "a368ee5e708b71b13f671b75ab678952ee327ce3a463a4bfe5e5ae4171239daf",
+          "reference_sha256": "3f52f65ecec5086c8b4f44394362a03d924dc0f498290193a2b8c88271184c12"
+        },
+        {
+          "sample_id": "hand-written-009",
+          "image_sha256": "1227ea325bb64da524867a9984304cff2d390043fbd354dd559f1e3edb75e391",
+          "reference_sha256": "06506f7da745e4557b933942a0c44f0cd1188ee39ea6a759796f95f544c0d7c4"
+        },
+        {
+          "sample_id": "hand-written-010",
+          "image_sha256": "2a5ff134a27a52c5a5cd9b4450e995271d44ce5bd58c1ca78e6eab0a5f80f797",
+          "reference_sha256": "b6620dfa74d29db5e788aa1fed264beab9b6051df51f28db3f950430effec346"
+        },
+        {
+          "sample_id": "typed-001",
+          "image_sha256": "927f1dd02a368869568d6edfbf12412cfef14c3bcf861ac9819e261ca44a6ad1",
+          "reference_sha256": "8e8abc84d3c0b581b88a26245e26a561f1b0e915286586273ce6c0756557bc5b"
+        },
+        {
+          "sample_id": "typed-002",
+          "image_sha256": "971d296d209f24dce85da6c242af1127202c4b78790c654cc0d652be3025b907",
+          "reference_sha256": "8ab1fb88af133df741f845dd47b793c9e5b41508e06035550cf3a7aba4a8a367"
+        },
+        {
+          "sample_id": "typed-003",
+          "image_sha256": "d1de98144d15724c55264794a18768ca5370dab6c27745e6843d2e357f72a839",
+          "reference_sha256": "93b07084eae2e40be7a7715103abbfb4541085055432818cb0d07413b6abdb55"
+        },
+        {
+          "sample_id": "typed-004",
+          "image_sha256": "ace0bc6e4b7dcae2009d27928aee32cbef966d93aa234dfd507860a0f038a321",
+          "reference_sha256": "b9df9cb2b7602c7ef23bc271ee9a774db8ea97eb8b726e71162dcf604072761c"
+        },
+        {
+          "sample_id": "typed-005",
+          "image_sha256": "6798fa4eb78542a9679f01e900af134714fb49e28be0b65a4fa1f2347e977818",
+          "reference_sha256": "2fdb7745d2d3d38e9f66b99bffa5bfe50c7e528671dcf783696721996b5e3492"
+        },
+        {
+          "sample_id": "typed-006",
+          "image_sha256": "394fc7fa4e3e50ca7cbefe0a3a8b269b9ec820b9fffb86cf0a1ff9265f8facfd",
+          "reference_sha256": "2de4aa53fe40fcbff857c244431d51313f89c7083c493d6c4728277dc3c6779e"
+        },
+        {
+          "sample_id": "typed-007",
+          "image_sha256": "75dfa0328e61459a15fd3d9089a94e9f4385e070ec48a275a9b95ed57f4b598e",
+          "reference_sha256": "6e5214af385fc902239c7e820b7d141049462d3a12e9d09165f42b52f8968ebe"
+        },
+        {
+          "sample_id": "typed-008",
+          "image_sha256": "0bfa9c943ac89c24787435b3469f5b133ac1aa41572731e2de050b6cb117e58a",
+          "reference_sha256": "278a16e94d1171543fa6bd31f21a0e729d7a3df39c417f12df6521ec4d5a4ec5"
+        },
+        {
+          "sample_id": "typed-009",
+          "image_sha256": "09933594dab8e5f26e0867507fd7a0bd3937cfd73b0bd569e394a763cf9f97cd",
+          "reference_sha256": "dc31a6d7122c7c262cd05787d23b1ac05535db5bee51af9dda847d58140f2dd5"
+        },
+        {
+          "sample_id": "typed-010",
+          "image_sha256": "e8485e1ebe14e8d9e02146bd96e0b712d69a23cbf35cb099e447aa4bc6059553",
+          "reference_sha256": "099ba86574d14bda1a48f4db6e100a7b1d3c93cfaa065128d9f74bf2cc020733"
+        }
+      ],
+      "n_samples": 20,
+      "splits": {
+        "phase1_screening": 20
+      },
+      "content_types": {
+        "handwritten": 9,
+        "printed": 11
+      }
+    },
+    "model": {
+      "id": "tesseract_fas",
+      "class": "full_page_detector_recognizer_pipeline",
+      "checkpoint_type": "integrated_page_segmentation_recognizer",
+      "identity": {
+        "engine": {
+          "name": "tesseract.exe",
+          "version": "tesseract v5.5.0.20241111\n leptonica-1.85.0\n  libgif 5.2.2 : libjpeg 8d (libjpeg-turbo 3.0.4) : libpng 1.6.44 : libtiff 4.7.0 : zlib 1.3.1 : libwebp 1.4.0 : libopenjp2 2.5.2\n Found AVX2\n Found AVX\n Found FMA\n Found SSE4.1\n Found libarchive 3.7.7 zlib/1.3.1 liblzma/5.6.3 bz2lib/1.0.8 liblz4/1.10.0 libzstd/1.5.6\n Found libcurl/8.11.0 Schannel zlib/1.3.1 brotli/1.1.0 zstd/1.5.6 libidn2/2.3.7 libpsl/0.21.5 libssh2/1.11.0"
+        },
+        "language_components": {
+          "fas": {
+            "variant": "best",
+            "path": "models/tessdata/best/fas.traineddata",
+            "size_bytes": 3325955,
+            "sha256": "99e420969b5ddd2cb135b416316a7ed417c59c4faf9e0d28941348f6448114df"
+          }
+        }
+      }
+    },
+    "runner": {
+      "package": "persian-ocr",
+      "version": "0.2.0",
+      "files": {
+        "__init__.py": "9160fd8048751cc1a114443eaccdb97c33c283faec723e4570a513c9f0ca8182",
+        "__main__.py": "d5f5be239183a77bfc60b66b3aa254bf6b6c1bff20b83aeff9c3ee358142f124",
+        "adapters/__init__.py": "686f2de879f8d46b28a3860ef3fbc6b65047d28ffa21f895ad9e5517344dba1f",
+        "adapters/_shared.py": "57d04f82e0e30b87bfe77874d27cc0beb1e386cfc97f81e28fa48924fb732afd",
+        "adapters/easyocr_fa.py": "d884bc4e4706648de0c2b22cb5ede62db6888195657f0984a4fd1a5c2abd454e",
+        "adapters/ppocrv5_arabic_mobile_rec.py": "92476c09d10874f2d05f9ce321f7699900d725d2a81dcfe1627efbe22613e23b",
+        "adapters/tesseract_fas.py": "f9277f5ba4f0c2872d528553827d3a384483b9e47f9a0cdc4cfe9304e7d58099",
+        "artifacts.py": "1ca231f0a8bbc870d7da9c5bc9583c40226b467184e49ef45ff9ef53d540b438",
+        "catalog.py": "19f4b16cf6ac59a13a01a1d1d93dd9d306fae6be017a193f68dc6ad609efcf2d",
+        "dataset.py": "756364f16e561ca8d96fad60d54af484d3d07bb7d6b48fd239ac9df809e6df60",
+        "devices.py": "6a011740f4aac3040c877171806171a2f4fe765bdd35426f27d1c1bc8f5a7537",
+        "metrics.py": "d358906e0095d933f18909e962cd781973feff3bc70fe00f02ce3cb8f59e4c89",
+        "normalization.py": "1f52f63da7a808bf2ed7dda14f551723e680309fcffab3cc8846a3075fcf38aa",
+        "paths.py": "a4afc6877e9bbf3ef566d781896bdf0f48fb4119782294515a0934023f46c485",
+        "preprocessing.py": "1902d5575ee3448c4a871f2c23822cce7f8dbacae5c024e3de4852fec145edcf",
+        "reporting.py": "0ef5713309e9cf18c5853aec5925bf80d79f4d211c48f27103b1d7a404d889b6"
+      },
+      "source_sha256": "2debc8196ccc90d1af694cc7bb34de687d071d723a11aa77d8c4121cc31c8c4f",
+      "git": {
+        "commit": "67d18815c8e8676666b4c7b2047de59da3fafef5",
+        "dirty": true
+      },
+      "shared_scorer": {
+        "files": {
+          "adapters/_shared.py": "57d04f82e0e30b87bfe77874d27cc0beb1e386cfc97f81e28fa48924fb732afd",
+          "artifacts.py": "1ca231f0a8bbc870d7da9c5bc9583c40226b467184e49ef45ff9ef53d540b438",
+          "dataset.py": "756364f16e561ca8d96fad60d54af484d3d07bb7d6b48fd239ac9df809e6df60",
+          "metrics.py": "d358906e0095d933f18909e962cd781973feff3bc70fe00f02ce3cb8f59e4c89",
+          "normalization.py": "1f52f63da7a808bf2ed7dda14f551723e680309fcffab3cc8846a3075fcf38aa",
+          "preprocessing.py": "1902d5575ee3448c4a871f2c23822cce7f8dbacae5c024e3de4852fec145edcf"
+        },
+        "source_sha256": "1c25d2864adb7c4ccd45d06507f64ee44d84a56b1c120880e605bdf0bda0b481"
+      }
+    },
+    "config": {
+      "language": "fas",
+      "oem": 1,
+      "psm": 3,
+      "variant": "best",
+      "timeout_seconds": 60.0,
+      "preprocess": {
+        "name": "raw",
+        "min_width": 0,
+        "deskew": false,
+        "denoise": false,
+        "clahe": false,
+        "threshold": "none",
+        "border_px": 0
+      },
+      "save_tsv": false,
+      "manifest": "small_bench/manifest.jsonl",
+      "selected_sample_ids": [
+        "hand-written-001",
+        "hand-written-002",
+        "hand-written-003",
+        "hand-written-004",
+        "hand-written-005",
+        "hand-written-006",
+        "hand-written-007",
+        "hand-written-008",
+        "hand-written-009",
+        "hand-written-010",
+        "typed-001",
+        "typed-002",
+        "typed-003",
+        "typed-004",
+        "typed-005",
+        "typed-006",
+        "typed-007",
+        "typed-008",
+        "typed-009",
+        "typed-010"
+      ],
+      "selected_count": 20,
+      "dataset_count": 20,
+      "subdir": null,
+      "limit": null,
+      "require_reviewed": true,
+      "accepted_review_statuses": [
+        "ai_assisted_recovered_not_human_reviewed",
+        "human_reviewed",
+        "human_verified"
+      ]
+    },
+    "environment": {
+      "python": "3.12.13",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "implementation": "CPython",
+      "cpu_count": 20,
+      "packages": {
+        "Pillow": "12.3.0",
+        "pytesseract": "0.3.13",
+        "numpy": "2.3.5",
+        "opencv-python-headless": "5.0.0.93"
+      }
+    },
+    "digest": "813660439b61f3e7ce55853fc9b4e5857d4098104537f025eac912677a3486c3"
+  },
+  "summary": {
+    "model": {
+      "id": "tesseract_fas",
+      "class": "full_page_detector_recognizer_pipeline"
+    },
+    "protocol": {
+      "id": "phase1_screening",
+      "phase": "phase1_screening",
+      "track": "full_page_ocr",
+      "version": "2.1",
+      "digest": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72"
+    },
+    "dataset": {
+      "id": "smoke20-v1",
+      "digest": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe",
+      "n_samples": 20
+    },
+    "counts": {
+      "total": 20,
+      "ok": 20,
+      "error": 0,
+      "skipped": 0
+    },
+    "metrics": {
+      "n_runs": 20,
+      "n_ok": 20,
+      "n_err": 0,
+      "macro_page_CER_canonical": 0.552146,
+      "median_page_CER_canonical": 0.625745,
+      "mean_grapheme_CER_strict": 0.561727,
+      "mean_WER_canonical": 0.754354,
+      "mean_raw_unicode_CER": 0.560775,
+      "mean_raw_unicode_WER": 0.758227,
+      "mean_exact_token_rate": 0.257318,
+      "exact_line_rate": 0.0,
+      "mean_faithfulness_precision": 0.436222,
+      "mean_faithfulness_recall": 0.271567,
+      "mean_faithfulness_f1": 0.289224,
+      "mean_bag_of_words_WER": 1.086545,
+      "mean_reading_order_gap": 0.0,
+      "micro_corpus_CER_canonical": 0.48003,
+      "page_bootstrap_95ci": [
+        0.416096,
+        0.680875
+      ],
+      "metadata_breakdowns": {}
+    },
+    "operations": {
+      "latency_scope": "end-to-end Tesseract page recognition",
+      "initialization_seconds": 1.192273,
+      "mean_seconds_per_page": 0.701704,
+      "median_seconds_per_page": 0.445389,
+      "p95_seconds_per_page": 1.769927,
+      "peak_vram_gb": null,
+      "peak_ram_gb": null
+    }
+  },
+  "results": [
+    {
+      "sample_id": "hand-written-001",
+      "image": "small_bench/hand-written/1.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.918422,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/1.md",
+        "source_member_sha256": "e21e8e784a34d7469c562708c9f9eae78fe87b3646d3400ba58838f7d359e290",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "low_contrast",
+          "mixed_script"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "من همیشه گفتم که از قدیم دو تا تمدن در منطقه\nآسیا اهمیت داشت یکی چینی بود و دیگری ایرانی،\nامّا این ایرانِ امروز نیست - البته ایران بزرگ بود\nیعنی از مجارستان تا مغولستان و چین غربی و از\nهند تا بین‌النهرین ، و در آن سرزمین چند\nخرده فرهنگ مثل ساکا، سغدی و غیره موجود\nبودند، و چنانکه مغول‌ها وابستگی به چین داشت\nهمچنین ترک‌ها ارتباط به ایرانیان بود.\nمحمود کاشغری نوشت کلاه بدون سر و ترک\nبدون تاجیک وجود ندارد\nریچارد فرای ایران‌دوست\nگنجینه پژوهشی ایرج افشار\nسپرده به مرکز دایرة‌المعارف بزرگ اسلامی\n۱۳۷۸ شمسی\nIRAJ AFSHAR RESEARCH TROVE\nENTRUSTED TO THE CENTRE FOR THE GREAT ISLAMIC ENCYCLOPAEDIA\nEST. 2004",
+      "prediction": "همه گلتم ۳ اژقدم درتا مرن د له\nاهممت داشت ی یی برد ردگر ارلی »\n\nیاهمیت هر\n\nای ایرات امرو رس الق ایران بزرگ ود\n\nمه از مبارستدان:! مطولستاری ای قرف وا\nهمده مف ال سالا *میری و یره مهرد\n\nی سرا ارتباط و زان پرد.\n\nد اشرو وتا ای بش\n\nو ابوک زرد ارچ\n\nو زرد دزی ارس\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.701169,
+        "persian_normalized_cer": 0.694257,
+        "raw_unicode_wer": 0.938053,
+        "persian_normalized_wer": 0.938053,
+        "cer_codepoint_strict": 0.701169,
+        "cer_grapheme_strict": 0.701014,
+        "cer_grapheme_canonical": 0.694257,
+        "cer_grapheme_search": 0.694257,
+        "wer_canonical": 0.938053,
+        "exact_token_rate": 0.061947,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 9,
+          "omitted_tokens": 104,
+          "inserted_tokens": 51,
+          "duplicated_tokens": 51,
+          "precision": 0.15,
+          "recall": 0.079646,
+          "f1": 0.104046
+        },
+        "reading_order": {
+          "sequential_wer": 0.938053,
+          "bag_of_words_wer": 1.371681,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 592,
+        "canonical_hyp_graphemes": 248,
+        "canonical_insertions": 6,
+        "canonical_deletions": 350,
+        "canonical_substitutions": 55,
+        "canonical_edit_distance": 411,
+        "orthographic": {
+          "yeh_ref_count": 41,
+          "yeh_correct": 11,
+          "yeh_substitutions": 4,
+          "yeh_deletions": 26,
+          "yeh_insertions": 2,
+          "yeh_recall": 0.2682926829268293,
+          "kaf_ref_count": 10,
+          "kaf_correct": 1,
+          "kaf_substitutions": 2,
+          "kaf_deletions": 7,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.1,
+          "zwnj_ref_count": 5,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 17,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 1,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 4,
+            "correct": 0,
+            "missed": 4,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-002",
+      "image": "small_bench/hand-written/2.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.596453,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/2.md",
+        "source_member_sha256": "c1a5f171a9997477e0e400fe1d9a572d7831b3afe68ccdf196f1dbe8158c457e",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "low_resolution"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "به نام خدا\nسلام پریسا\nپریسا چرا دیروز نیآمدی توی کوچه با من بازی کنی. پریسا من\nیک عروسک برای تو خریدم. و به مامانم گفتم که می‌خواهم با پریسا\nعروسی کنم ولی مامانم می‌گوید تو هنوز کوچولو هستی و هر وقت که\nبزرگ شدی و رفتی دانشگاه با پریسا عروسی کن. ولی من هنوز کلاس\nسوم هستم. مامانم می‌گوید پریسا هم باید برود دانشگاه و دکتر بشود.\nولی داداش ناصر می‌گوید دخترها وقتی می‌روند دانشگاه با یک\nپسر دیگر دوست می‌شوند پریسا تو هیچ وقت نرو دانشگاه\nچون اگر تو بروی دانشگاه با یک پسر دیگر دوست می‌شوی و دیگر\nمن را دوست نداری و من هم می‌روم سیگار می‌کشم و معتاد\nمی‌شوم و می‌میرم.\nشایان",
+      "prediction": "سره\nسا چرا دمروز تباسدی توی‌کومه با بای کسام\n\nیگ عروسک بای توطریرم موب نایم کف که می‌ضواهم با برسا\n\nعروسی تدولی سابا دزم می‌کو ید دراو زکوتولو هس وهروفت که\nمرک ظوی ورفوی راز تمه بارس موی سسکا\nسوم عستقی ابا میگ بیاعم مور داتشه ور وه\n\nوی داراش نامر م ی کویو دضرها وف سی رورئووانشگاه با ریک\n\nپسم وم دوس می شون دسا شرا رش\n\nپوت اگر مرو شاه با پر رورس می موی\n\nی راروست د خداری وم هم نصا مار ,۶ ی\n\nیوم وم منرم<\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.499121,
+        "persian_normalized_cer": 0.503584,
+        "raw_unicode_wer": 0.897436,
+        "persian_normalized_wer": 0.897436,
+        "cer_codepoint_strict": 0.499121,
+        "cer_grapheme_strict": 0.507168,
+        "cer_grapheme_canonical": 0.503584,
+        "cer_grapheme_search": 0.503584,
+        "wer_canonical": 0.897436,
+        "exact_token_rate": 0.102564,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 12,
+          "omitted_tokens": 105,
+          "inserted_tokens": 78,
+          "duplicated_tokens": 78,
+          "precision": 0.133333,
+          "recall": 0.102564,
+          "f1": 0.115942
+        },
+        "reading_order": {
+          "sequential_wer": 0.897436,
+          "bag_of_words_wer": 1.564103,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 558,
+        "canonical_hyp_graphemes": 393,
+        "canonical_insertions": 13,
+        "canonical_deletions": 178,
+        "canonical_substitutions": 90,
+        "canonical_edit_distance": 281,
+        "orthographic": {
+          "yeh_ref_count": 52,
+          "yeh_correct": 27,
+          "yeh_substitutions": 9,
+          "yeh_deletions": 16,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.5192307692307693,
+          "kaf_ref_count": 14,
+          "kaf_correct": 8,
+          "kaf_substitutions": 3,
+          "kaf_deletions": 3,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.5714285714285714,
+          "zwnj_ref_count": 11,
+          "zwnj_pred_count": 3,
+          "zwnj_precision": 0.6666666666666666,
+          "zwnj_recall": 0.18181818181818182,
+          "zwnj_f1": 0.2857142857142857
+        },
+        "unicode_variants": {
+          "output_yeh_count": 30,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 12,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-003",
+      "image": "small_bench/hand-written/3.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 1.61674,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/3.md",
+        "source_member_sha256": "49e824a95967533351495df319f0e286f00484b50036a28b1e79f3b53aaf180d",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "lined_paper",
+          "watermark"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "5 آوریل 1954\nخانم فروغ فرخزاد،\nشماره اول مجله Paris Review را ملاحظه فرمودید. در آنجا چند شعر از اشعار شما را\nکه ترجمه و چاپ کرده‌ام. امیدوارم از اینکه بی اجازه ترجمه و چاپ\nکرده‌ام معذور خواهید داشت. و تبریک عرض می‌کنم که این شعرهای شما\nبسیار زیبا و دلپذیر است. نمیدانم به چه حد لطف و شیرینی آن در ترجمه محفوظ مانده است.\nحتماً نظرتان را در این مورد برایم بنویسید.\nبقیه اشعار شما را خوانده‌ام. بزودی آن‌ها را نیز خواهم توانست ترجمه و چاپ کنم.\nدر صورتی که اجازه بدهید، مجموعه‌ای از اشعارتان را ترجمه و بصورت کتاب در اینجا\nبه‌چاپ رسانم. این تصمیم البته منوط است به تمایل شما و پذیرفتن این پیشنهاد من.\nعجالتاً تصمیمی نگرفته‌ام ولی مایلم بدانم نظر شما چیست.\nخواهشمند است جواب این نامه را همه‌رقم نظریات و انتقادات خود هر چه زودتر\nبرایم بنویسید و همچنین در ارسال اگر (اگر چنانچه به انگلیسی بنویسید که چه بهتر)\nما را راهنمایی کنید.\nبا تقدیم احترام\nالکسندر جوان\nخوب شد @Khoob_Shod",
+      "prediction": "ی ادا 2 ‌\n\nدس ز زار .\n\nسر تور مش مه مرت رس 3\n\n1\n\nاه\n\nسراس کی ماس مردام مردام لاد سر ان رد\n\nسس سس ات مر سس\n\nره مور رم هواس وف وال70 ی\nرس ً - ن‌ه1\n\nسس رسارس رسارس جرک مرا زهجم مت وس و زین ۶ ضط\n\nی\n\nخرن ماک ما م ّمم .\nه‌ ۸\nسر رم و ی رام ی و\n\nزضص 0 ی 7 لت لحم فش رس‌لبا ورس\n\nی ار حرط ات۳05۶ و\nسم اج سح 1\n\nخ نا 2\n\nهس وا ,ی دس را اروت ی رس درهر 2/7\n\nرام رس خی سر 7 رر رح مر مج ) -\n\nسیخ\nوارا یرل + س یسم س_ سد\n_ِ ظ\nسم کت سر ای مسبت\n۳ 7۳ 030055800\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.756881,
+        "persian_normalized_cer": 0.735192,
+        "raw_unicode_wer": 0.970238,
+        "persian_normalized_wer": 0.970238,
+        "cer_codepoint_strict": 0.756881,
+        "cer_grapheme_strict": 0.757259,
+        "cer_grapheme_canonical": 0.735192,
+        "cer_grapheme_search": 0.735192,
+        "wer_canonical": 0.970238,
+        "exact_token_rate": 0.029762,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 6,
+          "omitted_tokens": 162,
+          "inserted_tokens": 124,
+          "duplicated_tokens": 124,
+          "precision": 0.046154,
+          "recall": 0.035714,
+          "f1": 0.040268
+        },
+        "reading_order": {
+          "sequential_wer": 0.970238,
+          "bag_of_words_wer": 1.702381,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 861,
+        "canonical_hyp_graphemes": 415,
+        "canonical_insertions": 2,
+        "canonical_deletions": 448,
+        "canonical_substitutions": 183,
+        "canonical_edit_distance": 633,
+        "orthographic": {
+          "yeh_ref_count": 53,
+          "yeh_correct": 9,
+          "yeh_substitutions": 8,
+          "yeh_deletions": 36,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.16981132075471697,
+          "kaf_ref_count": 13,
+          "kaf_correct": 1,
+          "kaf_substitutions": 3,
+          "kaf_deletions": 9,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.07692307692307693,
+          "zwnj_ref_count": 9,
+          "zwnj_pred_count": 4,
+          "zwnj_precision": 0.25,
+          "zwnj_recall": 0.1111111111111111,
+          "zwnj_f1": 0.15384615384615385
+        },
+        "unicode_variants": {
+          "output_yeh_count": 16,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 4,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 2,
+            "correct": 0,
+            "missed": 2,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 1
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-004",
+      "image": "small_bench/hand-written/4.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.119042,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/4.md",
+        "source_member_sha256": "558e376d4632c5c184dbaa402fea9cd0ac08b6d3be0d9921f9bb63e543709821",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "rotated"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "به نظر من، بهترین سن برای ازدواج\nو تفاهم ۸۰ سالگیه، نه تو می‌تونی\nحرف بزنی نه اون می‌شنوه چی میگی!\nفتحی\nاکبر",
+      "prediction": "",
+      "metrics": {
+        "raw_unicode_cer": 1.0,
+        "persian_normalized_cer": 1.0,
+        "raw_unicode_wer": 1.0,
+        "persian_normalized_wer": 1.0,
+        "cer_codepoint_strict": 1.0,
+        "cer_grapheme_strict": 1.0,
+        "cer_grapheme_canonical": 1.0,
+        "cer_grapheme_search": 1.0,
+        "wer_canonical": 1.0,
+        "exact_token_rate": 0.0,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 0,
+          "omitted_tokens": 23,
+          "inserted_tokens": 0,
+          "duplicated_tokens": 0,
+          "precision": 1.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "reading_order": {
+          "sequential_wer": 1.0,
+          "bag_of_words_wer": 1.0,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 106,
+        "canonical_hyp_graphemes": 0,
+        "canonical_insertions": 0,
+        "canonical_deletions": 106,
+        "canonical_substitutions": 0,
+        "canonical_edit_distance": 106,
+        "orthographic": {
+          "yeh_ref_count": 11,
+          "yeh_correct": 0,
+          "yeh_substitutions": 0,
+          "yeh_deletions": 11,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.0,
+          "kaf_ref_count": 1,
+          "kaf_correct": 0,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 1,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.0,
+          "zwnj_ref_count": 2,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 0,
+          "persian_yeh_fraction": null,
+          "output_kaf_count": 0,
+          "persian_kaf_fraction": null
+        },
+        "punctuation": {
+          "،": {
+            "ref": 2,
+            "correct": 0,
+            "missed": 2,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-005",
+      "image": "small_bench/hand-written/5.jpg",
+      "split": "phase1_screening",
+      "track": "social_media_graphics",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.399205,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/5.md",
+        "source_member_sha256": "c8af8d9aa0a56adfa6f24fd6d139142f57aff2aaa91e66cef19fd5b5ffe2cbef",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "social_media_graphic",
+          "decorative"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "بعضی چیزها را نمی‌شود گفت...\nبعضی چیزها را احساس می‌کنید،\nرگ و پی شما را می‌تراشد\nدل شما را آب می‌کند،\nاما وقتی می‌خواهید بیان کنید\nمی‌بینید که بی‌رنگ و جلاست\nمانند تابلویی‌ست که شاگردی\nاز روی کار استاد ساخته باشد\nعینا همان تابلوست اما آن روح،\nآن چیزی که دل شما را می‌فشارد\nدر آن نیست...\n📖 #چشم_هایش\n✍️ #بزرگ_علوی",
+      "prediction": "بعضی چیزها ما نی سود ار\nبعضی چیرها ما امسال م یکنیده\nری نمی راو\n\nل ان\n\nدل شا ما آب م ی کندء\nاما وقتی می‌فواهید بیان گنیر\nمی‌بیدی دک بی رگ و لست\nسافتواتارلوفیست کل سرد\n\nاد سوک کام استاد ساختر باشد\n\nعینا هسال تابلوستٌ اما آل میی»\nیرگ کر ول هروس فشند\n\nرل مسب\nلا #هشم‌هایش\n\n۸ #ید دس لوق\n",
+      "metrics": {
+        "raw_unicode_cer": 0.373802,
+        "persian_normalized_cer": 0.382838,
+        "raw_unicode_wer": 0.852459,
+        "persian_normalized_wer": 0.852459,
+        "cer_codepoint_strict": 0.373802,
+        "cer_grapheme_strict": 0.389439,
+        "cer_grapheme_canonical": 0.382838,
+        "cer_grapheme_search": 0.382838,
+        "wer_canonical": 0.852459,
+        "exact_token_rate": 0.213115,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 14,
+          "omitted_tokens": 47,
+          "inserted_tokens": 49,
+          "duplicated_tokens": 49,
+          "precision": 0.222222,
+          "recall": 0.229508,
+          "f1": 0.225806
+        },
+        "reading_order": {
+          "sequential_wer": 0.852459,
+          "bag_of_words_wer": 1.57377,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 303,
+        "canonical_hyp_graphemes": 272,
+        "canonical_insertions": 7,
+        "canonical_deletions": 38,
+        "canonical_substitutions": 71,
+        "canonical_edit_distance": 116,
+        "orthographic": {
+          "yeh_ref_count": 30,
+          "yeh_correct": 22,
+          "yeh_substitutions": 5,
+          "yeh_deletions": 3,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.7333333333333333,
+          "kaf_ref_count": 7,
+          "kaf_correct": 6,
+          "kaf_substitutions": 1,
+          "kaf_deletions": 0,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.8571428571428571,
+          "zwnj_ref_count": 9,
+          "zwnj_pred_count": 3,
+          "zwnj_precision": 0.6666666666666666,
+          "zwnj_recall": 0.2222222222222222,
+          "zwnj_f1": 0.3333333333333333
+        },
+        "unicode_variants": {
+          "output_yeh_count": 26,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 7,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 3,
+            "correct": 0,
+            "missed": 3,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-006",
+      "image": "small_bench/hand-written/6.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.415011,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/6.md",
+        "source_member_sha256": "97c15bf365d36c27617d2f12f64684422ac97cc0f4618ee69cf8de47f4943ed6",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "lined_paper"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "بزرگی درخور هر کس نشاید\nبزرگ آن است که مشکلی را گشاید\nبزرگی بر ستونی می‌برازد\nکه سقفی را نگهداری نماید",
+      "prediction": "وس رس اس\n\nری رخ رگرلسی سیر سس\nری لو\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.754902,
+        "persian_normalized_cer": 0.752475,
+        "raw_unicode_wer": 1.0,
+        "persian_normalized_wer": 1.0,
+        "cer_codepoint_strict": 0.754902,
+        "cer_grapheme_strict": 0.752475,
+        "cer_grapheme_canonical": 0.752475,
+        "cer_grapheme_search": 0.752475,
+        "wer_canonical": 1.0,
+        "exact_token_rate": 0.0,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 0,
+          "omitted_tokens": 21,
+          "inserted_tokens": 10,
+          "duplicated_tokens": 10,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "reading_order": {
+          "sequential_wer": 1.0,
+          "bag_of_words_wer": 1.47619,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 101,
+        "canonical_hyp_graphemes": 34,
+        "canonical_insertions": 0,
+        "canonical_deletions": 67,
+        "canonical_substitutions": 9,
+        "canonical_edit_distance": 76,
+        "orthographic": {
+          "yeh_ref_count": 10,
+          "yeh_correct": 4,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 5,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.4,
+          "kaf_ref_count": 4,
+          "kaf_correct": 0,
+          "kaf_substitutions": 1,
+          "kaf_deletions": 3,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.0,
+          "zwnj_ref_count": 1,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 4,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 0,
+          "persian_kaf_fraction": null
+        },
+        "punctuation": {
+          "،": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-007",
+      "image": "small_bench/hand-written/7.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 1.066891,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/7.md",
+        "source_member_sha256": "93ad7f676840e5bd4a501d6fed6e06ad6130517bf7a36824a2d5caec4be99edb",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "low_resolution",
+          "printed_form_header",
+          "watermark",
+          "dense_text"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "Subject: ________ Year: ________ Month: ________ Date: __ __\nبسم الله الرحمن الرحیم\nسپاس خدای را که نعمت های فراوان بر ما ارزانی داشت و هزاران شکر\nکه در عصر خمینی حیاتمان را قرار داد. همه پدران و مادران ما در آرزوی\nاین دوران بودند ندیدند - ما دیدیم - دوران احیای اسلام عزیز و عزتمندی\nملت‌های مسلمان - مقاومت مجاهدین راه اسلام - عصر تحول و شکوه و\nعظمت در جهان اسلام - عصر بیداری ملت‌ها - عصر زوال طاغوت‌ها\nعصر فروپاشی قدرت‌های استکباری - عصر برگشتن به خویشتن\nخدا را هزاران شکر بخاطر این نعمت‌ها - نعمت زندگی در ۸ سال دفاع\nمقدس - زندگی با مجاهدینی که محبوب خدا بودند و میهمان خدا شدند - زندگی\nدر کنار ملتی که خوش درخشیدند و در مقابل همه توطئه‌ها و فشارهای سنگین\nدشمنان تسلیم نشدند و مدل شدند نمونه شدند در بین ملت‌ها که سرآمد همه\nآنها پدران و مادران و همسران و فرزندان شهیدان گرانقدر ما هستند\nچه افتخاری بالاتر از آن که آزادگان ما و جانبازان ما و خانواده مقاوم‌شان\nصبر را شرمنده کردند - ده سال در اردوگاه‌ها غربت صفحه زرینی\nبر تاریخ این ملت نگاشتند - جانبازان ما با تحمل دردهای فراوان حجت\nرا بر ما تمام کردند که باید مقاومت را ادامه داد\nخدای بزرگ را شکر بخاطر نعمت برخورداری از ولایت - ولایت امیرالمؤمنین\nخبرگزاری مهر - MEHR NEWS AGENCY",
+      "prediction": "۱۳ مریم اس\n\nسا یرای ار اصت هاک وال برما ارزارن داسّت وخزاران عم\n\nک درک رحینی ات کر را دواد مان ونارزانتاندز رزوی\nاي ددران ری ذر-مادیه ) « دوران ای اسر عزم و زمیز ی\nملت‌ها کاصهان .سامت کاهری می «اسرا) - کص رل وکلوه و\nعفلت درچان اسرام کم بواری عست ها -عصر وال طاعژست دا\nعصیر رو سم مررست ها راما کهیر َغ بط ین\n\nحدا را طزاران ستر مَاطایه طسی اش تنم درو سل دم\nمقس - نب هر که حبوب دا ود و مهمان دا رد < رن\nدر رمل حول درخو نو درسابل هدن ها رخامهای مت\nان نارق رز سل رش دورد مرن ات اقا کر نام\n7 بهران رارران رهران «ط مان وان ان رما هد\nجد نام رام رن انا و هدن ما وخافا مسارم مرخ\nی را من گر ندمت ل در ارد وا رب یت مود رو\nنارکا مست تسد ماخ زان ما 4 تم دردها فاد ان عیبی\nویر گنای موه مه سنت و 4 وا مت وی\n\nبو بو رو : ج\nماک برس را فرب و همست برطر بای رز وزاریت.- ولاست (مر رارسا\n| اک ما آ 0\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.564374,
+        "persian_normalized_cer": 0.562667,
+        "raw_unicode_wer": 0.947137,
+        "persian_normalized_wer": 0.947137,
+        "cer_codepoint_strict": 0.564374,
+        "cer_grapheme_strict": 0.568889,
+        "cer_grapheme_canonical": 0.562667,
+        "cer_grapheme_search": 0.562667,
+        "wer_canonical": 0.947137,
+        "exact_token_rate": 0.052863,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 20,
+          "omitted_tokens": 207,
+          "inserted_tokens": 174,
+          "duplicated_tokens": 174,
+          "precision": 0.103093,
+          "recall": 0.088106,
+          "f1": 0.095012
+        },
+        "reading_order": {
+          "sequential_wer": 0.947137,
+          "bag_of_words_wer": 1.678414,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 1125,
+        "canonical_hyp_graphemes": 767,
+        "canonical_insertions": 18,
+        "canonical_deletions": 376,
+        "canonical_substitutions": 239,
+        "canonical_edit_distance": 633,
+        "orthographic": {
+          "yeh_ref_count": 52,
+          "yeh_correct": 15,
+          "yeh_substitutions": 12,
+          "yeh_deletions": 25,
+          "yeh_insertions": 2,
+          "yeh_recall": 0.28846153846153844,
+          "kaf_ref_count": 15,
+          "kaf_correct": 3,
+          "kaf_substitutions": 6,
+          "kaf_deletions": 6,
+          "kaf_insertions": 1,
+          "kaf_recall": 0.2,
+          "zwnj_ref_count": 9,
+          "zwnj_pred_count": 1,
+          "zwnj_precision": 1.0,
+          "zwnj_recall": 0.1111111111111111,
+          "zwnj_f1": 0.2
+        },
+        "unicode_variants": {
+          "output_yeh_count": 30,
+          "persian_yeh_fraction": 0.9666666666666667,
+          "output_kaf_count": 15,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 3
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 2
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-008",
+      "image": "small_bench/hand-written/8.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.712182,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/8.md",
+        "source_member_sha256": "f71f4a9906d9cf8947a7c861599d6dfdb753dc5ecfed1a82bff1e81d64595980",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "clean_scan",
+          "dense_text"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "ای بخارا شاد باش و دیر زی!\nعلی عزیز!\nمی‌دانی چرا عزیزی؟ اول به سبب آن که از\nنوجوانیت تو را شناخته‌ام و از همان هنگام می‌دانستم\nکه عاشق نشر و گسترش فرهنگ و علاقه‌مند جدی ارزش‌های\nملی هستی و اکنون می‌بینم که چگونه ذره ذره از جانت مایه\nگذاشته‌ای تا بخارا و پیش از ده سال کلک را ایستاده\nنگه داری. امید است که عمرت دراز باشد و این خدمت را\nدر روزگار پیری - که هنوز از تو دور است - به پسری شهاب\nبسپاری؛ اگرچه می‌دانم رنجی که در این راه کشیده‌ای در\nالزام این تکلیف به جگر گوشه‌ات به تردید وا می‌داردت.\nدوم این که هم‌نام پسرم علی هستی و می‌توانم تو را\nفرزند بدانم و مثل او برایت آرزوی خیر کنم.\nسوم این که نشریه تو سفره‌ی گسترده‌ای است با\nنعمت‌های گوناگون که هر کس با هر ذائقه و میل تواند",
+      "prediction": "ریت زر( سس ورگ زک !\n۱\nکر مر\nدا مار ی ؟ (ول سرکس 21201\n\nدای را هام رازم 0 هنگام ۱۶\nصمعم ی مش رت رو در\n9 که رازن و مکی رشن نیون\n\n0 # مر 0\nرای ابا فاد دسا دا ری 9\n\nرد 7\n\nکه زا\nبل ای سورد ارم ی\n\nی اس ب رمرم[ و رت ی سروس\nما رک میم مر موز ای در\nال اوقت مر ی رد ماما روم\n\nدرم رم زک میج دما ۱\nرس دا رات زوم\n\nوس ی نس ی\nنت غ یر مر رز گم رک ۷ داش رسل‌ ید ام\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.70944,
+        "persian_normalized_cer": 0.688822,
+        "raw_unicode_wer": 0.965753,
+        "persian_normalized_wer": 0.965753,
+        "cer_codepoint_strict": 0.70944,
+        "cer_grapheme_strict": 0.703927,
+        "cer_grapheme_canonical": 0.688822,
+        "cer_grapheme_search": 0.688822,
+        "wer_canonical": 0.965753,
+        "exact_token_rate": 0.034247,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 9,
+          "omitted_tokens": 137,
+          "inserted_tokens": 95,
+          "duplicated_tokens": 95,
+          "precision": 0.086538,
+          "recall": 0.061644,
+          "f1": 0.072
+        },
+        "reading_order": {
+          "sequential_wer": 0.965753,
+          "bag_of_words_wer": 1.589041,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 662,
+        "canonical_hyp_graphemes": 338,
+        "canonical_insertions": 3,
+        "canonical_deletions": 327,
+        "canonical_substitutions": 126,
+        "canonical_edit_distance": 456,
+        "orthographic": {
+          "yeh_ref_count": 50,
+          "yeh_correct": 16,
+          "yeh_substitutions": 7,
+          "yeh_deletions": 27,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.32,
+          "kaf_ref_count": 16,
+          "kaf_correct": 2,
+          "kaf_substitutions": 7,
+          "kaf_deletions": 7,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.125,
+          "zwnj_ref_count": 16,
+          "zwnj_pred_count": 1,
+          "zwnj_precision": 0.0,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 20,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 9,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 1,
+            "correct": 1,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 2
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-009",
+      "image": "small_bench/hand-written/9.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.287681,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/9.md",
+        "source_member_sha256": "5c6493a84d517e6c4cd0c2aa7987398d033ac351c9ef9bcdf6993108699fbcaf",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "low_resolution",
+          "decorative",
+          "watermark"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "روز معلم یادآور شکوه و عظمت زنان و مردان\nپاکباخته‌ای است که در طول تاریخ\nدر عرصه‌ی تعلیم و تربیت زیباترین جلوه‌های عشق\nو ایثار را به نمایش گذاشته‌اند ....\nروز معلم مبارک\n۱۰۰۰ گل سرخ تقدیم به معلم عزیزم که به من درس\nصبر و وفاداری آموخت\nو مرا در سرزمین دانش باور ساخت. روزت مبارک\nboxit.ir | ۰۹۰۰۱۰۳۰۱۰۰",
+      "prediction": "ماد ارم کلوه و عقلمت زنال) مارم\n3 خر هروا ررنیخ\nلو تارج\n: لو ها من\nرا مرطایل از 2\nیزار\n\n<دال دی سم زد ن‌ین)\n\nمب وقاا)آمرگی\nهمرادسرزمی ول رارسا میدن\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.706667,
+        "persian_normalized_cer": 0.699324,
+        "raw_unicode_wer": 0.966667,
+        "persian_normalized_wer": 0.966667,
+        "cer_codepoint_strict": 0.706667,
+        "cer_grapheme_strict": 0.702703,
+        "cer_grapheme_canonical": 0.699324,
+        "cer_grapheme_search": 0.699324,
+        "wer_canonical": 0.966667,
+        "exact_token_rate": 0.033333,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 3,
+          "omitted_tokens": 57,
+          "inserted_tokens": 30,
+          "duplicated_tokens": 30,
+          "precision": 0.090909,
+          "recall": 0.05,
+          "f1": 0.064516
+        },
+        "reading_order": {
+          "sequential_wer": 0.966667,
+          "bag_of_words_wer": 1.45,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 296,
+        "canonical_hyp_graphemes": 144,
+        "canonical_insertions": 3,
+        "canonical_deletions": 155,
+        "canonical_substitutions": 49,
+        "canonical_edit_distance": 207,
+        "orthographic": {
+          "yeh_ref_count": 15,
+          "yeh_correct": 3,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 11,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.2,
+          "kaf_ref_count": 6,
+          "kaf_correct": 0,
+          "kaf_substitutions": 2,
+          "kaf_deletions": 4,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.0,
+          "zwnj_ref_count": 4,
+          "zwnj_pred_count": 1,
+          "zwnj_precision": 0.0,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 8,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 1,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 3
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "hand-written-010",
+      "image": "small_bench/hand-written/10.jpg",
+      "split": "phase1_screening",
+      "track": "handwriting_smoke",
+      "content_type": "handwritten",
+      "status": "ok",
+      "seconds": 0.391947,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/hand-written/10.md",
+        "source_member_sha256": "1ee3e0f2891b332b972c394ea3d478be218dd3f6aff1f1b99931c496011209f2",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "handwritten",
+          "low_resolution",
+          "watermark",
+          "dense_text"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/hand-written.json",
+      "reference": "سلام به معلم عزیزم که حدود ۵۲ سال پیش، تمام تلاش خود رو بکار گرفت تا من رو هدایت کند؛\nغافل از اینکه من فکر می‌کردم ایشون داره من رو گمراه می‌کند!!\nراستش من کلاس دوم ابتدایی که بودم، وقتی معلم کلاس، خانم کشاورز، می‌آمد سر کلاس، بی هیچ\nوقفه‌ای می‌گفت: «بچه‌ها! کتاب رو باز کنید، می‌خوام درس «بدی» رو بدم!»\nمنم که از بچگی، پدر و مادرم بارها گفته بودند که هیچوقت به حرف «بد» نباید گوش داد،\nمحکم گوش‌هام رو با دو دست می‌گرفتم تا درس «بدی» که خانم معلم قراره بده رو گوش نکنم!!\nخلاصه یه روز که متوجه شدم درسم داره روز به روز ضعیف‌تر می‌شه، موضوع رو با ترس و لرز\nبه پدر و مادرم گفتم و اونا بعد از مذاکره با خانم معلم، فهمیدن منظورش درس «بـ ـدی» بوده و نه\nدرس «بدی»! من تازه متوجه می‌شدم!\nروز معلم رو صمیمانه به معلم نازنینم تبریک می‌گم. نمی‌دونم که ایشون در حال حاضر در قید حیات\nهستن یا نه! اگر در قید حیات هستن، از خداوند سلامتی و توفیق براشون آرزو می‌کنم و اگر\nآسمانی شدن، طلب مغفرت دارم.\n«روز معلمتان مبارک»\nارادتمند؛ رضائیان\nدبستان مظفر امیری\n| boxit.ir | ۹۰۰۰۷۰۳۰ | باکسیت",
+      "prediction": "مرظم کر یبد\n۳\nدم گنر کم ین دومن هنودب\n\nلاب با ری\nی\nگم را وت وم\nما دون ور عفر وی جع نان ول\nپا ی\n\nرس مب ۱ نمی چم\n\nدمن مد\nاور ؛ غابات\nسل ارس\n\nسس\n\n.\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.881321,
+        "persian_normalized_cer": 0.87631,
+        "raw_unicode_wer": 0.994949,
+        "persian_normalized_wer": 0.994949,
+        "cer_codepoint_strict": 0.881321,
+        "cer_grapheme_strict": 0.880503,
+        "cer_grapheme_canonical": 0.87631,
+        "cer_grapheme_search": 0.87605,
+        "wer_canonical": 0.994949,
+        "exact_token_rate": 0.005051,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 1,
+          "omitted_tokens": 197,
+          "inserted_tokens": 41,
+          "duplicated_tokens": 41,
+          "precision": 0.02381,
+          "recall": 0.005051,
+          "f1": 0.008333
+        },
+        "reading_order": {
+          "sequential_wer": 0.994949,
+          "bag_of_words_wer": 1.20202,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 954,
+        "canonical_hyp_graphemes": 139,
+        "canonical_insertions": 0,
+        "canonical_deletions": 815,
+        "canonical_substitutions": 21,
+        "canonical_edit_distance": 836,
+        "orthographic": {
+          "yeh_ref_count": 49,
+          "yeh_correct": 7,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 41,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.14285714285714285,
+          "kaf_ref_count": 26,
+          "kaf_correct": 2,
+          "kaf_substitutions": 1,
+          "kaf_deletions": 23,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.07692307692307693,
+          "zwnj_ref_count": 15,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 7,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 2,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 12,
+            "correct": 0,
+            "missed": 12,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 2,
+            "correct": 0,
+            "missed": 2,
+            "inserted": 1
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 7,
+            "correct": 0,
+            "missed": 7,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 7,
+            "correct": 0,
+            "missed": 7,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-001",
+      "image": "small_bench/typed/1.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 1.286844,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/1.md",
+        "source_member_sha256": "b3f51b62fd28affc83a0e0c0b4a8d4f771ab79411c9e36ad23129e0730bc3de3",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "clean_scan",
+          "book_page"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "پیشگفتار\nموفقیت چاپ اول کتاب اقتصاد خرد میانه باعث خوشحالی من شد. این حقیقت باعث شد که عقیده من مبنی بر اینکه بازار یک روش تحلیلی را برای اقتصاد خرد در سطح کارشناسی استقبال می‌کند، تأکید شود.\nهدف من از نوشتن چاپ اول این کتاب ارائهٔ طرز عمل روشهای اقتصاد خرد بود تا به دانشجویان امکان دهد که از این ابزار به روش خودشان، و نه به‌صورت انتخاب موارد از پیش حل‌شده در متن کتاب، استفاده کنند. در این راستا، دریافتم که بهترین راه برای انجام این امر تأکید بر مفاهیم اساسی اقتصاد خرد و ارائهٔ مثالهایی از کاربرد آنهاست. نوشتن مجموعه‌ای از اصطلاحات و گفته‌ها به‌تنهایی چندان مفید نیست.\nلزوم دنبال کردن چنین روشی، کمبود پیشنیازهای ریاضی برای درسهای اقتصاد در بسیاری از کالج‌ها و دانشگاه‌ها بود. فقدان حساب دیفرانسیل و انتگرال و به‌طور کلی تجربه حل مسائل ارائهٔ روشهای تحلیلی در اقتصاد را مشکل می‌سازد. با پرداختن به چند مثال واقعی از توابع تقاضای خطی و توابع عرضه و جبر مقدماتی می‌توان راه را بسیار کوتاه کرد. این کاملاً امکان‌پذیر است که بدون تکیهٔ زیاد بر ریاضی، مسائل را تجزیه و تحلیل کرد.\nلازم است بر تمایز این دو تأکید شود. روش تحلیلی در اقتصاد آن است که استفاده‌کنندگان دلائل منطقی و توصیفی به‌کار برند. این لزوماً به معنی استفاده از روشهای پیشرفتهٔ ریاضی نیست. مسلماً زبان ریاضی به تحلیل توصیفی کمک می‌کند، و بدون شک در صورت امکان بهترین راه برای پرداختن به مسائل است ولی برای تمام دانشجویان خوشایند نیست.\nبسیاری از دانشجویان کارشناسی رشتهٔ اقتصاد باید حساب دیفرانسیل بدانند، ولی می‌توان گفت که آنها این علم را نمی‌دانند یا حداقل خیلی خوب نمی‌دانند. بدین‌دلیل من حساب دیفرانسیل را از متن کتاب جدا ساخته‌ام. اما، در بسیاری از پیوستهای فصول حساب دیفرانسیل کاملی ارائه شده است.",
+      "prediction": "۸ که تار\n\nسم\nموفقیت چاپ اول کتاب اقتصاد حرد میانه باعث خوشحالی من شد. این حقیقت باعث شد که عقیدة\nمن مبنی بر اینکه بازار یک روش تحلیلی را برای اقتصاد خرد در سطح کارشناسی استقبال می‌کند.\nتاکید شود.\n\nهدف من از نوشتن چاپ اول این کتاب ارائة طرز عمل روشهای اقتصاد خرد بود تا به دانشجویان\nامکان دهد که از این ابزار به‌روش خودشان, و نه به‌صورت انتخاب موارد از پیش حل‌شده در متن کتاب,\nاستفاده کنند. در این راستاء دریافتم که بهترین راه برای انجام این امر تأکید بر مفاهیم اساسی اقتصاد خرد و\nارائنة مثالهایی ازکار برد آنهاست. نوشتن مجموعه‌ای از اصطلاحات وگفته‌ها به‌تنهایی چندان مفید نیست.\n\nلزوم دنبال کردن چنین روشی» کمبود پیشنیازهای ریاضی برای درسهای اقتصاد در بسیاری از\nکالج‌ها و دانشگاه‌ها بود. فقدان حساب دیفرانسیل و انتگرال و به‌طور کلی تجربه حل مسائل ارائةٌ\nروشهای تحلیلی در اقتصاد را مشکل می‌سازد. با پرداختن به چند مثال واقعی از توابع تقاضای خطی\nو توابع عرضه و جبر مقدماتی می‌توان راه را بسیار کوتاه کرد. این کاملا امکان‌پذیر است که بدون تكية\nزیاد بر ریاضی, مسائل را تجزیه و تحلیل کرد.\n\nلازم است بر تمایز این دو تأکید شود. روش تحلیلی در اقتصاد آن است که استفاد‌کنندگان دلائل\nمنطقی و توصیفی بدکار برند. این لزوماً به معثی.استفاده از روشهای پيشرفتة ریاضی«تیست: مسلماً\nزبان ریاضی به تحلیل توصیفی کمک می‌کند. و بدون شک در صورت امکان بهترین راه برای پرداختن\nبه مسائل است ولی برای تمام دانشجویان خوشایند نیست.\n\nبسیاری از دانشجویان کارشناسی رشتة اقتصاد باید حساب دیفرانسیل بدانند. ولی می‌توان گفت\nکه آنها این علم را نمی‌دانند یا حداقل خیلی خوب نمی‌دانند. بدین‌دلیل من حساب دیفرانسیل را از\nمتن کتاب جدا ساخته‌ام. اماء در بسیاری از پیوستهای فصول حساب دیفرانسیل کاملی ارائه شده است.\n",
+      "metrics": {
+        "raw_unicode_cer": 0.042702,
+        "persian_normalized_cer": 0.026623,
+        "raw_unicode_wer": 0.12069,
+        "persian_normalized_wer": 0.12069,
+        "cer_codepoint_strict": 0.042702,
+        "cer_grapheme_strict": 0.040909,
+        "cer_grapheme_canonical": 0.026623,
+        "cer_grapheme_search": 0.026623,
+        "wer_canonical": 0.12069,
+        "exact_token_rate": 0.889655,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 258,
+          "omitted_tokens": 32,
+          "inserted_tokens": 31,
+          "duplicated_tokens": 31,
+          "precision": 0.892734,
+          "recall": 0.889655,
+          "f1": 0.891192
+        },
+        "reading_order": {
+          "sequential_wer": 0.12069,
+          "bag_of_words_wer": 0.217241,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 1540,
+        "canonical_hyp_graphemes": 1541,
+        "canonical_insertions": 5,
+        "canonical_deletions": 4,
+        "canonical_substitutions": 32,
+        "canonical_edit_distance": 41,
+        "orthographic": {
+          "yeh_ref_count": 122,
+          "yeh_correct": 121,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 0,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.9918032786885246,
+          "kaf_ref_count": 40,
+          "kaf_correct": 40,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 0,
+          "kaf_insertions": 0,
+          "kaf_recall": 1.0,
+          "zwnj_ref_count": 20,
+          "zwnj_pred_count": 20,
+          "zwnj_precision": 0.95,
+          "zwnj_recall": 0.95,
+          "zwnj_f1": 0.95
+        },
+        "unicode_variants": {
+          "output_yeh_count": 121,
+          "persian_yeh_fraction": 0.9834710743801653,
+          "output_kaf_count": 41,
+          "persian_kaf_fraction": 0.975609756097561
+        },
+        "punctuation": {
+          "،": {
+            "ref": 9,
+            "correct": 0,
+            "missed": 9,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-002",
+      "image": "small_bench/typed/2.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.107586,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/2.md",
+        "source_member_sha256": "dd1e6c32ca61082230e989c052106a643bbdd9e0226c8066e1174ffce4c29f56",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "low_resolution",
+          "uneven_illumination",
+          "book_page"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "در شرح حال حکیم نظامی\nالیاس ابن یوسف متخلص به نظامی — شاعر بزرگ سدهٔ ششم هجری — در شهر گنجه واقع در جمهوری آذربایجان کنونی تولد یافته و چنان که از اشعار او برمی‌آید تا آخر عمر در آن شهر ماندگار شده است ولی از فحوای اشعارش پیداست که اصلاً از عراق عجم بوده است.\nدر بحر بیکران شعر و ادب پارسی، حکیم نظامی گنجه‌ای یکی از بزرگان آن به‌شمار می‌رود. نظامی، در اوزان مختلف مثنوی همچون سعدی و حافظ در غزل، سرآمد سخنوران دوران است و در این عرصه فقط فردوسی و مولانا جلال‌الدین رومی را می‌توان شایان مقایسه با حکیم نظامی دانست.\nنظامی در علوم ادبی و عربی، عقلی و نقلی و نیز در علوم طبیعی و فلسفه نیز در ردیف حکمای طراز اول زمان خود جای داشته و در این رشته‌ها به تدریس نیز می‌پرداخته است. در عرفان نیز در شمار یکی از پیشوایان به‌شمار می‌رفته. از لحاظ معتقدات مذهبی گرچه تشیع نظامی ثابت نشده است ولی از آنجا که حضرت علی را به سبب مقام علم و فضل وی بر دیگران مقدم می‌داشته، چنین می‌نماید به مذهب شافعی تعلق خاطر داشته است.\nنظامی با آنکه به اصول و شریعت اسلامی پای‌بندی داشته ولی از طرح برخی مسایل فلسفی هم که ظاهراً با اصول اسلامی چندان سازگار نبوده، فروگذار نکرده است.\nحکیم نظامی از حیث پاکی اخلاقی و تقوای بیان، در میان همه شعرای پارسی‌گو، فقط با فردوسی قابل مقایسه است. در آثار این دو بزرگوار از آغاز تا پایان یک لفظ زشت و رکیک مشاهده نمی‌شود. نظامی در منظومه‌های خسرو و شیرین و لیلی و مجنون از عشق آمیخته به عفت سخن می‌دارد و حتی در توصیف همبستری آنان به زبان شعر، لحظه‌ای از روش پرهیزگارانه منحرف نمی‌شود.",
+      "prediction": "",
+      "metrics": {
+        "raw_unicode_cer": 1.0,
+        "persian_normalized_cer": 1.0,
+        "raw_unicode_wer": 1.0,
+        "persian_normalized_wer": 1.0,
+        "cer_codepoint_strict": 1.0,
+        "cer_grapheme_strict": 1.0,
+        "cer_grapheme_canonical": 1.0,
+        "cer_grapheme_search": 1.0,
+        "wer_canonical": 1.0,
+        "exact_token_rate": 0.0,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 0,
+          "omitted_tokens": 283,
+          "inserted_tokens": 0,
+          "duplicated_tokens": 0,
+          "precision": 1.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "reading_order": {
+          "sequential_wer": 1.0,
+          "bag_of_words_wer": 1.0,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 1372,
+        "canonical_hyp_graphemes": 0,
+        "canonical_insertions": 0,
+        "canonical_deletions": 1372,
+        "canonical_substitutions": 0,
+        "canonical_edit_distance": 1372,
+        "orthographic": {
+          "yeh_ref_count": 110,
+          "yeh_correct": 0,
+          "yeh_substitutions": 0,
+          "yeh_deletions": 110,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.0,
+          "kaf_ref_count": 19,
+          "kaf_correct": 0,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 19,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.0,
+          "zwnj_ref_count": 19,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 0,
+          "persian_yeh_fraction": null,
+          "output_kaf_count": 0,
+          "persian_kaf_fraction": null
+        },
+        "punctuation": {
+          "،": {
+            "ref": 9,
+            "correct": 0,
+            "missed": 9,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-003",
+      "image": "small_bench/typed/3.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.892978,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/3.md",
+        "source_member_sha256": "e838d3ccd12cb3bbecbac7ffe1904fad33f9f543978703f776d5d47ce26c87bc",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "clean_scan",
+          "book_page"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "۱۰۲ | تکه‌هایی از یک کل منسجم\nدست‌دادن به همراه دارد و هر از دست‌دادنی غمگین کننده است. از اندوه که بگذریم در بسیاری از مواقع خشمگین هم هستیم و گاهی همین خالی کردن خشم هم می‌تواند وسوسه‌ای برای شروع دوبارهٔ رابطه باشد. اما به یاد داشته باشید تخلیهٔ خشم، به هر شیوه‌ای؛ انتقام، تلافی، هر شیوه‌ای که آسیبی آشکار یا نهان در آن باشد، فقط برای لحظاتی ما را تسکین می‌دهد و اگر خشم به درستی و به شکلی سالم در درون ما تجربه، حس و تحمل نشود، هر تلاش ما در دراز مدت، بیهوده خواهد بود و ما هنوز آرام نیستیم. تلاش برای شروع دوباره باید با آگاهی باشد.\nگاهی آدم‌ها به هزار دلیل می‌خواهند دوباره با ما وارد رابطه شوند، حواسمان باشد آدم‌ها مثل ما آدم هستند. سخت تغییر می‌کنند و گاهی فقط شکل آزارشان تغییر می‌کند اما در نهایت اگر ناسازگاری عمیقی در رابطه باشد، احتمال اینکه تکرار شود زیاد است. اگر آزار دیده‌اید و احساس امنیت نمی‌کنید، به سرعت وارد رابطه نشوید. صبر کنید و با خودتان این جمله را تکرار کنید «ما یکبار ناخواسته اشتباه می‌کنیم و بار دیگر تصمیم می‌گیریم و با آگاهی اشتباه را تکرار می‌کنیم».",
+      "prediction": "دست‌دادن به همراه دارد و هر از دست‌دادنی غمکین کننده است. از اندوه که\nبگذریم در بسیاری از مواقع خشمگین هم هستیم و گاهی همین شنالی,کرون\nشم هنم می‌تواند وسوسه‌ای برای شروع دوبارهٌ رابطه باشد. اما به یاد داشته\nباشید تخلیةٌ خشم» به هر شیوه‌ای؛ انتام» تلافی» هر شیوه‌ای که آسیبی آشکار\nیا نهان در آن باشدء فقط برای لحظاتی ما را تسکین می‌دهد و اگر خشم به\nدرستی و به شکلی سالم در درون ما تجربه» حس و تحمل نشود. هر تلاش\nما در دراز مدت» بیهوده خواهد بود و ما هنوز آرام نیستیم. تلاش برای شروع\nدوباره باید با آگاهی باشد.\n\nگاهی آدم‌ها به هزار دلیل می‌خواهند دوباره با ما وارد رابطه شوند\nحواسمان باشد آدم‌ها مثل ما آدم هستند. سخت تغییر می‌کنند و گاهی فقط\nشکل آزارشان تغییر می‌کند اما در نهایت اگر ناسازگاری عمیقی در رابطه\nباشد, احتمال اینکه تکرار شود زیاد است. اگر آزار دیده‌اید و احساس امنیت\nنمی‌کنید» به سرعت وارد رابطه نشوید. صبر کنید و با خودتان این جمله را\nتکرار کنید «ما یکبار ناخواسته اشتباه می‌کنیم و بار دیگر تصمیم می‌گیریم وبا\nآگاهی اشتباه را تکرار می‌کنیم).\n",
+      "metrics": {
+        "raw_unicode_cer": 0.06802,
+        "persian_normalized_cer": 0.05285,
+        "raw_unicode_wer": 0.139175,
+        "persian_normalized_wer": 0.139175,
+        "cer_codepoint_strict": 0.06802,
+        "cer_grapheme_strict": 0.067358,
+        "cer_grapheme_canonical": 0.05285,
+        "cer_grapheme_search": 0.05285,
+        "wer_canonical": 0.139175,
+        "exact_token_rate": 0.860825,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 167,
+          "omitted_tokens": 27,
+          "inserted_tokens": 18,
+          "duplicated_tokens": 18,
+          "precision": 0.902703,
+          "recall": 0.860825,
+          "f1": 0.881266
+        },
+        "reading_order": {
+          "sequential_wer": 0.139175,
+          "bag_of_words_wer": 0.231959,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 965,
+        "canonical_hyp_graphemes": 934,
+        "canonical_insertions": 2,
+        "canonical_deletions": 33,
+        "canonical_substitutions": 16,
+        "canonical_edit_distance": 51,
+        "orthographic": {
+          "yeh_ref_count": 75,
+          "yeh_correct": 72,
+          "yeh_substitutions": 0,
+          "yeh_deletions": 3,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.96,
+          "kaf_ref_count": 23,
+          "kaf_correct": 20,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 3,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.8695652173913043,
+          "zwnj_ref_count": 18,
+          "zwnj_pred_count": 17,
+          "zwnj_precision": 1.0,
+          "zwnj_recall": 0.9444444444444444,
+          "zwnj_f1": 0.9714285714285714
+        },
+        "unicode_variants": {
+          "output_yeh_count": 72,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 21,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 10,
+            "correct": 0,
+            "missed": 10,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 1,
+            "correct": 1,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 1,
+            "correct": 1,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 6
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-004",
+      "image": "small_bench/typed/4.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.318831,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/4.md",
+        "source_member_sha256": "566a24e35f91787f16063f97b79e526212504fa61bdb60ff9ecd72e71216b026",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "low_light",
+          "cropped",
+          "book_page"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "آورده بود،\nنونیز تقسیم شده بود. در نهایت هیئت مدیره،\nزیر فشار زیاد باشگاه، تعارضات پشت‌پرده و ارتباط رو به\nدرهم شکست. کرایوف رفته بود اما هنوز یکی از ماندگارترین وارثان او در قامت\nپپ گواردیولا باقی مانده بود، هافبک وسط جوان لاغری که تبدیل به نشانه و\nتجسم فلسفه‌هایی شد که مربی هلندی تدوین کرده بود.\nبعد از کرایوف، سر بابی رابسون آمد، مربی شصت‌وسه ساله خوش‌خلقی که\nمعمولاً با اسم مستعار «گرنند میکونل¹» (ستاره تبلیغات برای شراب ارزان) میان\nبازیکنان ارشد شناخته می‌شد. رابسون هرگز زبان اسپانیولی یا زبان بازیکنانش را\nنفهمید اما از مقایسه‌های نامنصفانه‌ی بین خود و مربی هلندی اذیت می‌شد که\nبرهمه سایه افکنده بود.\nیکی از اولین جلسات تمرین سر بابی رابسون در نیوکمپ. اواخر صبح،\nسال ۱۹۹۶\nیک روز صبح به محض ورود، سر بابی رابسون از یک تیکه گچ برای ترسیم\nتاکتیکش بر روی تخته رختکن استفاده کرد و ژوزه مورینیو برحسب وظیفه، زبان\nانگلیسی رابسون را به اسپانیولی ترجمه می‌کرد. بازیکنان به او نگاه می‌کردند و\nنگاه‌های بهت‌زده‌ای را بین خود رد و بدل می‌کردند چون می‌دیدند که پیرمرد قبل\nاز ورود آن‌ها، خط‌خطی‌های نامفهومی را روی کف رختکن ترسیم کرده بود. این\nدقیقاً همان زمانی بود که او مدیریت رختکن را از دست داد و همان‌طور که فصل\nادامه داشت، نوعی خودمدیریتی میان بازیکنان تکامل یافت.\nدفعات زیادی پیش می‌آمد که مورینیو صحبت‌های رابسون را ترجمه می‌کرد و\nچیزهایی به آن اضافه می‌کرد و دستورات را شفاف‌تر می‌ساخت و گاهی هم خیلی\nبه آن اضافه می‌کرد. پپ و ژوزه به سرعت در گـ...",
+      "prediction": "لندی تدوین گزده بود ی\nامد آمریی شصت‌وسه ساله خوش‌خلق یک\nات برای شسراب ارزان) مان\n\nاند میکونل » (ستاره\n\nایند راینون هرگز زبان\n\nی این ن را ترجمه می‌کزدد\nررض راشفافتر تر می‌ساخت وگاهی هم خل\nرم\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.872687,
+        "persian_normalized_cer": 0.873772,
+        "raw_unicode_wer": 0.956522,
+        "persian_normalized_wer": 0.956522,
+        "cer_codepoint_strict": 0.872687,
+        "cer_grapheme_strict": 0.874528,
+        "cer_grapheme_canonical": 0.873772,
+        "cer_grapheme_search": 0.873676,
+        "wer_canonical": 0.956522,
+        "exact_token_rate": 0.047431,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 15,
+          "omitted_tokens": 238,
+          "inserted_tokens": 23,
+          "duplicated_tokens": 23,
+          "precision": 0.394737,
+          "recall": 0.059289,
+          "f1": 0.103093
+        },
+        "reading_order": {
+          "sequential_wer": 0.956522,
+          "bag_of_words_wer": 1.031621,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 1323,
+        "canonical_hyp_graphemes": 182,
+        "canonical_insertions": 1,
+        "canonical_deletions": 1142,
+        "canonical_substitutions": 13,
+        "canonical_edit_distance": 1156,
+        "orthographic": {
+          "yeh_ref_count": 109,
+          "yeh_correct": 15,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 93,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.13761467889908258,
+          "kaf_ref_count": 40,
+          "kaf_correct": 2,
+          "kaf_substitutions": 1,
+          "kaf_deletions": 37,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.05,
+          "zwnj_ref_count": 26,
+          "zwnj_pred_count": 4,
+          "zwnj_precision": 1.0,
+          "zwnj_recall": 0.15384615384615385,
+          "zwnj_f1": 0.26666666666666666
+        },
+        "unicode_variants": {
+          "output_yeh_count": 15,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 3,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 11,
+            "correct": 0,
+            "missed": 11,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 1
+          },
+          "(": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 1
+          },
+          ")": {
+            "ref": 1,
+            "correct": 1,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-005",
+      "image": "small_bench/typed/5.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.457669,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/5.md",
+        "source_member_sha256": "3a6df217b6f3ad880b30ef94f6434b85abd52d625ed4c4f30706bf87485717c8",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "grayscale_photo",
+          "perspective_distortion",
+          "book_page"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "اللا\nبوستون، ۹ ژوئن ۲۰۰۸\nبه یاد نداشت که هیچ وقت از تنها ماندن خوشش آمده باشد. اما این اواخر، شاید هم برای اولین بار در زندگی‌اش، برای تنها ماندن در خانه لحظه شماری می‌کرد. در هر فرصتی با ملت عشق سر و کله می‌زد؛ گزارشی را که دربارهٔ رمان نوشته بود بازنویسی می‌کرد. به میشله تلفن کرده بود و گفته بود یک هفته فرصت اضافه می‌خواهد. راستش، اگر کمی می‌جنبید، می‌توانست گزارش را سر موقع آماده کند. اما خودش نخواسته بود. رمان زاهارا سبب شده بود به دنیای ذهنی خودش قدم بگذارد و به این ترتیب هم از مسئولیت‌های خانوادگی فرار کند و هم از دعوا و مرافعه با شوهرش که خیلی وقت بود انتظارش را می‌کشید. این هفته به جلسهٔ کلوب آشپزی فوزیون نرفته بود؛ این اولین غیبتش بود. حالا که خودش نمی‌دانست با زندگی‌اش چه کند، سختش بود پهلوی پانزده زن دیگر که زندگی مشابهی داشتند، بایستد و آشپزی کند.\nدر این میان إلا قضیهٔ نامه‌نگاری‌اش با عزیز را مثل رازی برای خودش نگه داشته بود. چه جالب؛ این اواخر کلی راز برای خودش پیدا کرده بود: مثلاً عزیز نمی‌دانست إلا دارد برای انتشارات گزارشی در مورد رمانش می‌نویسد. در مؤسسهٔ انتشاراتی هم کسی خبر نداشت إلا با نویسنده‌ای که",
+      "prediction": "9\nپینون ‎٩‏ ژوئن ۱*۸\n\nدنت که هیچ وقت از ها مان خوخش آنده باش. مان وا\nدی رای ی ار در زنگیاش برای تها ماد درخ لحظانماری\nشخ سرد کله می‌زد گزارشی راکه درب\n\nبرد درهر فرصتی بات\nنون بود پازنویسی می‌کرد ه میشله تن کرده بو وک رد یک\nنرست اضافه می‌خواهد. واستش؛ اگر کی می‌جنید می‌تواست\nکوش راسر موقع آماده کند. اما خودش نخواسته بود. رما تاه سر\nبرد به دای رخعتی خودش, ق) زگ اهب ات رو\nسویت‌های خانوادگی فرارکند و هم از دعواومرافعه با شوهرزب .ی\nرف بردتتظارش را می‌کشید. این هفته به جلسةکلوب آشجزی بر ری وی\nان وین خینشی پودر ما که خودشی نمی انحت را و\nمخش برد بهلوي پتزده زن ادیکر که وینگی مشایی داشتده ببس ار\n\nنپزی کند.\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.532367,
+        "persian_normalized_cer": 0.518738,
+        "raw_unicode_wer": 0.82266,
+        "persian_normalized_wer": 0.82266,
+        "cer_codepoint_strict": 0.532367,
+        "cer_grapheme_strict": 0.533531,
+        "cer_grapheme_canonical": 0.518738,
+        "cer_grapheme_search": 0.517751,
+        "wer_canonical": 0.82266,
+        "exact_token_rate": 0.17734,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 42,
+          "omitted_tokens": 161,
+          "inserted_tokens": 86,
+          "duplicated_tokens": 86,
+          "precision": 0.328125,
+          "recall": 0.206897,
+          "f1": 0.253776
+        },
+        "reading_order": {
+          "sequential_wer": 0.82266,
+          "bag_of_words_wer": 1.216749,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 1014,
+        "canonical_hyp_graphemes": 592,
+        "canonical_insertions": 15,
+        "canonical_deletions": 437,
+        "canonical_substitutions": 74,
+        "canonical_edit_distance": 526,
+        "orthographic": {
+          "yeh_ref_count": 70,
+          "yeh_correct": 39,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 30,
+          "yeh_insertions": 2,
+          "yeh_recall": 0.5571428571428572,
+          "kaf_ref_count": 21,
+          "kaf_correct": 13,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 8,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.6190476190476191,
+          "zwnj_ref_count": 16,
+          "zwnj_pred_count": 7,
+          "zwnj_precision": 1.0,
+          "zwnj_recall": 0.4375,
+          "zwnj_f1": 0.6086956521739131
+        },
+        "unicode_variants": {
+          "output_yeh_count": 45,
+          "persian_yeh_fraction": 0.9777777777777777,
+          "output_kaf_count": 17,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 7,
+            "correct": 0,
+            "missed": 7,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 3,
+            "correct": 0,
+            "missed": 3,
+            "inserted": 1
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-006",
+      "image": "small_bench/typed/6.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 1.769927,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/6.md",
+        "source_member_sha256": "fb110adbd52762c45dfef1ad00357e3b8a47e438e8879e393339ecab6708f8a0",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "table",
+          "form"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "مدارک تضامین تحویلی پرونده ( ---------------- ) به صندوق/ نماینده آن در شرکت شهرک‌های صنعتی استان ؛\n❖ الف) مدارک مربوط به وثیقه ملکی/خودرو:\nقرارداد واگذاری حق بهره‌برداری سند مالکیت ثبتی خودرو (سواری مدل ۱۳۹۸ و ۲۰۱۵ به بعد)\nاصل دفترچه قرارداد محل اجرای طرح و ضمائم آن اصل سند مالکیت اصل سند کمپانی\nاصل سند تعهد غیرمالی تنظیمی دفترخانه اصل سند رهنی اصل برگ سبز\nاصل سند وکالت فروش محل اجرای طرح اصل سند وکالت فروش اصل سند رهنی\nاصل گزارش کارشناسی رسمی دادگستری (صرفاً اعیان و مستحدثات) اصل گزارش کارشناسی رسمی دادگستری اصل سند وکالت فروش\nاصل تعهد جانشینی شرکت شهرک‌های صنعتی فتوکپی تمام صفحات شناسنامه و کارت هوشمند ملی راهن فتوکپی شناسنامه (تمام صفحات) و کارت هوشمند ملی (پشت و رو) مالک خودرو (برابر اصل شده)\nتاییدیه ثبت نام ثنا برای بهره‌بردار تاییدیه ثبت نام ثنا مالک وثیقه (راهن) فتوکپی بیمه شخص ثالث (برابر اصل شده)\nفتوکپی بیمه بدنه (برابر اصل شده)\nفتوکپی عدم خلافی خودرو/ تسویه جرایم (برابر اصل شده)\nتاییدیه ثبت نام ثنا مالک خودرو (راهن)\n❖ ب) مدارک مربوط به متقاضی :\nاشخاص حقوقی، صاحبان امضا مجاز، مدیران و سهامداران ۱۰٪ و بالاتر اشخاص حقیقی\nفتوکپی شناسنامه (تمام صفحات) برابر اصل شده فتوکپی شناسنامه (تمام صفحات) برابر اصل شده\nفتوکپی کارت هوشمند ملی (پشت و رو) برابر اصل شده فتوکپی کارت هوشمند ملی (پشت و رو) برابر اصل شده\nاصل گواهی امضاء دفترخانه اصل گواهی امضاء دفترخانه\nتکمیل و ارائه فرم استعلام بانک که در آن مطابقت امضای مندرج در بانک به تایید رسیده باشد (فقط برای شماره حساب چک تضمین) تکمیل و ارائه فرم استعلام بانک که در آن مطابقت امضای مندرج در بانک به تایید رسیده باشد (فقط برای شماره حساب چک تضمین)\nتاییدیه ثبت نام ثنا تاییدیه ثبت نام ثنا\nصورتجلسه تعیین درصد یا تعداد سهام سهامداران شرکت\nآخرین روزنامه رسمی صاحبان امضاء مجاز، اعضای هیات مدیره و مدیرعامل\n❖ ج) مدارک ضامن/ ضامنین:\nدارای پروانه کسب یا پروانه بهره‌برداری / فعالیت اقتصادی معتبر شاغل در بخش دولتی یا بخش خصوصی معتبر\nارائه پروانه کسب / پروانه بهره‌برداری یا فعالیت اقتصادی برابر اصل شده حکم کارگزینی یا قرارداد سالجاری برابر اصل شده - آخرین فیش حقوقی ممهور به مهر کارگزینی / پرینت سوابق بیمه\nارائه استعلام چک برگشتی و گردش حساب اصلی (سه ماهه اخیر) ارائه استعلام چک برگشتی و گردش حساب واریز حقوق (سه ماهه اخیر)\nتکمیل و امضای فرم معرفی اموال بانضمام تصویر اسناد مالکیت اموال تکمیل و امضای فرم معرفی اموال بانضمام تصویر اسناد مالکیت اموال\nفتوکپی شناسنامه تمام صفحات برابر اصل شده فتوکپی شناسنامه تمام صفحات برابر اصل شده\nفتوکپی کارت هوشمند ملی (پشت و رو) برابر اصل شده فتوکپی کارت هوشمند ملی (پشت و رو) برابر اصل شده\nاصل گواهی امضاء دفترخانه اصل گواهی امضاء دفترخانه\nتاییدیه ثبت نام ثنا تاییدیه ثبت نام ثنا\nفتوکپی سند مالکیت محل کسب (در صورت استیجاری بودن؛ اجاره نامه معتبر ۵ سال اخیر) برابر اصل شده\n❖ د) تضامین:\nارائه سه فقره چک معادل ۱۵۰٪ مبلغ ضمانتنامه و همچنین سفته به مبلغ اعلامی توسط متقاضی با امضا و اثر انگشت در ظهر (پشت) آنها توسط صاحبان امضای مجاز و مدیران (بعنوان شخصیت حقیقی)، سهامداران ۱۰٪ و بالاتر و ضامنین.\n❖ ه) قرارداد صدور ضمانتنامه:\nتکمیل قرارداد صدور ضمانتنامه با امضاء و اثرانگشت راهن، متقاضی، مدیران، ضامنین، سهامداران ۱۰٪ و بالاتر (کلیه متعهدین) به همراه تاییدیه نماینده صندوق\n❖ و) سایر مدارک:\n۱- تکمیل فرم اطلاعات و مشخصات راهن، متقاضی، مدیران، ضامنین، سهامداران ۱۰٪ و بالاتر (کلیه متعهدین)",
+      "prediction": ") به صندوق / نماینده آن در شرکت شهرکهای صنعتی استان ؛\n\n۵ ۴ خودرو:\nقرارداد واگذاری حق بهره برداری سند مالکیت ثبتی\n(سواری مدل ۱۳۹۸و ۲۰۱۵ به بعد)\nاصل دفترچه قراداد محل اجرای طرح و ضمائم آن ] اصل سند مالکیت آسال سته کمپای\nاصل سند تجهد غبرمالي تنظیمی دفترخانه: اصل سند وهی ال برگ سبز\nاصل سند وکالت فروش محل اجرای طرح امل سند وکالت فروش اصل مند هن\nاصل گزارش کارشناسی وسمی دادگستری کا ۷ قرو\n(سرفًامیان و مستحدنات) ال گزارش کارشتاسی رسمی .| اصل صنداوکالت فروشی\nدادگستری\nفتوکپی تمام صفحات شناسنامه و | فتوکپی شناسنامه (تمام صفحات) و کارت هوشمند ملی\nاصل تعهد جانشینی شرکت شهرکهای صنعتی | کارت هوشمند ملی راهن (پشت و رو) مالک خودرو(برابر اصل شده)\nتاییدیه ثبت نام نا مالک و فتوکبی بیمه شخص تالث (برابر اصل شدم)\nتاییدیه ثبت نام قنا برای بهره بردار (راهن) فتوکپی بیمه بدنه (برابر اصل شده)\nافتوکپی عدم خلاقی خودروا تسویه جرایم (برابر اصل شده ).\nتابیدیه ثبت نام نا مالک خودرو (راهن)\n+ ب) مدارک مربوط به متقاضی :\nآشخاص حقوقي, صاحبان امضا مجاز. مدیران و سهامداران ۱۱۰ و بالاتر آشخاص حقیقی\nفتوکپی شناسنامه (تمام صفحات) برابراصل شده فتوکپی شناسنامه (تمام صفحات) برابراصل شده\nفتوگبی کارت هوشمند ملي(پشت و رو برایو اصل شنده: فتوکپی کارت هوشمند ملی (پشت و رو) برابراصل شده\nاصل کواهی امضاه دقترخانه آصل گواهي امضاء دقترخانه\nتکمیل و ارانه فرم استعلام بانگ که در آن مطابقت امضای مندرج در بان به | تکمیل و ارانه فرم استعلام بالگ که درآن مطابقت امضای مندرج در\nتابید رسیده باشد(فقط برای شماره حساب چک تضمین) بانک به تایید رسیده باشد (فقط برای شماره حساب چک تضمین)\nتاپیدیه ثبت نام نا تأییدیه ثبت تام نا\nصورتجاسه تمیین درصد با تمداد سهام سهامداران شرکت\nآخرین روزنامه رسمی صاحبان امضاه مجازء اعضای هیات مدبره و مدیرعامل\n\n+ چ)مدارک ضامن / ضا:\n\nارای بروانه کسب با پروانه بهره بردار ی اقعالیت اقتصادی معتبر ال در بقای دولتی با بش خصوسی معتبر\n\nپروانه کسبآپروانه بهره برداری با فعالیت اقتصادی برار اصل شده ‏ ا حکم کارکزینی يا فرارداد سالجاری برابواصل شده - آخرین فبتن حقوای\nممهور به مهرکارگزيني! پوینت سوابق بیمه.\n\nآرآنه استعلام جک برکتتی و رشن حساب آسای (سه ماهه ای آرانه استعلام چگ برگشتی و گردش حساب واریز تقو زسه ماهه ای\n\nتکمیل و امضای قرم معرفی آمول بانضمام تصویر اسناد مالکیت اموال .| تکمیل و امضای قوم معرفی اموال بانضمام تصویر اسناد مالکیت آموال\n\nقتوکیی شناسنامه تمام صفحات برابر اصل شده. قتوکمی شناسنامه تمام صفحات برابر اصل شده\n\nفتوکبی کارت هوشمند ملي (پشت و رو) برابراصل شده. فتوكيي کارت هوشمند ملي (پشت و رو) برابراصل شده.\n\nاسل کوامی اقا دفترخای اصل کواهي امضاه دفترخانه\n\nتابیدیه ثبت تام بت تابیدیه ثبت تام بت\n\nکنوکبی سند مالکیت محل کسب در صورت استیجاری بودن و آجاره ناب\n\nمعتبر۵ سال اغیر) برابر اصل شده\n\n+ د) تفا\n\nارائه سه فقره چک معادل 1۱۵۰ مبلغ ضمانتنامه و همچنین سفته به مبلغ اعلامی توسط متقاضی با امضا و اثر انگشت در\nظهر(پشت) آنها توسط صاحبان امضای مجاز و مدیران (بعنوان شخصیت حقیقی). سهامداران ۲۱۰و بالاتر و ضامنین.\n۳ هس)قرارداد صدور ضمانتنامه:\nتکمیل قرارداد صدور ضمانتنامه با امضاءو اثرانگشت‌راهن, متقاضی, مدیران, ضامنین, سهامداران 1:۱۰ و بالاتر(کلیه متعهدین) به\nهمراه تابیدیه نماینده صندوق\nواسایر مدارکه\nتکمیل قرم اطلاغات و مشخصات راهن متقاض, مدیران ضامتین, سوامداران 1۱ بالات زکليه متفید,\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.206159,
+        "persian_normalized_cer": 0.197856,
+        "raw_unicode_wer": 0.486772,
+        "persian_normalized_wer": 0.477954,
+        "cer_codepoint_strict": 0.206159,
+        "cer_grapheme_strict": 0.207277,
+        "cer_grapheme_canonical": 0.197856,
+        "cer_grapheme_search": 0.197531,
+        "wer_canonical": 0.477954,
+        "exact_token_rate": 0.557319,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 354,
+          "omitted_tokens": 213,
+          "inserted_tokens": 190,
+          "duplicated_tokens": 190,
+          "precision": 0.650735,
+          "recall": 0.624339,
+          "f1": 0.637264
+        },
+        "reading_order": {
+          "sequential_wer": 0.477954,
+          "bag_of_words_wer": 0.710758,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 3078,
+        "canonical_hyp_graphemes": 2953,
+        "canonical_insertions": 82,
+        "canonical_deletions": 207,
+        "canonical_substitutions": 320,
+        "canonical_edit_distance": 609,
+        "orthographic": {
+          "yeh_ref_count": 185,
+          "yeh_correct": 148,
+          "yeh_substitutions": 25,
+          "yeh_deletions": 12,
+          "yeh_insertions": 1,
+          "yeh_recall": 0.8,
+          "kaf_ref_count": 70,
+          "kaf_correct": 54,
+          "kaf_substitutions": 10,
+          "kaf_deletions": 6,
+          "kaf_insertions": 2,
+          "kaf_recall": 0.7714285714285715,
+          "zwnj_ref_count": 6,
+          "zwnj_pred_count": 1,
+          "zwnj_precision": 0.0,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 168,
+          "persian_yeh_fraction": 0.9226190476190477,
+          "output_kaf_count": 69,
+          "persian_kaf_fraction": 0.9855072463768116
+        },
+        "punctuation": {
+          "،": {
+            "ref": 12,
+            "correct": 0,
+            "missed": 12,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 2,
+            "correct": 1,
+            "missed": 1,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 26,
+            "correct": 18,
+            "missed": 8,
+            "inserted": 4
+          },
+          ")": {
+            "ref": 32,
+            "correct": 23,
+            "missed": 9,
+            "inserted": 3
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-007",
+      "image": "small_bench/typed/7.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.149485,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/7.md",
+        "source_member_sha256": "f04eacf3371b7ce808167f3f82f0c2264ef90036bb8f8f4b53f551dd5050fccb",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "low_resolution",
+          "form"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "مشخصات شناسنامه‌ای\nشماره ملی: تاریخ تولد:\nنام: نام خانوادگی:\nنام پدر: شماره شناسنامه:\nمحل تولد: محل صدور:\nجنسیت: وضعیت تاهل:\nدین: مسلمان-شیعه تابعیت: ایران\nاطلاعات تماس\nتلفن ثابت:\nتلفن همراه:\nپست الکترونیک:\nاقامتگاه\nشهر:\nمنطقه شهرداری: کدپستی:\nخیابان اصلی:\nنشانی:\nسایر\nنام مستعار:\nشغل:\nتحصیلات:\nسایر ملاحظات:\nاینجانب ................................ ضمن تأیید موارد فوق تعهد مینمایم که در صورت تغییر هریک از اطلاعات اعلامی سریعاً نسبت به اصلاح آن در سامانه ثنا اقدام نمایم. در غیر این صورت اطلاعات فوق ملاک اقدامات قانونی خواهد بود. همچنین ابلاغ اوراق قضایی از طریق سامانه کافی و مورد قبول است.\nتاریخ:\nامضا:",
+      "prediction": "موارد قوق نمهد میتمایم که در صورت نغیر ریک از اطلاعات اعلامی سریعا:\nنا اقدام نمایم. در قیر این صورت اطلاعات توق ملای اقدامات قانونی حواقد بود.\"\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.782537,
+        "persian_normalized_cer": 0.780165,
+        "raw_unicode_wer": 0.846939,
+        "persian_normalized_wer": 0.846939,
+        "cer_codepoint_strict": 0.782537,
+        "cer_grapheme_strict": 0.781818,
+        "cer_grapheme_canonical": 0.780165,
+        "cer_grapheme_search": 0.780165,
+        "wer_canonical": 0.846939,
+        "exact_token_rate": 0.153061,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 15,
+          "omitted_tokens": 83,
+          "inserted_tokens": 12,
+          "duplicated_tokens": 12,
+          "precision": 0.555556,
+          "recall": 0.153061,
+          "f1": 0.24
+        },
+        "reading_order": {
+          "sequential_wer": 0.846939,
+          "bag_of_words_wer": 0.969388,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 605,
+        "canonical_hyp_graphemes": 143,
+        "canonical_insertions": 0,
+        "canonical_deletions": 462,
+        "canonical_substitutions": 10,
+        "canonical_edit_distance": 472,
+        "orthographic": {
+          "yeh_ref_count": 39,
+          "yeh_correct": 10,
+          "yeh_substitutions": 0,
+          "yeh_deletions": 29,
+          "yeh_insertions": 0,
+          "yeh_recall": 0.2564102564102564,
+          "kaf_ref_count": 7,
+          "kaf_correct": 2,
+          "kaf_substitutions": 1,
+          "kaf_deletions": 4,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.2857142857142857,
+          "zwnj_ref_count": 1,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": 0.0,
+          "zwnj_f1": 0.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 11,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 2,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-008",
+      "image": "small_bench/typed/8.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.218344,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/8.md",
+        "source_member_sha256": "d3a258eba0855ce118235fb07998a7db9059045a7ad017b0b39169ae2479ccc8",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "social_media_graphic",
+          "decorative"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "انتخاب بریت‌ماری این نبود\nکه هیچ انتظاری از زندگی نداشته باشد،\nفقط یک روز صبح از خواب بیدار شد و فهمید که\nتاریخ انقضای آرزوهایش خیلی وقت پیش گذشته است.\nبریت ماری اینجا بود – فردریک بکمن\nبلومی",
+      "prediction": "انتخاب بریت‌ماری این نبود\nکه هیچ انتظاری از زندگی نداشته باشدء\nفقط يك روز صبح از خواب بیدار شد و فهمید که\n\nتاریخ انقفای آرزوهایش خیلی وقت پیش گذشته است.\n\nبریت ماری اینجا بود - فردريك یکمن\n\n9 نوی\n",
+      "metrics": {
+        "raw_unicode_cer": 0.078534,
+        "persian_normalized_cer": 0.042105,
+        "raw_unicode_wer": 0.210526,
+        "persian_normalized_wer": 0.157895,
+        "cer_codepoint_strict": 0.078534,
+        "cer_grapheme_strict": 0.078947,
+        "cer_grapheme_canonical": 0.042105,
+        "cer_grapheme_search": 0.042105,
+        "wer_canonical": 0.157895,
+        "exact_token_rate": 0.868421,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 33,
+          "omitted_tokens": 5,
+          "inserted_tokens": 6,
+          "duplicated_tokens": 6,
+          "precision": 0.846154,
+          "recall": 0.868421,
+          "f1": 0.857143
+        },
+        "reading_order": {
+          "sequential_wer": 0.157895,
+          "bag_of_words_wer": 0.289474,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 190,
+        "canonical_hyp_graphemes": 190,
+        "canonical_insertions": 1,
+        "canonical_deletions": 1,
+        "canonical_substitutions": 6,
+        "canonical_edit_distance": 8,
+        "orthographic": {
+          "yeh_ref_count": 20,
+          "yeh_correct": 20,
+          "yeh_substitutions": 0,
+          "yeh_deletions": 0,
+          "yeh_insertions": 0,
+          "yeh_recall": 1.0,
+          "kaf_ref_count": 5,
+          "kaf_correct": 5,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 0,
+          "kaf_insertions": 0,
+          "kaf_recall": 1.0,
+          "zwnj_ref_count": 1,
+          "zwnj_pred_count": 1,
+          "zwnj_precision": 1.0,
+          "zwnj_recall": 1.0,
+          "zwnj_f1": 1.0
+        },
+        "unicode_variants": {
+          "output_yeh_count": 21,
+          "persian_yeh_fraction": 0.9047619047619048,
+          "output_kaf_count": 5,
+          "persian_kaf_fraction": 0.6
+        },
+        "punctuation": {
+          "،": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-009",
+      "image": "small_bench/typed/9.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 1.875728,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/9.md",
+        "source_member_sha256": "018eba98f5258fc40bd81800c49873a30949630dcf23cbac85684773bc89c77d",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "legal_document",
+          "source_redactions",
+          "watermark",
+          "dense_text"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "دادگستری کل استان مازندران\n«فلا تتبعوا الهوی ان تعدلوا»\nشعبه ۵ دادگاه تجدیدنظر استان مازندران\nدادنامه\nشماره دادنامه: 140147390005961808 تاریخ تنظیم: 1401/07/24\nشماره پرونده: 9909981227400101 شماره بایگانی شعبه: 0100866\nپرونده کلاسه 9909981227400101 شعبه ۵ دادگاه تجدیدنظر استان مازندران تصمیم نهایی شماره 140147390005961808\nتجدیدنظرخواه: آقای با وکالت آقای امیرفرهنگ فرزان فرزند محمدعلی به نشانی استان تهران - شهرستان تهران - شهر تهران - خ فاطمی تقاطع حجاب جنب بانک پارسیان پ 245 ط 3 واحد 7\nتجدیدنظرخوانده: خانم\nتجدیدنظر خواسته: نسبت به دادنامه شماره 140147390003641294 مورخ 1401/05/08 صادره از شعبه ۴ دادگاه عمومی شهرستان محمودآباد\nرأی دادگاه\nدر خصوص تجدیدنظرخواهی آقای با وکالت آقای امیر فرهنگ فرزان به طرفیت پای پهلوان با وکالت آقای نسبت به دادنامه شماره 140147390003641294 مورخ 1401/05/08 صادره از شعبه ۴ دادگاه عمومی شهرستان محمودآباد که دربردارنده قرار رد دادخواست واخواهی از دادنامه شماره 140047390000975953 به لحاظ خارج از فرجه قانونی دادخواست واخواهی مطرح گردیده است. نظرباینکه هرچند تجدیدنظر خواه به عنوان واخواهی خارج از فرجه مبادرت به واخواهی نموده است لیکن ابلاغ از طریق سامانه ثنا صورت گرفته و عدم ملاحظه آن، ابلاغ قانونی تلقی می‌شود. با توجه به اینکه در ابلاغ الکترونیکی نحوه دسترسی به سیستم ارتباطی مناسب و وضعیت اشخاص اعم از سن و از لحاظ منطقه ای متفاوت می‌باشد، و هر شخص ممکن است قادر به دسترسی به وسایل ارتباطی در زمان و مکان خاصی و در ایامی نباشد و این امر موجب می‌شود تا شخص قادر به رؤیت پیام‌های ارسالی اخطاریه نباشد. لذا در جهت جلوگیری از تضییع حقوق تجدیدنظرخواه مطابق ماده 353 قانون آیین دادرسی مدنی قرار صادره را نقض و پرونده را برای رسیدگی ماهوی به دادگاه نخستین برگشت داده می‌شود. رأی صادره قطعی است.\nرئیس دادگاه مستشار دادگاه\nنبی‌اله عبدی فومشی اسماعیل وجدانی\nنشانی: ساری - خیابان مازیار - ساختمان دادگستری کل استان مازندران - دادگاههای تجدید نظر و کیفری یک استان مازندران\nتصویر برابر با اصل است\nScanned with CamScanner",
+      "prediction": "«فلا تبعوا آلهوي انْ تغدلُوا »»\n\nریی شماره دادنامه : 140147390005961808\nتاریخ تنظیم : 1401/07/24\n5 خحردنظ: اسگاه» مان مد شماره پرونده : 9909981227400101\nاش تجدیدنر اسان ملاشوان شماره بايگاني شعبه : 0100866\nدادنامه\n\nدادگستري کل استان مازندران\nونده کلاسه 227400101| 990998 شعبه 5 دادگاه تجدیدنظر استان مازندران تصمیم نهایی شماره 140147390005961808 1\nندیدنظرخواه: 1 با وکالت آقای امیرفر هنگ فرزان فرزند محمدعلي به نشاني استان تهران - شهرستان تهران -\nهر تهران - خ فاطمی تقاطع حجاب جنب بانك پارسیان پ245ط 3و احد7\n\nخواستهنسبت‌به دادنامه شمازه 4و ۱۳۸ صناذزه از شعبه ۴ دادگاه عمومی شهرستان محمودآباد\n\nی با یود\n\nرأی دادگاه\n\nزخصوص تجدیدنظرخواهی آقای «ه6 وه با رکالت آقای امیر فرهنگ فرزان به\nنت بو بای ببلران با رکالت آنای ویو ی سبت‌به دادنامه شماره\n9 وورخ ۱۴۰۱/۰۵/۰۸ صادره از شعبه ۴ دادگاه عمومی شهرستان\nحمودآباد که دربردارنده قرار رد دادخواست واخواهی از دادنامه شماره 140047390000975953\nحاظ خارج از فرجه قانونی دادخواست واخواهی مطرح گردیده است. نظرباینکه هرچند تجدیدنظر\nواه به‌منوان واخواهی خارچ از فرجه مبادرت به واخواهی نموده است لیکن ابلاغ از طریق سامانه\n۱ صورت‌گرفته و عدم ملاحظه آن, ابلاغ قانونی تلقی می‌شود. با توجه به این‌که در ابلاغ الکترونیکی\nحوه دسترسی به سیستم ارتباطی مناسب و وضعیت اشخاص اعم از سن و از لحاظ منطقه ای متفاوت\nی‌باشد, و هر شخص ممکن است قادر به دسترسی به وسایل ارتباطی در زمان و مکان خاصی و\n۳ ایامی نباشد و این امر موجب می‌شود تا شخص قادر به رزیت پیام‌های ارسالی اخطاریه نباشد. لذا\nیت جلوگیری از حقوق تجدیدنظرخواه مطابق ماده 353 قانون آیین دادرسی مدنی قرار صادره\n\nنقض و پرونده را برای رسیدگی ماهوی به دادگاه نخستین برگشت داده می‌شود.رأی صادره قطعی\n\nسب\n\nرئیس دادگاه مستشار دادگاه\nنبی‌اله فومتٌ\nنبی‌اله عبدی فومشی اسماعیل وجدانی\n\nتصویر برابر او\n\nنشاني: ساري- خیابان مازیار -ساختمان دادگستري کل استان مازندران-دادگاهی\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.274499,
+        "persian_normalized_cer": 0.260728,
+        "raw_unicode_wer": 0.439103,
+        "persian_normalized_wer": 0.423077,
+        "cer_codepoint_strict": 0.274499,
+        "cer_grapheme_strict": 0.27648,
+        "cer_grapheme_canonical": 0.260728,
+        "cer_grapheme_search": 0.254753,
+        "wer_canonical": 0.423077,
+        "exact_token_rate": 0.657051,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 221,
+          "omitted_tokens": 91,
+          "inserted_tokens": 79,
+          "duplicated_tokens": 79,
+          "precision": 0.736667,
+          "recall": 0.708333,
+          "f1": 0.722222
+        },
+        "reading_order": {
+          "sequential_wer": 0.423077,
+          "bag_of_words_wer": 0.544872,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 1841,
+        "canonical_hyp_graphemes": 1704,
+        "canonical_insertions": 137,
+        "canonical_deletions": 274,
+        "canonical_substitutions": 69,
+        "canonical_edit_distance": 480,
+        "orthographic": {
+          "yeh_ref_count": 101,
+          "yeh_correct": 89,
+          "yeh_substitutions": 1,
+          "yeh_deletions": 11,
+          "yeh_insertions": 8,
+          "yeh_recall": 0.8811881188118812,
+          "kaf_ref_count": 17,
+          "kaf_correct": 14,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 3,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.8235294117647058,
+          "zwnj_ref_count": 6,
+          "zwnj_pred_count": 12,
+          "zwnj_precision": 0.5,
+          "zwnj_recall": 1.0,
+          "zwnj_f1": 0.6666666666666666
+        },
+        "unicode_variants": {
+          "output_yeh_count": 99,
+          "persian_yeh_fraction": 0.9090909090909091,
+          "output_kaf_count": 15,
+          "persian_kaf_fraction": 0.9333333333333333
+        },
+        "punctuation": {
+          "،": {
+            "ref": 2,
+            "correct": 0,
+            "missed": 2,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 1,
+            "correct": 1,
+            "missed": 0,
+            "inserted": 1
+          },
+          "»": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 3
+          },
+          "(": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    },
+    {
+      "sample_id": "typed-010",
+      "image": "small_bench/typed/10.jpg",
+      "split": "phase1_screening",
+      "track": "printed_smoke",
+      "content_type": "printed",
+      "status": "ok",
+      "seconds": 0.43311,
+      "metadata": {
+        "schema": "persian_ocr_smoke_manifest_v1",
+        "source_archive": "small_bench.zip",
+        "source_archive_sha256": "e7e085e636512bb1ec009877a2d616d85865a879fb6a83b3052108fe9118fce1",
+        "source_member": "small_bench/typed/10.md",
+        "source_member_sha256": "8c117836ddb6641127512434d15f7430310416b5cbfc15ab2ed762c4c1a3fb95",
+        "annotation_method": "archived_markdown_recovery_with_ai_assisted_visual_review",
+        "condition": [
+          "printed",
+          "low_resolution",
+          "form"
+        ],
+        "review_status": "ai_assisted_recovered_not_human_reviewed",
+        "provenance_status": "source_and_license_unknown",
+        "comparison_class": "full_page_detector_recognizer_pipeline",
+        "reference_quality": "ai_assisted_recovered_not_human_reviewed"
+      },
+      "reference_source": "small_bench/typed.json",
+      "reference": "بسمه تعالی\nجناب آقای\nمدیر محترم شرکت\nموضوع : درخواست همکاری\nبا سلام و احترام\nبدینوسیله پیرو درج آگهی دعوت به همکاری آن شرکت در نشریه ............... مورخ ................ جهت همکاری دربخش ................ آن شرکت ، به پیوست مشخصات و سوابق شغلی خود ( رزومه ) خود را برای اعلام آمادگی جهت همکاری تقدیم می دارم.\nامیدوارم ویژگی های اینجانب ازجمله ، تحصیل دررشته ................ و گذراندن دوره های تخصصی ، تسلط کامل به زبان انگلیسی ، داشتن مهارت های ارتباطی قوی ، اعتماد به نفس بالا واشتیاق منحصر به فرد در یادگیری و به روز نمودن اطلاعات شغلی مورد توجه آن مدیریت محترم قرارگیرد و فرصتی را فراهم سازد تا بتوانم خواست ها و خدمات مورد نظر آن شرکت را برآورده سازم.\nضمن آرزوی توفیق وبهروزی برای جنابعالی ، ازوقتی که برای بررسی رزومه اینجانب اختصاص می دهید تشکر نموده و آمادگی خود را جهت حضور درآن شرکت برای ارائه سایر اطلاعاتی که لازم باشد و آشنایی بیشتر اعلام می دارم.\nنام و نام خانوادگی\nتاریخ و امضا",
+      "prediction": "بسمه تعالی\n\nجناب آقای\n\nمدیر محترم شرکت\nموضوع : درخواست همکاری\nپا سلام و احترام\n\nبدیتوسیله پیسرو درج آگهسی دصوت پبه همکاری آن.\n\nهمکارق فزیخش آناشرکت یه پوس تمغ ات نو\n\nبرای اعلام آمادگی جهت همکاری تقدیم می دارم.\n\nوگفرشدن دوره های تخصصی\nتسلط کلمل به زیان انگلیسی : داشتن مهسارت های ارتباطی نوی » اعتصاد یه تفس ببالا وا\nفرد لاضنات شفلی ورد توجه آن مدیریت محترم قرارگی رد و فرصتی را\nفراهم سازد تا بتونم خولست ها و خدمات مورد نظر آن شرکت را\n\nبادگیری ویه روز تمودن\n\nن رزوی روزی رای جنایسالی : ازوقشی که بسوای بزرسی رزوسه اینجانب الصا\n\nگی خود را جهست حضور درآن شرکت بسرای اراکه سایر اطلاماتی که لازم باشد و آشنایی\n\nبیشتر اقلام می دارم.\n\n",
+      "metrics": {
+        "raw_unicode_cer": 0.410314,
+        "persian_normalized_cer": 0.394619,
+        "raw_unicode_wer": 0.609467,
+        "persian_normalized_wer": 0.609467,
+        "cer_codepoint_strict": 0.410314,
+        "cer_grapheme_strict": 0.410314,
+        "cer_grapheme_canonical": 0.394619,
+        "cer_grapheme_search": 0.394619,
+        "wer_canonical": 0.609467,
+        "exact_token_rate": 0.402367,
+        "exact_line": false,
+        "exact_page": false,
+        "faithfulness": {
+          "token_true_positive": 69,
+          "omitted_tokens": 100,
+          "inserted_tokens": 54,
+          "duplicated_tokens": 54,
+          "precision": 0.560976,
+          "recall": 0.408284,
+          "f1": 0.472603
+        },
+        "reading_order": {
+          "sequential_wer": 0.609467,
+          "bag_of_words_wer": 0.911243,
+          "order_gap": 0.0
+        },
+        "canonical_ref_graphemes": 892,
+        "canonical_hyp_graphemes": 617,
+        "canonical_insertions": 16,
+        "canonical_deletions": 291,
+        "canonical_substitutions": 45,
+        "canonical_edit_distance": 352,
+        "orthographic": {
+          "yeh_ref_count": 61,
+          "yeh_correct": 42,
+          "yeh_substitutions": 2,
+          "yeh_deletions": 17,
+          "yeh_insertions": 2,
+          "yeh_recall": 0.6885245901639344,
+          "kaf_ref_count": 13,
+          "kaf_correct": 11,
+          "kaf_substitutions": 0,
+          "kaf_deletions": 2,
+          "kaf_insertions": 0,
+          "kaf_recall": 0.8461538461538461,
+          "zwnj_ref_count": 0,
+          "zwnj_pred_count": 0,
+          "zwnj_precision": null,
+          "zwnj_recall": null,
+          "zwnj_f1": null
+        },
+        "unicode_variants": {
+          "output_yeh_count": 50,
+          "persian_yeh_fraction": 1.0,
+          "output_kaf_count": 12,
+          "persian_kaf_fraction": 1.0
+        },
+        "punctuation": {
+          "،": {
+            "ref": 6,
+            "correct": 0,
+            "missed": 6,
+            "inserted": 0
+          },
+          "؛": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "؟": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "«": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 0
+          },
+          "»": {
+            "ref": 0,
+            "correct": 0,
+            "missed": 0,
+            "inserted": 1
+          },
+          "(": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 0
+          },
+          ")": {
+            "ref": 1,
+            "correct": 0,
+            "missed": 1,
+            "inserted": 0
+          }
+        }
+      },
+      "raw_output": {
+        "config": "--oem 1 --psm 3",
+        "language": "fas"
+      }
+    }
+  ]
+}

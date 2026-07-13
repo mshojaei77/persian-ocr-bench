@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 from typing import Any
@@ -21,6 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 RUN_ROOT = REPO_ROOT / "bench_runs" / "smoke20-v1"
 STATE_PATH = RUN_ROOT / "state.json"
 LOG_ROOT = RUN_ROOT / "logs"
+ARCHIVE_ROOT = REPO_ROOT / "bench_runs" / "archives"
 
 MODEL_COMMANDS: dict[str, list[str]] = {
     "tesseract_fas": [
@@ -82,6 +84,21 @@ def output_path(model_id: str) -> Path:
     return RUN_ROOT / f"{model_id}.json"
 
 
+def reset_phase1() -> Path | None:
+    """Archive an existing screen before starting a fresh, reproducible attempt."""
+    if not RUN_ROOT.exists():
+        return None
+    ARCHIVE_ROOT.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    archive = ARCHIVE_ROOT / f"smoke20-v1-{stamp}"
+    suffix = 1
+    while archive.exists():
+        suffix += 1
+        archive = ARCHIVE_ROOT / f"smoke20-v1-{stamp}-{suffix}"
+    shutil.move(str(RUN_ROOT), str(archive))
+    return archive
+
+
 def build_command(model_id: str, limit: int | None, device: str) -> list[str]:
     command = [sys.executable, *MODEL_COMMANDS[model_id]]
     if model_id in {"ppocrv5_arabic_mobile_rec", "easyocr_fa"}:
@@ -140,6 +157,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--force", action="store_true", help="Rerun successful models.")
     parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Archive the current smoke20-v1 state and artifacts, then start a fresh Phase 1 run.",
+    )
+    parser.add_argument(
         "--continue-on-error", action="store_true", help="Continue after a failed adapter."
     )
     parser.add_argument("--dry-run", action="store_true")
@@ -150,6 +172,12 @@ def main() -> int:
     args = parse_args()
     if args.limit is not None and args.limit <= 0:
         raise SystemExit("--limit must be greater than zero")
+    if args.reset:
+        archive = reset_phase1()
+        if archive:
+            print(f"Archived prior Phase 1 run: {archive.relative_to(REPO_ROOT)}")
+        else:
+            print("No prior Phase 1 run exists; starting fresh.")
     selected = args.model or list(MODEL_COMMANDS)
     state = load_state()
     state["updated_at"] = utc_now()

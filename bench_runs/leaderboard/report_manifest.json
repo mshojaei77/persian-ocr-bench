@@ -1,0 +1,15 @@
+{
+  "schema": "persian_ocr_report_manifest_v1",
+  "mode": "screening",
+  "report_sha256": "499b9c7f0a091981510a103b5476c073e959f9d0ac6070aebedd8a3d4b6e0e5b",
+  "generated_files": [
+    "leaderboard.csv",
+    "leaderboard.json",
+    "leaderboard_by_type.csv",
+    "leaderboard_by_type.json",
+    "screening_report.csv",
+    "screening_report.json",
+    "screening_report.md",
+    "screening_slices.csv"
+  ]
+}

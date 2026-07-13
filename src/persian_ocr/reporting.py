@@ -750,6 +750,14 @@ def _artifact_row(record: ValidatedArtifact) -> dict[str, Any]:
         values = [item[name] for item in orthographic if isinstance(item.get(name), (int, float))]
         return round(statistics.fmean(values), 6) if values else None
 
+    def mean_metric(path: str) -> float | None:
+        values = [
+            _metric(_mapping(result.get("metrics")), path)
+            for result in ok_results
+        ]
+        finite = [value for value in values if value is not None]
+        return round(statistics.fmean(finite), 6) if finite else None
+
     return {
         "model_id": record.model_id or record.path.stem,
         "capability_class": record.model_class,
@@ -772,6 +780,23 @@ def _artifact_row(record: ValidatedArtifact) -> dict[str, Any]:
         "macro_page_cer_canonical": record.cer,
         "micro_corpus_cer_canonical": record.micro_cer,
         "mean_wer_canonical": record.wer,
+        "mean_raw_unicode_cer": mean_metric("raw_unicode_cer"),
+        "mean_raw_unicode_wer": mean_metric("raw_unicode_wer"),
+        "mean_exact_token_rate": mean_metric("exact_token_rate"),
+        "exact_line_rate": (
+            round(
+                sum(bool(_nested(_mapping(result.get("metrics")), "exact_line")) for result in ok_results)
+                / len(ok_results),
+                6,
+            )
+            if ok_results
+            else None
+        ),
+        "faithfulness_precision": mean_metric("faithfulness.precision"),
+        "faithfulness_recall": mean_metric("faithfulness.recall"),
+        "faithfulness_f1": mean_metric("faithfulness.f1"),
+        "bag_of_words_wer": mean_metric("reading_order.bag_of_words_wer"),
+        "reading_order_gap": mean_metric("reading_order.order_gap"),
         "page_cer_ci95_low": record.ci95[0] if record.ci95 else None,
         "page_cer_ci95_high": record.ci95[1] if record.ci95 else None,
         "mean_seconds_per_image": record.mean_seconds,
@@ -1234,8 +1259,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
             [
                 "This 20-image phase is a viability screen, not a general Persian OCR ranking.",
                 "",
-                "| Decision | Model | Coverage | CER | P90 CER | Worst Q CER | WER | Exact pages | Yeh recall | Kaf recall | ZWNJ F1 | Mean sec | P95 sec |",
-                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+                "| Decision | Model | Coverage | Norm CER | Raw CER | WER | BoW WER | Order gap | Faith F1 | Exact pages | Yeh recall | Kaf recall | ZWNJ F1 | Mean sec |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in report["rows"]:
@@ -1255,7 +1280,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 else f"{row['mean_seconds_per_image']:.3f}"
             )
             lines.append(
-                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {cer} | {row.get('p90_page_cer_canonical') or '-'} | {row.get('worst_quartile_page_cer_canonical') or '-'} | {row.get('mean_wer_canonical') or '-'} | {row.get('exact_page_rate') or '-'} | {row.get('yeh_recall') or '-'} | {row.get('kaf_recall') or '-'} | {row.get('zwnj_f1') or '-'} | {seconds} | {row.get('p95_seconds_per_image') or '-'} |"
+                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {cer} | {row.get('mean_raw_unicode_cer') if row.get('mean_raw_unicode_cer') is not None else '-'} | {row.get('mean_wer_canonical') if row.get('mean_wer_canonical') is not None else '-'} | {row.get('bag_of_words_wer') if row.get('bag_of_words_wer') is not None else '-'} | {row.get('reading_order_gap') if row.get('reading_order_gap') is not None else '-'} | {row.get('faithfulness_f1') if row.get('faithfulness_f1') is not None else '-'} | {row.get('exact_page_rate') if row.get('exact_page_rate') is not None else '-'} | {row.get('yeh_recall') if row.get('yeh_recall') is not None else '-'} | {row.get('kaf_recall') if row.get('kaf_recall') is not None else '-'} | {row.get('zwnj_f1') if row.get('zwnj_f1') is not None else '-'} | {seconds} |"
             )
         lines.extend(
             [
@@ -1267,10 +1292,11 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "| Metric | Meaning | Direction |",
                 "|---|---|---|",
                 "| Coverage | Successful pages divided by expected pages. | Higher is better; complete coverage is required. |",
-                "| CER | Macro page character error rate after canonical Persian normalization. | Lower is better. |",
+                "| Norm CER / Raw CER | Macro page CER after frozen Persian normalization / exact Unicode CER after NFC only. | Lower is better. |",
                 "| P90 CER | 90th-percentile page CER; exposes difficult-page failures. | Lower is better. |",
                 "| Worst Q CER | Mean CER of the worst 25% of successful pages. | Lower is better. |",
-                "| WER | Mean canonical word error rate. | Lower is better. |",
+                "| WER / BoW WER / Order gap | Sequential WER, order-insensitive token error rate, and their positive difference. The gap isolates likely reading-order failures. | Lower is better. |",
+                "| Faith F1 | Token-level precision/recall F1; omissions and insertions remain visible in CSV/JSON. | Higher is better. |",
                 "| Exact pages | Fraction of pages with zero canonical CER. | Higher is better. |",
                 "| Yeh recall | Recall of Persian yeh characters in the orthographic slice. | Higher is better. |",
                 "| Kaf recall | Recall of Persian kaf characters in the orthographic slice. | Higher is better. |",
