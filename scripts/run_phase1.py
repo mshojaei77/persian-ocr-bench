@@ -113,7 +113,13 @@ def run_model(model_id: str, command: list[str]) -> int:
         )
         assert process.stdout is not None
         for line in process.stdout:
-            print(line, end="")
+            try:
+                sys.stdout.write(line)
+            except UnicodeEncodeError:
+                encoding = sys.stdout.encoding or "utf-8"
+                safe_line = line.encode(encoding, errors="replace").decode(encoding)
+                sys.stdout.write(safe_line)
+            sys.stdout.flush()
             log.write(line)
         return process.wait()
 
@@ -168,13 +174,19 @@ def main() -> int:
             "output": str(output_path(model_id).relative_to(REPO_ROOT)).replace("\\", "/"),
         }
         write_state(state)
-        return_code = run_model(model_id, command)
+        try:
+            return_code = run_model(model_id, command)
+            run_error = None
+        except Exception as exc:  # keep resumable state even if orchestration fails
+            return_code = 1
+            run_error = f"{type(exc).__name__}: {exc}"
         complete = return_code == 0 and output_path(model_id).is_file()
         model_state[model_id].update(
             {
                 "status": "complete" if complete else "failed",
                 "finished_at": utc_now(),
                 "return_code": return_code,
+                "error": run_error,
             }
         )
         write_state(state)
