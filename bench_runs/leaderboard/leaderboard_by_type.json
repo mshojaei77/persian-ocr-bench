@@ -1,0 +1,244 @@
+{
+  "schema": "persian_ocr_screening_report_v1",
+  "mode": "screening",
+  "report_identity": {
+    "target_contract": {
+      "schema": "persian_ocr_benchmark_v2",
+      "phase": "phase1_screening",
+      "benchmark_id": "phase1_screening",
+      "protocol_version": "2.0",
+      "protocol_track": "full_page_ocr",
+      "protocol_hash": "ce683321a491e5a64f2e6c54b8418820767279dee30b743aff7a14b30494bfc8",
+      "dataset_id": "smoke20-v1",
+      "dataset_hash": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe"
+    },
+    "run_hashes": [
+      "0f567388f92ac2a648ab87b7fe27277adb8393c330b58f4ccccc9ee2faf68a37",
+      "55a2ee62f85945d5f06677f8931f4d385a3a9fdafeb83aeeb75ebf113748a3c9",
+      "a32cebf3b42c7044b2cbdbf322d9f920f09c385ba5c5aeb9d269e4ca16aa6b1c"
+    ],
+    "artifact_hashes": {
+      "bench_runs/smoke20-v1/easyocr_fa.json": "bbf23c285e61f03e4ba0ca372c3d16c3498262c76d1042a8fe117eb7714dc35b",
+      "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "99020f5d95449544eba32f1bcef21ba6ef6ca05f16b097cd300b006077d4780e",
+      "bench_runs/smoke20-v1/tesseract_fas.json": "4d968af51b7b6f71cc1f10ebdc7b785dc88a022bb9518913befd2f183ea64eb5"
+    },
+    "report_sha256": "5bbd6438d6933b7ed3f9af7afc7594a406c11ed98f7a1241e7bf79dfe8f2a864"
+  },
+  "rows": [
+    {
+      "model_id": "easyocr_fa",
+      "capability_class": "full_page_detector_recognizer_pipeline",
+      "artifact": "bench_runs/smoke20-v1/easyocr_fa.json",
+      "benchmark_id": "phase1_screening",
+      "phase": "phase1_screening",
+      "protocol_track": "full_page_ocr",
+      "dataset_id": "smoke20-v1",
+      "dataset_hash": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe",
+      "protocol_hash": "ce683321a491e5a64f2e6c54b8418820767279dee30b743aff7a14b30494bfc8",
+      "run_hash": "0f567388f92ac2a648ab87b7fe27277adb8393c330b58f4ccccc9ee2faf68a37",
+      "config_hash": "f43f874af5470f49e3aef84878f02d882c1ded5d3e4527311cb3af3887610de9",
+      "environment_hash": "d137b8ccca7400bce28a5ff3593e4b2996ad358c3c21a9f8477f8a62f2965c25",
+      "expected": 20,
+      "attempted": 20,
+      "ok": 20,
+      "error": 0,
+      "coverage": 1.0,
+      "attempt_coverage": 1.0,
+      "macro_page_cer_canonical": 0.453409,
+      "micro_corpus_cer_canonical": 0.399227,
+      "mean_wer_canonical": 0.829449,
+      "page_cer_ci95_low": 0.359557,
+      "page_cer_ci95_high": 0.545868,
+      "mean_seconds_per_image": 14.156441,
+      "median_seconds_per_image": 12.434873,
+      "p95_seconds_per_image": null,
+      "p90_page_cer_canonical": 0.667674,
+      "worst_quartile_page_cer_canonical": 0.703858,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.509614,
+      "kaf_recall": 0.482296,
+      "zwnj_f1": 0.0,
+      "decision": "Hold",
+      "decision_reasons": [
+        "complete evidence retained without a forced small-sample rank"
+      ],
+      "validation_issues": []
+    },
+    {
+      "model_id": "ppocrv5_arabic_mobile_rec",
+      "capability_class": "full_page_detector_recognizer_pipeline",
+      "artifact": "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json",
+      "benchmark_id": "phase1_screening",
+      "phase": "phase1_screening",
+      "protocol_track": "full_page_ocr",
+      "dataset_id": "smoke20-v1",
+      "dataset_hash": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe",
+      "protocol_hash": "ce683321a491e5a64f2e6c54b8418820767279dee30b743aff7a14b30494bfc8",
+      "run_hash": "55a2ee62f85945d5f06677f8931f4d385a3a9fdafeb83aeeb75ebf113748a3c9",
+      "config_hash": "274507eb9e5773f02207f380f5ba9f4f5b21ba7c3db655abdd25164cac277e12",
+      "environment_hash": "a17e2e505ffa938df8852b6f70e7273d4a8536945c040701c954c75b5de88ed9",
+      "expected": 20,
+      "attempted": 20,
+      "ok": 20,
+      "error": 0,
+      "coverage": 1.0,
+      "attempt_coverage": 1.0,
+      "macro_page_cer_canonical": 0.554557,
+      "micro_corpus_cer_canonical": 0.542279,
+      "mean_wer_canonical": 0.812495,
+      "page_cer_ci95_low": 0.425183,
+      "page_cer_ci95_high": 0.680731,
+      "mean_seconds_per_image": 14.554824,
+      "median_seconds_per_image": 11.722189,
+      "p95_seconds_per_image": null,
+      "p90_page_cer_canonical": 0.901278,
+      "worst_quartile_page_cer_canonical": 0.89608,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.392238,
+      "kaf_recall": 0.46827,
+      "zwnj_f1": 0.0,
+      "decision": "Hold",
+      "decision_reasons": [
+        "complete evidence retained without a forced small-sample rank"
+      ],
+      "validation_issues": []
+    },
+    {
+      "model_id": "tesseract_fas",
+      "capability_class": "full_page_detector_recognizer_pipeline",
+      "artifact": "bench_runs/smoke20-v1/tesseract_fas.json",
+      "benchmark_id": "phase1_screening",
+      "phase": "phase1_screening",
+      "protocol_track": "full_page_ocr",
+      "dataset_id": "smoke20-v1",
+      "dataset_hash": "8abf9b32bb2746d85b75c07049f35cebd245d42dc656c1c955a219cfd19a7dbe",
+      "protocol_hash": "ce683321a491e5a64f2e6c54b8418820767279dee30b743aff7a14b30494bfc8",
+      "run_hash": "a32cebf3b42c7044b2cbdbf322d9f920f09c385ba5c5aeb9d269e4ca16aa6b1c",
+      "config_hash": "91942eeb773b981ba836aa52e7e9894230c5a3707c49c64e7b0ba0506ebf0755",
+      "environment_hash": "6b2fabb42ec575567d900e208199ce2cebd8a20f97e95282d64b5afd09884a35",
+      "expected": 20,
+      "attempted": 20,
+      "ok": 20,
+      "error": 0,
+      "coverage": 1.0,
+      "attempt_coverage": 1.0,
+      "macro_page_cer_canonical": 0.552146,
+      "micro_corpus_cer_canonical": 0.48003,
+      "mean_wer_canonical": 0.754354,
+      "page_cer_ci95_low": 0.414704,
+      "page_cer_ci95_high": 0.683505,
+      "mean_seconds_per_image": 0.758445,
+      "median_seconds_per_image": 0.574833,
+      "p95_seconds_per_image": null,
+      "p90_page_cer_canonical": 0.87631,
+      "worst_quartile_page_cer_canonical": 0.906049,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.465734,
+      "kaf_recall": 0.413643,
+      "zwnj_f1": 0.286124,
+      "decision": "Hold",
+      "decision_reasons": [
+        "complete evidence retained without a forced small-sample rank"
+      ],
+      "validation_issues": []
+    }
+  ],
+  "slices": [
+    {
+      "model_id": "easyocr_fa",
+      "split": "phase1_screening",
+      "content_type": "handwritten",
+      "expected": 9,
+      "ok": 9,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.627311,
+      "page_cer_ci95": [
+        0.561661,
+        0.697664
+      ]
+    },
+    {
+      "model_id": "easyocr_fa",
+      "split": "phase1_screening",
+      "content_type": "printed",
+      "expected": 11,
+      "ok": 11,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.311126,
+      "page_cer_ci95": [
+        0.214918,
+        0.408362
+      ]
+    },
+    {
+      "model_id": "ppocrv5_arabic_mobile_rec",
+      "split": "phase1_screening",
+      "content_type": "handwritten",
+      "expected": 9,
+      "ok": 9,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.714062,
+      "page_cer_ci95": [
+        0.572115,
+        0.83755
+      ]
+    },
+    {
+      "model_id": "ppocrv5_arabic_mobile_rec",
+      "split": "phase1_screening",
+      "content_type": "printed",
+      "expected": 11,
+      "ok": 11,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.424052,
+      "page_cer_ci95": [
+        0.266194,
+        0.601301
+      ]
+    },
+    {
+      "model_id": "tesseract_fas",
+      "split": "phase1_screening",
+      "content_type": "handwritten",
+      "expected": 9,
+      "ok": 9,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.723626,
+      "page_cer_ci95": [
+        0.634562,
+        0.817014
+      ]
+    },
+    {
+      "model_id": "tesseract_fas",
+      "split": "phase1_screening",
+      "content_type": "printed",
+      "expected": 11,
+      "ok": 11,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.411845,
+      "page_cer_ci95": [
+        0.22439,
+        0.609231
+      ]
+    }
+  ],
+  "excluded": [],
+  "ranking_policy": null,
+  "validation_summary": {
+    "artifacts_seen": 3,
+    "artifacts_valid": 3,
+    "artifacts_compatible": 3,
+    "artifacts_unique": 3,
+    "artifacts_complete": 3,
+    "duplicate_runs": 0,
+    "errors": 0,
+    "warnings": 0
+  }
+}

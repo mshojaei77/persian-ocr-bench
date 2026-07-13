@@ -1489,7 +1489,14 @@ def write_report(report: Mapping[str, Any], output_dir: Path) -> list[str]:
             "leaderboard.json": json_name,
             "leaderboard.csv": csv_name,
             "leaderboard_by_type.csv": slice_name,
+            "leaderboard_by_type.json": json_name,
             "leaderboard_cer.png": "screening_coverage.png",
+            "leaderboard_hand_written.png": "screening_coverage.png",
+            "leaderboard_latency.png": next(
+                (name for name in generated if name.startswith("screening_quality_latency_")),
+                None,
+            ),
+            "leaderboard_typed.png": "screening_coverage.png",
             "leaderboard_accuracy_latency.png": next(
                 (name for name in generated if name.startswith("screening_quality_latency_")),
                 None,
