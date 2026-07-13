@@ -40,7 +40,11 @@ from persian_ocr.preprocessing import preprocess_image
 
 
 AI_ASSISTED_REVIEW_STATUS = "ai_assisted_recovered_not_human_reviewed"
-PHASE1_REVIEW_STATUSES = {*HUMAN_REVIEW_STATUSES, AI_ASSISTED_REVIEW_STATUS}
+PHASE1_REVIEW_STATUSES = {
+    *HUMAN_REVIEW_STATUSES,
+    AI_ASSISTED_REVIEW_STATUS,
+    "ai_audited_not_human_reviewed",
+}
 
 
 @dataclass(frozen=True)
@@ -280,6 +284,26 @@ def run_phase1(args: argparse.Namespace, adapter: Phase1Adapter) -> int:
         else:
             assert prediction is not None
             metrics = score_text(sample.reference, prediction)
+            eligibility = sample.metadata.get("metric_eligibility", {})
+            if isinstance(eligibility, Mapping) and not eligibility.get(
+                "smoke_plain_text_cer_wer", True
+            ):
+                # Preserve raw diagnostics, but keep excluded samples out of
+                # official CER/WER aggregation and leaderboard eligibility.
+                for key in (
+                    "cer_codepoint_strict",
+                    "cer_grapheme_strict",
+                    "cer_grapheme_canonical",
+                    "cer_grapheme_search",
+                    "persian_normalized_cer",
+                    "raw_unicode_cer",
+                    "wer_canonical",
+                    "persian_normalized_wer",
+                    "raw_unicode_wer",
+                ):
+                    metrics[key] = None
+                metadata["scoring_excluded"] = True
+                metadata["scoring_exclusion_reason"] = "manifest metric_eligibility.smoke_plain_text_cer_wer=false"
             if (
                 getattr(args, "save_failure_images", False)
                 and processed is not None
@@ -306,10 +330,9 @@ def run_phase1(args: argparse.Namespace, adapter: Phase1Adapter) -> int:
                 metadata=metadata,
                 raw_output=dict(raw_output or {}),
             )
-            print(
-                f"  [OK ] {sample.sample_id}  "
-                f"CER={metrics['cer_grapheme_canonical']:.3f} t={elapsed:.2f}s"
-            )
+            cer_value = metrics.get("cer_grapheme_canonical")
+            cer_display = f"{cer_value:.3f}" if isinstance(cer_value, (int, float)) else "excluded"
+            print(f"  [OK ] {sample.sample_id}  CER={cer_display} t={elapsed:.2f}s")
         results.append(result)
 
     operations = _operations(

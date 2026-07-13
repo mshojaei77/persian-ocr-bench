@@ -113,6 +113,16 @@ def _workspace_for_manifest(path: Path, workspace_root: str | Path | None) -> Pa
     return discovered or path.parent.resolve()
 
 
+def _resolve_dataset_path(value: str, workspace: Path) -> Path:
+    """Resolve paths from either repo-root or the manifest's small_bench root."""
+    resolved = resolve_path(value, base=workspace)
+    if not resolved.exists() and not Path(value).is_absolute():
+        candidate = workspace / "small_bench" / value
+        if candidate.exists():
+            return candidate
+    return resolved
+
+
 def load_manifest(
     path: str | Path,
     workspace_root: str | Path | None = None,
@@ -122,7 +132,7 @@ def load_manifest(
     workspace = _workspace_for_manifest(manifest, workspace_root)
     entries: list[tuple[Path, dict[str, Any]]] = []
     for row in _read_manifest_rows(manifest):
-        image = resolve_path(row["image"], base=workspace)
+        image = _resolve_dataset_path(str(row["image"]), workspace)
         metadata = dict(row)
         metadata.pop("image", None)
         entries.append((image, metadata))
@@ -134,28 +144,37 @@ def _reference_indexes(
 ) -> dict[Path, dict[str, str]]:
     indexes: dict[Path, dict[str, str]] = {}
     for row in rows:
-        corpus_value = row.get("reference_corpus")
+        corpus_value = row.get("reference_corpus") or row.get("reference_file")
         if not corpus_value:
             image = resolve_path(str(row["image"]), base=workspace)
             corpus = image.parent.parent / f"{image.parent.name}.json"
         else:
             corpus = resolve_path(str(corpus_value), base=workspace)
+            if not corpus.is_file() and not Path(str(corpus_value)).is_absolute():
+                corpus = workspace / "small_bench" / str(corpus_value)
         if corpus in indexes:
             continue
         try:
-            payload = json.loads(corpus.read_text(encoding="utf-8"))
+            raw = corpus.read_text(encoding="utf-8")
+            if corpus.name == "references.jsonl":
+                payload = [json.loads(line) for line in raw.splitlines() if line.strip()]
+            else:
+                payload = json.loads(raw)
         except (OSError, json.JSONDecodeError) as exc:
             raise DatasetError(f"Invalid reference corpus {corpus}: {exc}") from exc
         if not isinstance(payload, list):
             raise DatasetError(f"Reference corpus must contain a JSON array: {corpus}")
         index: dict[str, str] = {}
         for item in payload:
-            if not isinstance(item, dict) or not isinstance(item.get("image"), str):
+            if not isinstance(item, dict):
                 raise DatasetError(f"Invalid reference record in {corpus}")
-            text = item.get("text")
+            key = item.get("sample_id") or item.get("image")
+            if not isinstance(key, str):
+                raise DatasetError(f"Reference record has no sample_id/image in {corpus}")
+            text = item.get("scorable_text", item.get("text"))
             if not isinstance(text, str):
-                raise DatasetError(f"Reference text must be a string: {corpus}:{item['image']}")
-            index[item["image"]] = text
+                raise DatasetError(f"Reference text must be a string: {corpus}:{key}")
+            index[key] = text
         indexes[corpus] = index
     return indexes
 
@@ -171,18 +190,18 @@ def load_dataset(
     indexes = _reference_indexes(rows, workspace)
     samples: list[DatasetSample] = []
     for index, row in enumerate(rows, 1):
-        image_path = resolve_path(str(row["image"]), base=workspace)
+        image_path = _resolve_dataset_path(str(row["image"]), workspace)
         image_logical = ensure_logical_path(str(row["image"]).replace("\\", "/"))
-        corpus_value = row.get("reference_corpus")
+        corpus_value = row.get("reference_corpus") or row.get("reference_file")
         if corpus_value:
             corpus = resolve_path(str(corpus_value), base=workspace)
+            if not corpus.is_file() and not Path(str(corpus_value)).is_absolute():
+                corpus = workspace / "small_bench" / str(corpus_value)
             corpus_logical = ensure_logical_path(str(corpus_value).replace("\\", "/"))
         else:
             corpus = image_path.parent.parent / f"{image_path.parent.name}.json"
             corpus_logical = logical_path(corpus, base=workspace)
-        reference_key = str(
-            row.get("reference_key") or f"{image_path.parent.name}/{image_path.name}"
-        )
+        reference_key = str(row.get("reference_key") or row.get("sample_id") or f"{image_path.parent.name}/{image_path.name}")
         try:
             reference = indexes[corpus][reference_key]
         except KeyError as exc:
@@ -209,7 +228,8 @@ def load_dataset(
                 provenance_status=str(row.get("provenance_status") or "unknown"),
                 image_sha256=str(row.get("image_sha256") or sha256_file(image_path)),
                 reference_sha256=str(
-                    row.get("reference_sha256")
+                    row.get("reference_scorable_sha256")
+                    or row.get("reference_sha256")
                     or sha256_bytes(reference.encode("utf-8"))
                 ),
                 dataset_id=str(row.get("dataset_id") or manifest.parent.name),
@@ -232,6 +252,7 @@ def load_dataset(
                         "provenance_status",
                         "image_sha256",
                         "reference_sha256",
+                        "reference_scorable_sha256",
                         "dataset_id",
                         "dataset_version",
                         "dataset_sha256",
@@ -273,6 +294,23 @@ def dataset_content_digest(
     dataset_version: str,
     samples: Iterable[DatasetSample],
 ) -> str:
+    selected = list(samples)
+    if any(sample.metadata.get("metadata_sha256") for sample in selected):
+        material = {
+            "dataset_id": dataset_id,
+            "dataset_version": dataset_version,
+            "samples": [
+                {
+                    "sample_id": sample.sample_id,
+                    "image_sha256": sample.image_sha256,
+                    "reference_scorable_sha256": sample.reference_sha256,
+                    "metadata_sha256": sample.metadata.get("metadata_sha256"),
+                }
+                for sample in selected
+            ],
+        }
+        encoded = json.dumps(material, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return sha256_bytes(encoded.encode("utf-8"))
     lines = [f"{dataset_id}\n{dataset_version}"]
     lines.extend(
         f"{sample.sample_id}|{sample.image_sha256}|{sample.reference_sha256}"
@@ -389,7 +427,12 @@ def build_dataset_identity(
         "manifest": logical_path(manifest, base=workspace),
         "manifest_sha256": sha256_file(manifest),
         "reference_corpora_sha256": {
-            corpus: sha256_file(resolve_path(corpus, base=workspace)) for corpus in corpora
+            corpus: sha256_file(
+                _resolve_dataset_path(corpus, workspace)
+                if not Path(corpus).is_absolute()
+                else Path(corpus)
+            )
+            for corpus in corpora
         },
         "images_sha256": {
             sample.image: sample.image_sha256 for sample in selected
@@ -399,6 +442,14 @@ def build_dataset_identity(
                 "sample_id": sample.sample_id,
                 "image_sha256": sample.image_sha256,
                 "reference_sha256": sample.reference_sha256,
+                **(
+                    {
+                        "reference_scorable_sha256": sample.reference_sha256,
+                        "metadata_sha256": sample.metadata["metadata_sha256"],
+                    }
+                    if sample.metadata.get("metadata_sha256")
+                    else {}
+                ),
             }
             for sample in selected
         ],

@@ -358,13 +358,31 @@ def validate_dataset_identity(identity: Mapping[str, Any]) -> None:
     samples = identity.get("samples")
     if isinstance(samples, list) and identity.get("id") and identity.get("version"):
         try:
-            lines = [f"{identity['id']}\n{identity['version']}"]
-            for sample in samples:
-                lines.append(
-                    f"{sample['sample_id']}|{sample['image_sha256']}|"
-                    f"{sample['reference_sha256']}"
-                )
-            expected = sha256_bytes(("\n".join(lines) + "\n").encode("utf-8"))
+            if all("metadata_sha256" in sample for sample in samples):
+                material = {
+                    "dataset_id": identity["id"],
+                    "dataset_version": identity["version"],
+                    "samples": [
+                        {
+                            "sample_id": sample["sample_id"],
+                            "image_sha256": sample["image_sha256"],
+                            "reference_scorable_sha256": sample.get(
+                                "reference_scorable_sha256", sample["reference_sha256"]
+                            ),
+                            "metadata_sha256": sample["metadata_sha256"],
+                        }
+                        for sample in samples
+                    ],
+                }
+                expected = sha256_json(material)
+            else:
+                lines = [f"{identity['id']}\n{identity['version']}"]
+                for sample in samples:
+                    lines.append(
+                        f"{sample['sample_id']}|{sample['image_sha256']}|"
+                        f"{sample['reference_sha256']}"
+                    )
+                expected = sha256_bytes(("\n".join(lines) + "\n").encode("utf-8"))
             if claimed != expected:
                 errors.append("dataset.digest does not match ordered sample content")
         except (KeyError, TypeError) as exc:

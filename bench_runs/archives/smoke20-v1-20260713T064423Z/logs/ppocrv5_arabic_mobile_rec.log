@@ -1,0 +1,33 @@
+INFO: Could not find files for the given pattern(s).
+C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\paddle\utils\cpp_extension\extension_utils.py:712: UserWarning: No ccache found. Please be aware that recompiling all source files may be required. You can download and install ccache from: https://github.com/ccache/ccache/blob/master/doc/INSTALL.md
+  warnings.warn(warning_message)
+Model:              ppocrv5_arabic_mobile_rec
+Comparison class:   full_page_detector_recognizer_pipeline
+Protocol:           phase1_screening (no ranks)
+Dataset:            smoke20-v1
+Selected images:    20/20
+Preprocessing:      raw
+Results output:     C:\my_projects\05_train_models_datasets\persian-ocr\bench_runs\smoke20-v1\ppocrv5_arabic_mobile_rec.json
+
+  [ERR] hand-written-001: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-002: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-003: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-004: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-005: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-006: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-007: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-008: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-009: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] hand-written-010: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-001: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-002: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-003: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-004: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-005: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-006: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-007: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-008: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-009: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+  [ERR] typed-010: model initialization failed: OSError: [WinError 127] The specified procedure could not be found. Error loading "C:\my_projects\05_train_models_datasets\persian-ocr\.venv\Lib\site-packages\torch\lib\shm.dll" or one of its dependencies.
+
+Results saved to: C:\my_projects\05_train_models_datasets\persian-ocr\bench_runs\smoke20-v1\ppocrv5_arabic_mobile_rec.json

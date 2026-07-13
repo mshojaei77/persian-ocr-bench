@@ -2,5 +2,3 @@ model_id,split,content_type,expected,ok,error,coverage,macro_page_cer_canonical,
 easyocr_fa,phase1_screening,handwritten,1,1,0,1.0,0.552365,
 ppocrv5_arabic_mobile_rec,phase1_screening,handwritten,9,0,9,0.0,,
 ppocrv5_arabic_mobile_rec,phase1_screening,printed,11,0,11,0.0,,
-tesseract_fas,phase1_screening,handwritten,9,9,0,1.0,0.723626,"[0.634562,0.817014]"
-tesseract_fas,phase1_screening,printed,11,11,0,1.0,0.411845,"[0.22439,0.609231]"
