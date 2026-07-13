@@ -1,0 +1,15 @@
+{
+  "schema": "persian_ocr_report_manifest_v1",
+  "mode": "screening",
+  "report_sha256": "23cb8244f359cadf92b2589ee4883397f2b9ae85481db79b8b6f9d95f78b29a2",
+  "generated_files": [
+    "screening_coverage.png",
+    "screening_quality_latency_6b2fabb4.png",
+    "screening_quality_latency_a17e2e50.png",
+    "screening_quality_latency_d137b8cc.png",
+    "screening_report.csv",
+    "screening_report.json",
+    "screening_report.md",
+    "screening_slices.csv"
+  ]
+}

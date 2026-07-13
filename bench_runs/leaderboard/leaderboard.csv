@@ -1,3 +1,0 @@
-rank,model_id,artifact,schema,benchmark,scope,n_images,n_ok,n_err,cer,wer,micro_cer,mean_seconds,median_seconds,source,config
-1,tesseract_fas,tesseract_fas.json,persian_ocr_benchmark_v1,persian_ocr_smoke20,OCR benchmark; leaderboard-comparable,20,20,0,0.5126,0.7434,0.4483,0.7761,0.571,C:\my_projects\05_train_models_datasets\persian-ocr\bench_runs\tesseract_fas.json,best
-2,ppocrv5_arabic_mobile_rec,ppocrv5_arabic_mobile_rec.json,persian_ocr_benchmark_v1,persian_ocr_smoke20,full-page detector+recognizer benchmark; leaderboard-comparable,20,20,0,0.5655,0.8152,0.5494,8.9027,6.3982,C:\my_projects\05_train_models_datasets\persian-ocr\bench_runs\ppocrv5_arabic_mobile_rec.json,
