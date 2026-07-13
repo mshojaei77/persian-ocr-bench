@@ -552,7 +552,14 @@ def validate_artifact(
                     f"successful results[{index}] requires reference and prediction",
                 )
             cer_value = _result_metric(result, "cer")
-            if cer_value is None or cer_value < 0:
+            scoring_excluded = bool(
+                _mapping(result.get("metadata")).get("scoring_excluded")
+            )
+            if cer_value is None and scoring_excluded:
+                # Manifest-declared ineligible samples remain successful OCR
+                # attempts, but must not be forced into CER aggregation.
+                pass
+            elif cer_value is None or cer_value < 0:
                 _issue(
                     record,
                     "error",

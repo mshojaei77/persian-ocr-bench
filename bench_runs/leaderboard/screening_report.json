@@ -2,14 +2,27 @@
   "schema": "persian_ocr_screening_report_v1",
   "mode": "screening",
   "report_identity": {
-    "target_contract": null,
-    "run_hashes": [],
+    "target_contract": {
+      "schema": "persian_ocr_benchmark_v2",
+      "phase": "phase1_screening",
+      "benchmark_id": "phase1_screening",
+      "protocol_version": "2.1",
+      "protocol_track": "full_page_ocr",
+      "protocol_hash": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72",
+      "dataset_id": "smoke20-v1",
+      "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7"
+    },
+    "run_hashes": [
+      "9381692a5ba8cd1e1bf60b3e8a0bcc100a369cfa38c0fb57668774e1fb2c1f55",
+      "b577365e8c66e4577224c6b152bfd1ce9157551d0e721654f4b615641cf7c6d2",
+      "d4bc637111e43e4814fd3ac17932a40fdecc9df4c636fd3e1a091e3a3e2c1436"
+    ],
     "artifact_hashes": {
       "bench_runs/smoke20-v1/easyocr_fa.json": "5021782797ebbd232b46659b5f397e3144e5db72ad2487547c68f57cc90cf08c",
       "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "2d007c5c5843b4b9036bdea16cc006d2aa48527228bfab12cb9f02c055ff3a86",
       "bench_runs/smoke20-v1/tesseract_fas.json": "3c068940c69a47210af798c5b9c45438078d0a1fe9100d0523f0afd7a9c48980"
     },
-    "report_sha256": "8216c0a2f8ed420de8072a02b80abeefb85c4a238dcd6f5723e69ab718758db8"
+    "report_sha256": "7ae680dc3202f487e60b71b6c8a48a92fe3ff0cde90fefc724696f7ef4d88988"
   },
   "rows": [
     {
@@ -54,27 +67,11 @@
       "yeh_recall": 0.513506,
       "kaf_recall": 0.508996,
       "zwnj_f1": 0.0,
-      "decision": "Blocked",
+      "decision": "Hold",
       "decision_reasons": [
-        "artifact validation failed"
+        "complete evidence retained without a forced small-sample rank"
       ],
-      "validation_issues": [
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[15] requires non-negative canonical CER"
-        },
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[16] requires non-negative canonical CER"
-        },
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[18] requires non-negative canonical CER"
-        }
-      ]
+      "validation_issues": []
     },
     {
       "model_id": "ppocrv5_arabic_mobile_rec",
@@ -118,27 +115,11 @@
       "yeh_recall": 0.393237,
       "kaf_recall": 0.492916,
       "zwnj_f1": 0.0,
-      "decision": "Blocked",
+      "decision": "Hold",
       "decision_reasons": [
-        "artifact validation failed"
+        "complete evidence retained without a forced small-sample rank"
       ],
-      "validation_issues": [
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[15] requires non-negative canonical CER"
-        },
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[16] requires non-negative canonical CER"
-        },
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[18] requires non-negative canonical CER"
-        }
-      ]
+      "validation_issues": []
     },
     {
       "model_id": "tesseract_fas",
@@ -182,40 +163,109 @@
       "yeh_recall": 0.466206,
       "kaf_recall": 0.435414,
       "zwnj_f1": 0.286608,
-      "decision": "Blocked",
+      "decision": "Hold",
       "decision_reasons": [
-        "artifact validation failed"
+        "complete evidence retained without a forced small-sample rank"
       ],
-      "validation_issues": [
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[15] requires non-negative canonical CER"
-        },
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[16] requires non-negative canonical CER"
-        },
-        {
-          "severity": "error",
-          "code": "result_cer_missing",
-          "message": "successful results[18] requires non-negative canonical CER"
-        }
+      "validation_issues": []
+    }
+  ],
+  "slices": [
+    {
+      "model_id": "easyocr_fa",
+      "split": "phase1_screening",
+      "content_type": "handwritten",
+      "expected": 9,
+      "ok": 9,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.62493,
+      "page_cer_ci95": [
+        0.5587,
+        0.696486
+      ]
+    },
+    {
+      "model_id": "easyocr_fa",
+      "split": "phase1_screening",
+      "content_type": "printed",
+      "expected": 11,
+      "ok": 11,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.274078,
+      "page_cer_ci95": [
+        0.171921,
+        0.366546
+      ]
+    },
+    {
+      "model_id": "ppocrv5_arabic_mobile_rec",
+      "split": "phase1_screening",
+      "content_type": "handwritten",
+      "expected": 9,
+      "ok": 9,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.714914,
+      "page_cer_ci95": [
+        0.574644,
+        0.83755
+      ]
+    },
+    {
+      "model_id": "ppocrv5_arabic_mobile_rec",
+      "split": "phase1_screening",
+      "content_type": "printed",
+      "expected": 11,
+      "ok": 11,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.446948,
+      "page_cer_ci95": [
+        0.229145,
+        0.684418
+      ]
+    },
+    {
+      "model_id": "tesseract_fas",
+      "split": "phase1_screening",
+      "content_type": "handwritten",
+      "expected": 9,
+      "ok": 9,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.723626,
+      "page_cer_ci95": [
+        0.634562,
+        0.817014
+      ]
+    },
+    {
+      "model_id": "tesseract_fas",
+      "split": "phase1_screening",
+      "content_type": "printed",
+      "expected": 11,
+      "ok": 11,
+      "error": 0,
+      "coverage": 1.0,
+      "macro_page_cer_canonical": 0.40989,
+      "page_cer_ci95": [
+        0.181296,
+        0.651533
       ]
     }
   ],
-  "slices": [],
   "excluded": [],
   "ranking_policy": null,
   "validation_summary": {
     "artifacts_seen": 3,
-    "artifacts_valid": 0,
-    "artifacts_compatible": 0,
-    "artifacts_unique": 0,
-    "artifacts_complete": 0,
+    "artifacts_valid": 3,
+    "artifacts_compatible": 3,
+    "artifacts_unique": 3,
+    "artifacts_complete": 3,
     "duplicate_runs": 0,
-    "errors": 9,
+    "errors": 0,
     "warnings": 0
   }
 }

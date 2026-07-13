@@ -1,6 +1,6 @@
 {
   "schema": "persian_ocr_benchmark_v2",
-  "run_id": "9381692a5ba8cd1e1bf60b3e8a0bcc100a369cfa38c0fb57668774e1fb2c1f55",
+  "run_id": "072ae7bb81817e78910f30fe462db1a95b06cacc960bd447d3f478705a23112c",
   "run_identity": {
     "schema": "persian_ocr_run_identity_v2",
     "protocol": {
@@ -242,7 +242,7 @@
       },
       "source_sha256": "8ee97abb9c056b5fbdd01f89eb37c4e59a59907e79a225c91ad1df377a63f3d4",
       "git": {
-        "commit": "874951bc1f02cb19d7a5e6b4cf307cd0e895e4bc",
+        "commit": "acf136e556aa586356bd8e086f566046d9cf1c38",
         "dirty": true
       },
       "shared_scorer": {
@@ -320,7 +320,7 @@
         "opencv-python-headless": "5.0.0.93"
       }
     },
-    "digest": "9381692a5ba8cd1e1bf60b3e8a0bcc100a369cfa38c0fb57668774e1fb2c1f55"
+    "digest": "072ae7bb81817e78910f30fe462db1a95b06cacc960bd447d3f478705a23112c"
   },
   "summary": {
     "model": {
@@ -371,10 +371,10 @@
     },
     "operations": {
       "latency_scope": "end-to-end Tesseract page recognition",
-      "initialization_seconds": 0.652183,
-      "mean_seconds_per_page": 0.693401,
-      "median_seconds_per_page": 0.507205,
-      "p95_seconds_per_page": 1.76885,
+      "initialization_seconds": 0.588429,
+      "mean_seconds_per_page": 0.706101,
+      "median_seconds_per_page": 0.453273,
+      "p95_seconds_per_page": 1.808673,
       "peak_vram_gb": null,
       "peak_ram_gb": null
     }
@@ -387,7 +387,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.814536,
+      "seconds": 0.843636,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "archival_handwritten_note",
@@ -559,7 +559,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.54191,
+      "seconds": 0.568956,
       "metadata": {
         "capture_type": "low_resolution_scan",
         "document_type": "child_handwritten_letter",
@@ -729,7 +729,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 1.568302,
+      "seconds": 1.639542,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "handwritten_correspondence",
@@ -901,7 +901,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.126164,
+      "seconds": 0.10338,
       "metadata": {
         "capture_type": "rotated_phone_photo",
         "document_type": "handwritten_quote",
@@ -1071,7 +1071,7 @@
       "track": "handwriting_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.384648,
+      "seconds": 0.378228,
       "metadata": {
         "capture_type": "digital_or_screenshot",
         "document_type": "printed_social_quote_graphic",
@@ -1243,7 +1243,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.505019,
+      "seconds": 0.413764,
       "metadata": {
         "capture_type": "phone_photo",
         "document_type": "handwritten_poetry",
@@ -1413,7 +1413,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 1.081619,
+      "seconds": 1.085784,
       "metadata": {
         "capture_type": "low_resolution_reproduction",
         "document_type": "handwritten_public_note_on_printed_form",
@@ -1587,7 +1587,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.718234,
+      "seconds": 0.716303,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "handwritten_correspondence",
@@ -1758,7 +1758,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.293304,
+      "seconds": 0.348517,
       "metadata": {
         "capture_type": "low_resolution_phone_photo",
         "document_type": "handwritten_greeting_card",
@@ -1931,7 +1931,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 0.381657,
+      "seconds": 0.382095,
       "metadata": {
         "capture_type": "low_resolution_phone_photo",
         "document_type": "handwritten_anecdote_card",
@@ -2104,7 +2104,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 1.267882,
+      "seconds": 1.271283,
       "metadata": {
         "capture_type": "clean_scan",
         "document_type": "printed_book_page",
@@ -2275,7 +2275,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.112722,
+      "seconds": 0.117247,
       "metadata": {
         "capture_type": "low_resolution_phone_photo",
         "document_type": "printed_book_page",
@@ -2447,7 +2447,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.869614,
+      "seconds": 0.910335,
       "metadata": {
         "capture_type": "clean_scan",
         "document_type": "printed_book_page",
@@ -2619,7 +2619,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.302416,
+      "seconds": 0.292435,
       "metadata": {
         "capture_type": "cropped_low_light_phone_photo",
         "document_type": "printed_book_page_partial_crop",
@@ -2792,7 +2792,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.50939,
+      "seconds": 0.476786,
       "metadata": {
         "capture_type": "perspective_phone_photo",
         "document_type": "printed_book_page_partial_crop",
@@ -2965,7 +2965,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 1.76885,
+      "seconds": 1.808673,
       "metadata": {
         "capture_type": "digital_or_scan",
         "document_type": "printed_checklist_table_form",
@@ -3140,7 +3140,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.187838,
+      "seconds": 0.184014,
       "metadata": {
         "capture_type": "low_resolution_scan",
         "document_type": "printed_identity_form",
@@ -3314,7 +3314,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.20808,
+      "seconds": 0.226323,
       "metadata": {
         "capture_type": "digital_or_screenshot",
         "document_type": "printed_social_quote_graphic",
@@ -3485,7 +3485,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 1.801808,
+      "seconds": 1.924949,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "printed_legal_decision_redacted",
@@ -3662,7 +3662,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 0.424029,
+      "seconds": 0.429761,
       "metadata": {
         "capture_type": "low_resolution_scan",
         "document_type": "printed_business_letter_template",

@@ -1,12 +1,16 @@
 # Phase 1 screening report
 
+Dataset: `smoke20-v1` (`9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7`)
+
+Protocol: `phase1_screening` / `full_page_ocr` (`22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72`)
+
 This 20-image phase is a viability screen, not a general Persian OCR ranking.
 
 | Decision | Model | Coverage | Norm CER | Raw CER | WER | BoW WER | Order gap | Faith F1 | Exact pages | Yeh recall | Kaf recall | ZWNJ F1 | Mean sec |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Blocked | `easyocr_fa` | 20/20 | 0.4598 (0.3563-0.5598) | 0.49881 | 0.834228 | 1.402408 | 0.0 | 0.241238 | 0.0 | 0.513506 | 0.508996 | 0.0 | 11.639 |
-| Blocked | `ppocrv5_arabic_mobile_rec` | 20/20 | 0.5888 (0.4422-0.7306) | 0.618809 | 0.841573 | 1.160315 | 0.0 | 0.227477 | 0.0 | 0.393237 | 0.492916 | 0.0 | 11.197 |
-| Blocked | `tesseract_fas` | 20/20 | 0.5760 (0.4262-0.7128) | 0.584702 | 0.784347 | 1.086734 | 0.0 | 0.289751 | 0.0 | 0.466206 | 0.435414 | 0.286608 | 0.693 |
+| Hold | `easyocr_fa` | 20/20 | 0.4598 (0.3563-0.5598) | 0.49881 | 0.834228 | 1.402408 | 0.0 | 0.241238 | 0.0 | 0.513506 | 0.508996 | 0.0 | 11.639 |
+| Hold | `ppocrv5_arabic_mobile_rec` | 20/20 | 0.5888 (0.4422-0.7306) | 0.618809 | 0.841573 | 1.160315 | 0.0 | 0.227477 | 0.0 | 0.393237 | 0.492916 | 0.0 | 11.197 |
+| Hold | `tesseract_fas` | 20/20 | 0.5760 (0.4262-0.7128) | 0.584702 | 0.784347 | 1.086734 | 0.0 | 0.289751 | 0.0 | 0.466206 | 0.435414 | 0.286608 | 0.693 |
 
 ## Metric glossary
 
@@ -30,4 +34,4 @@ Interpretation: use CER/WER for general transcription quality, P90 and Worst Q f
 
 ## Validation
 
-{"artifacts_compatible": 0, "artifacts_complete": 0, "artifacts_seen": 3, "artifacts_unique": 0, "artifacts_valid": 0, "duplicate_runs": 0, "errors": 9, "warnings": 0}
+{"artifacts_compatible": 3, "artifacts_complete": 3, "artifacts_seen": 3, "artifacts_unique": 3, "artifacts_valid": 3, "duplicate_runs": 0, "errors": 0, "warnings": 0}

@@ -1,0 +1,76 @@
+{
+  "schema": "persian_ocr_phase1_state_v1",
+  "models": {
+    "tesseract_fas": {
+      "status": "complete",
+      "started_at": "2026-07-13T06:45:45.825331+00:00",
+      "command": [
+        "C:\\my_projects\\05_train_models_datasets\\persian-ocr\\.venv\\Scripts\\python.exe",
+        "src/tesseract_fas.py",
+        "--small_bench",
+        "--langs",
+        "fas",
+        "--psm",
+        "3",
+        "--variant",
+        "best",
+        "--preprocess",
+        "raw",
+        "--require-reviewed",
+        "--output",
+        "bench_runs\\smoke20-v1\\tesseract_fas.json"
+      ],
+      "output": "bench_runs/smoke20-v1/tesseract_fas.json",
+      "finished_at": "2026-07-13T06:46:01.635521+00:00",
+      "return_code": 0,
+      "error": null
+    },
+    "ppocrv5_arabic_mobile_rec": {
+      "status": "failed",
+      "started_at": "2026-07-13T06:44:58.803959+00:00",
+      "command": [
+        "C:\\my_projects\\05_train_models_datasets\\persian-ocr\\.venv\\Scripts\\python.exe",
+        "src/ppocrv5_arabic_mobile_rec.py",
+        "--small_bench",
+        "--device",
+        "auto",
+        "--preprocess",
+        "raw",
+        "--require-reviewed",
+        "--output",
+        "bench_runs\\smoke20-v1\\ppocrv5_arabic_mobile_rec.json"
+      ],
+      "output": "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json",
+      "finished_at": "2026-07-13T06:45:02.539315+00:00",
+      "return_code": 2,
+      "error": null
+    },
+    "easyocr_fa": {
+      "status": "complete",
+      "started_at": "2026-07-13T06:45:02.800308+00:00",
+      "command": [
+        "C:\\my_projects\\05_train_models_datasets\\persian-ocr\\.venv\\Scripts\\python.exe",
+        "src/easyocr_fa.py",
+        "--small_bench",
+        "--device",
+        "auto",
+        "--preprocess",
+        "raw",
+        "--ordering",
+        "rtl_rows",
+        "--require-reviewed",
+        "--limit",
+        "1",
+        "--output",
+        "bench_runs\\smoke20-v1\\easyocr_fa.json"
+      ],
+      "output": "bench_runs/smoke20-v1/easyocr_fa.json",
+      "finished_at": "2026-07-13T06:45:22.967398+00:00",
+      "return_code": 0,
+      "error": null
+    }
+  },
+  "updated_at": "2026-07-13T06:45:45.825331+00:00",
+  "dataset": "smoke20-v1",
+  "limit": null
+}
