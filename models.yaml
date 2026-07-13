@@ -232,7 +232,7 @@ models:
   - recognition model alone is not a page parser
   - RTL line ordering must be evaluated outside the recognizer
   execution:
-    status: adapter_ready
+    status: benchmarked
     entrypoint: src/ppocrv5_arabic_mobile_rec.py
     dependency_group: paddle
     artifact: bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json
@@ -280,7 +280,7 @@ models:
   - older recognition architecture
   - paragraph grouping can hide RTL ordering errors
   execution:
-    status: adapter_ready
+    status: benchmarked
     entrypoint: src/easyocr_fa.py
     dependency_group: easyocr
     artifact: bench_runs/smoke20-v1/easyocr_fa.json
