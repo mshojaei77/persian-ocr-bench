@@ -6,11 +6,11 @@ Protocol: `phase1_screening` / `full_page_ocr` (`22b8b6a898198bc4255324e8f07767a
 
 This 20-image phase is a viability screen, not a general Persian OCR ranking.
 
-| Decision | Model | Coverage | Norm CER | Raw CER | WER | BoW WER | Order gap | Faith F1 | Exact pages | Yeh recall | Kaf recall | ZWNJ F1 | Mean sec |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Hold | `easyocr_fa` | 20/20 | 0.4598 (0.3563-0.5598) | 0.49881 | 0.834228 | 1.402408 | 0.0 | 0.241238 | 0.0 | 0.513506 | 0.508996 | 0.0 | 11.639 |
-| Hold | `ppocrv5_arabic_mobile_rec` | 20/20 | 0.5888 (0.4422-0.7306) | 0.618809 | 0.841573 | 1.160315 | 0.0 | 0.227477 | 0.0 | 0.393237 | 0.492916 | 0.0 | 11.197 |
-| Hold | `tesseract_fas` | 20/20 | 0.5760 (0.4262-0.7128) | 0.584702 | 0.784347 | 1.086734 | 0.0 | 0.289751 | 0.0 | 0.466206 | 0.435414 | 0.286608 | 0.693 |
+| Decision | Model | Attempts | CER eligible | Norm CER | Raw CER | WER | BoW WER | Order gap | Faith F1 | Exact pages | Mean sec |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Hold | `easyocr_fa` | 20/20 | 17/20 | 0.4598 (0.3563-0.5598) | 0.49881 | 0.834228 | 1.402408 | 0.0 | 0.241238 | 0.0 | 11.639 |
+| Hold | `ppocrv5_arabic_mobile_rec` | 20/20 | 17/20 | 0.5888 (0.4422-0.7306) | 0.618809 | 0.841573 | 1.160315 | 0.0 | 0.227477 | 0.0 | 9.374 |
+| Hold | `tesseract_fas` | 20/20 | 17/20 | 0.5760 (0.4262-0.7128) | 0.584702 | 0.784347 | 1.086734 | 0.0 | 0.289751 | 0.0 | 0.693 |
 
 ## Metric glossary
 
@@ -18,7 +18,7 @@ All rows use the same dataset, protocol, scorer, and capability class. Values ar
 
 | Metric | Meaning | Direction |
 |---|---|---|
-| Coverage | Successful pages divided by expected pages. | Higher is better; complete coverage is required. |
+| Attempts / CER eligible | All successful attempts / pages eligible for official CER/WER. Metric exclusions are never silently treated as perfect scores. | Higher is better; complete attempts and disclosed eligibility are required. |
 | Norm CER / Raw CER | Macro page CER after frozen Persian normalization / exact Unicode CER after NFC only. | Lower is better. |
 | P90 CER | 90th-percentile page CER; exposes difficult-page failures. | Lower is better. |
 | Worst Q CER | Mean CER of the worst 25% of successful pages. | Lower is better. |

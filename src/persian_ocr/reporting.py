@@ -746,6 +746,10 @@ def _artifact_row(record: ValidatedArtifact) -> dict[str, Any]:
         for result in ok_results
         if (value := _result_metric(result, "cer")) is not None
     )
+    scoring_excluded = sum(
+        bool(_mapping(result.get("metadata")).get("scoring_excluded"))
+        for result in ok_results
+    )
     orthographic = [
         result["metrics"]["orthographic"]
         for result in ok_results
@@ -784,6 +788,11 @@ def _artifact_row(record: ValidatedArtifact) -> dict[str, Any]:
         "error": record.error,
         "coverage": record.coverage,
         "attempt_coverage": record.attempt_coverage,
+        "scorable_cer_pages": len(page_cers),
+        "scoring_excluded_pages": scoring_excluded,
+        "scorable_cer_coverage": (
+            round(len(page_cers) / record.expected, 6) if record.expected else 0.0
+        ),
         "macro_page_cer_canonical": record.cer,
         "micro_corpus_cer_canonical": record.micro_cer,
         "mean_wer_canonical": record.wer,
@@ -958,6 +967,10 @@ def slice_rows(records: Iterable[ValidatedArtifact]) -> list[dict[str, Any]]:
             for result in ok_results
             if (value := _result_metric(result, "cer")) is not None
         ]
+        excluded = sum(
+            bool(_mapping(result.get("metadata")).get("scoring_excluded"))
+            for result in ok_results
+        )
         rows.append(
             {
                 "model_id": model_id,
@@ -966,6 +979,11 @@ def slice_rows(records: Iterable[ValidatedArtifact]) -> list[dict[str, Any]]:
                 "expected": len(results),
                 "ok": len(ok_results),
                 "error": len(results) - len(ok_results),
+                "scorable_cer_pages": len(cers),
+                "scoring_excluded_pages": excluded,
+                "scorable_cer_coverage": round(len(cers) / len(results), 6)
+                if results
+                else 0.0,
                 "coverage": round(len(ok_results) / len(results), 6)
                 if results
                 else 0.0,
@@ -1266,8 +1284,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
             [
                 "This 20-image phase is a viability screen, not a general Persian OCR ranking.",
                 "",
-                "| Decision | Model | Coverage | Norm CER | Raw CER | WER | BoW WER | Order gap | Faith F1 | Exact pages | Yeh recall | Kaf recall | ZWNJ F1 | Mean sec |",
-                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+                "| Decision | Model | Attempts | CER eligible | Norm CER | Raw CER | WER | BoW WER | Order gap | Faith F1 | Exact pages | Mean sec |",
+                "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in report["rows"]:
@@ -1287,7 +1305,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 else f"{row['mean_seconds_per_image']:.3f}"
             )
             lines.append(
-                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {cer} | {row.get('mean_raw_unicode_cer') if row.get('mean_raw_unicode_cer') is not None else '-'} | {row.get('mean_wer_canonical') if row.get('mean_wer_canonical') is not None else '-'} | {row.get('bag_of_words_wer') if row.get('bag_of_words_wer') is not None else '-'} | {row.get('reading_order_gap') if row.get('reading_order_gap') is not None else '-'} | {row.get('faithfulness_f1') if row.get('faithfulness_f1') is not None else '-'} | {row.get('exact_page_rate') if row.get('exact_page_rate') is not None else '-'} | {row.get('yeh_recall') if row.get('yeh_recall') is not None else '-'} | {row.get('kaf_recall') if row.get('kaf_recall') is not None else '-'} | {row.get('zwnj_f1') if row.get('zwnj_f1') is not None else '-'} | {seconds} |"
+                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {row.get('scorable_cer_pages', 0)}/{row['expected']} | {cer} | {row.get('mean_raw_unicode_cer') if row.get('mean_raw_unicode_cer') is not None else '-'} | {row.get('mean_wer_canonical') if row.get('mean_wer_canonical') is not None else '-'} | {row.get('bag_of_words_wer') if row.get('bag_of_words_wer') is not None else '-'} | {row.get('reading_order_gap') if row.get('reading_order_gap') is not None else '-'} | {row.get('faithfulness_f1') if row.get('faithfulness_f1') is not None else '-'} | {row.get('exact_page_rate') if row.get('exact_page_rate') is not None else '-'} | {seconds} |"
             )
         lines.extend(
             [
@@ -1298,7 +1316,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 "",
                 "| Metric | Meaning | Direction |",
                 "|---|---|---|",
-                "| Coverage | Successful pages divided by expected pages. | Higher is better; complete coverage is required. |",
+                "| Attempts / CER eligible | All successful attempts / pages eligible for official CER/WER. Metric exclusions are never silently treated as perfect scores. | Higher is better; complete attempts and disclosed eligibility are required. |",
                 "| Norm CER / Raw CER | Macro page CER after frozen Persian normalization / exact Unicode CER after NFC only. | Lower is better. |",
                 "| P90 CER | 90th-percentile page CER; exposes difficult-page failures. | Lower is better. |",
                 "| Worst Q CER | Mean CER of the worst 25% of successful pages. | Lower is better. |",
@@ -1626,7 +1644,7 @@ def cli(argv: Sequence[str] | None = None, *, default_mode: str | None = None) -
     print(f"Output:     {output.resolve()}")
     if report["rows"]:
         print("Metrics:")
-        print("  model_id                              CER     P90 CER  Worst Q   Exact  Mean sec")
+        print("  model_id                              CER     Eligible  P90 CER  Worst Q   Exact  Mean sec")
         for row in report["rows"]:
             def _display(name: str, digits: int = 4) -> str:
                 value = row.get(name)
@@ -1635,6 +1653,7 @@ def cli(argv: Sequence[str] | None = None, *, default_mode: str | None = None) -
             print(
                 f"  {str(row['model_id']):<36} "
                 f"{_display('macro_page_cer_canonical'):>7} "
+                f"{row.get('scorable_cer_pages', 0):>3}/{row.get('expected', 0):<3} "
                 f"{_display('p90_page_cer_canonical'):>8} "
                 f"{_display('worst_quartile_page_cer_canonical'):>8} "
                 f"{_display('exact_page_rate'):>7} "

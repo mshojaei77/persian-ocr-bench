@@ -1,6 +1,6 @@
 {
   "schema": "persian_ocr_benchmark_v2",
-  "run_id": "b577365e8c66e4577224c6b152bfd1ce9157551d0e721654f4b615641cf7c6d2",
+  "run_id": "70cb972b400ebc518903d062644f1bfbd37d6413014d405de800560050aa1002",
   "run_identity": {
     "schema": "persian_ocr_run_identity_v2",
     "protocol": {
@@ -363,12 +363,12 @@
         "normalization.py": "1f52f63da7a808bf2ed7dda14f551723e680309fcffab3cc8846a3075fcf38aa",
         "paths.py": "a4afc6877e9bbf3ef566d781896bdf0f48fb4119782294515a0934023f46c485",
         "preprocessing.py": "1902d5575ee3448c4a871f2c23822cce7f8dbacae5c024e3de4852fec145edcf",
-        "reporting.py": "0ef5713309e9cf18c5853aec5925bf80d79f4d211c48f27103b1d7a404d889b6"
+        "reporting.py": "5687f62151fc3ba44b5426cd2772849f0a9386866a62a786eeb82a89f68b8b00"
       },
-      "source_sha256": "5111c1430c631c2201c8e273ea902ec0b5ac2062c4efbfd999f1e866a104e3dc",
+      "source_sha256": "58444b31d57b353a72663020d07196d0e1c24af57c679cb9f66a5aae42132914",
       "git": {
-        "commit": "874951bc1f02cb19d7a5e6b4cf307cd0e895e4bc",
-        "dirty": true
+        "commit": "111ca15441a50048cc2b2ab3483c442984802c8d",
+        "dirty": false
       },
       "shared_scorer": {
         "files": {
@@ -445,7 +445,7 @@
         "numpy": "2.3.5"
       }
     },
-    "digest": "b577365e8c66e4577224c6b152bfd1ce9157551d0e721654f4b615641cf7c6d2"
+    "digest": "70cb972b400ebc518903d062644f1bfbd37d6413014d405de800560050aa1002"
   },
   "summary": {
     "model": {
@@ -496,10 +496,10 @@
     },
     "operations": {
       "latency_scope": "end-to-end PP-OCRv5 detector+recognizer pipeline",
-      "initialization_seconds": 4.818831,
-      "mean_seconds_per_page": 11.196988,
-      "median_seconds_per_page": 6.511913,
-      "p95_seconds_per_page": 38.18397,
+      "initialization_seconds": 4.834994,
+      "mean_seconds_per_page": 9.374289,
+      "median_seconds_per_page": 6.853884,
+      "p95_seconds_per_page": 24.355152,
       "peak_vram_gb": null,
       "peak_ram_gb": null
     }
@@ -512,7 +512,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 6.596221,
+      "seconds": 6.521449,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "archival_handwritten_note",
@@ -1433,7 +1433,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 5.202862,
+      "seconds": 5.194173,
       "metadata": {
         "capture_type": "low_resolution_scan",
         "document_type": "child_handwritten_letter",
@@ -2307,7 +2307,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 7.507652,
+      "seconds": 8.165468,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "handwritten_correspondence",
@@ -3318,7 +3318,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 1.410232,
+      "seconds": 1.364765,
       "metadata": {
         "capture_type": "rotated_phone_photo",
         "document_type": "handwritten_quote",
@@ -3697,7 +3697,7 @@
       "track": "handwriting_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 4.025066,
+      "seconds": 4.217932,
       "metadata": {
         "capture_type": "digital_or_screenshot",
         "document_type": "printed_social_quote_graphic",
@@ -4483,7 +4483,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 4.178478,
+      "seconds": 4.152567,
       "metadata": {
         "capture_type": "phone_photo",
         "document_type": "handwritten_poetry",
@@ -5177,7 +5177,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 9.41802,
+      "seconds": 9.280621,
       "metadata": {
         "capture_type": "low_resolution_reproduction",
         "document_type": "handwritten_public_note_on_printed_form",
@@ -6325,7 +6325,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 4.217229,
+      "seconds": 4.21884,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "handwritten_correspondence",
@@ -7155,7 +7155,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 2.570558,
+      "seconds": 2.676801,
       "metadata": {
         "capture_type": "low_resolution_phone_photo",
         "document_type": "handwritten_greeting_card",
@@ -7762,7 +7762,7 @@
       "track": "handwriting_smoke",
       "content_type": "handwritten",
       "status": "ok",
-      "seconds": 5.290641,
+      "seconds": 5.281556,
       "metadata": {
         "capture_type": "low_resolution_phone_photo",
         "document_type": "handwritten_anecdote_card",
@@ -8729,7 +8729,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 15.722808,
+      "seconds": 15.792072,
       "metadata": {
         "capture_type": "clean_scan",
         "document_type": "printed_book_page",
@@ -9829,7 +9829,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 9.833043,
+      "seconds": 9.828584,
       "metadata": {
         "capture_type": "low_resolution_phone_photo",
         "document_type": "printed_book_page",
@@ -11065,7 +11065,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 9.734607,
+      "seconds": 14.551754,
       "metadata": {
         "capture_type": "clean_scan",
         "document_type": "printed_book_page",
@@ -11941,7 +11941,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 5.418085,
+      "seconds": 6.125986,
       "metadata": {
         "capture_type": "cropped_low_light_phone_photo",
         "document_type": "printed_book_page_partial_crop",
@@ -12863,7 +12863,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 6.427605,
+      "seconds": 7.18632,
       "metadata": {
         "capture_type": "perspective_phone_photo",
         "document_type": "printed_book_page_partial_crop",
@@ -13830,7 +13830,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 38.18397,
+      "seconds": 32.732605,
       "metadata": {
         "capture_type": "digital_or_scan",
         "document_type": "printed_checklist_table_form",
@@ -17499,7 +17499,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 21.679942,
+      "seconds": 11.887164,
       "metadata": {
         "capture_type": "low_resolution_scan",
         "document_type": "printed_identity_form",
@@ -19457,7 +19457,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 5.209677,
+      "seconds": 2.743107,
       "metadata": {
         "capture_type": "digital_or_screenshot",
         "document_type": "printed_social_quote_graphic",
@@ -19927,7 +19927,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 42.810008,
+      "seconds": 24.355152,
       "metadata": {
         "capture_type": "scan_or_reproduction",
         "document_type": "printed_legal_decision_redacted",
@@ -21933,7 +21933,7 @@
       "track": "printed_smoke",
       "content_type": "printed",
       "status": "ok",
-      "seconds": 18.503057,
+      "seconds": 11.208861,
       "metadata": {
         "capture_type": "low_resolution_scan",
         "document_type": "printed_business_letter_template",

@@ -13,16 +13,16 @@
       "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7"
     },
     "run_hashes": [
+      "70cb972b400ebc518903d062644f1bfbd37d6413014d405de800560050aa1002",
       "9381692a5ba8cd1e1bf60b3e8a0bcc100a369cfa38c0fb57668774e1fb2c1f55",
-      "b577365e8c66e4577224c6b152bfd1ce9157551d0e721654f4b615641cf7c6d2",
       "d4bc637111e43e4814fd3ac17932a40fdecc9df4c636fd3e1a091e3a3e2c1436"
     ],
     "artifact_hashes": {
       "bench_runs/smoke20-v1/easyocr_fa.json": "5021782797ebbd232b46659b5f397e3144e5db72ad2487547c68f57cc90cf08c",
-      "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "2d007c5c5843b4b9036bdea16cc006d2aa48527228bfab12cb9f02c055ff3a86",
+      "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "2ef572da74c4a03eea82dc8599bb8ae237ea566b30c71fa95c3a096eaf54c92f",
       "bench_runs/smoke20-v1/tesseract_fas.json": "3c068940c69a47210af798c5b9c45438078d0a1fe9100d0523f0afd7a9c48980"
     },
-    "report_sha256": "7ae680dc3202f487e60b71b6c8a48a92fe3ff0cde90fefc724696f7ef4d88988"
+    "report_sha256": "3ddf896daa5fb98dd22c5ec4a6a7170bbd803a1d6763a10063530c68857215cf"
   },
   "rows": [
     {
@@ -44,6 +44,9 @@
       "error": 0,
       "coverage": 1.0,
       "attempt_coverage": 1.0,
+      "scorable_cer_pages": 17,
+      "scoring_excluded_pages": 3,
+      "scorable_cer_coverage": 0.85,
       "macro_page_cer_canonical": 0.459823,
       "micro_corpus_cer_canonical": 0.395503,
       "mean_wer_canonical": 0.834228,
@@ -83,7 +86,7 @@
       "dataset_id": "smoke20-v1",
       "dataset_hash": "9543aff102da6cb4b3df1c4ac0f3c3a7dcf73c302233e8281fe68ad7411c28b7",
       "protocol_hash": "22b8b6a898198bc4255324e8f07767ab3ea874f718dbc6b410a9abaae4b0fb72",
-      "run_hash": "b577365e8c66e4577224c6b152bfd1ce9157551d0e721654f4b615641cf7c6d2",
+      "run_hash": "70cb972b400ebc518903d062644f1bfbd37d6413014d405de800560050aa1002",
       "config_hash": "52a0c1337e6e1b690957c0dbbedf14bf162d71018a40e56f667eb8912deb4c85",
       "environment_hash": "a17e2e505ffa938df8852b6f70e7273d4a8536945c040701c954c75b5de88ed9",
       "expected": 20,
@@ -92,6 +95,9 @@
       "error": 0,
       "coverage": 1.0,
       "attempt_coverage": 1.0,
+      "scorable_cer_pages": 17,
+      "scoring_excluded_pages": 3,
+      "scorable_cer_coverage": 0.85,
       "macro_page_cer_canonical": 0.588812,
       "micro_corpus_cer_canonical": 0.539183,
       "mean_wer_canonical": 0.841573,
@@ -106,8 +112,8 @@
       "reading_order_gap": 0.0,
       "page_cer_ci95_low": 0.442249,
       "page_cer_ci95_high": 0.730579,
-      "mean_seconds_per_image": 11.196988,
-      "median_seconds_per_image": 6.511913,
+      "mean_seconds_per_image": 9.374289,
+      "median_seconds_per_image": 6.853884,
       "p95_seconds_per_image": null,
       "p90_page_cer_canonical": 0.905882,
       "worst_quartile_page_cer_canonical": 0.894338,
@@ -140,6 +146,9 @@
       "error": 0,
       "coverage": 1.0,
       "attempt_coverage": 1.0,
+      "scorable_cer_pages": 17,
+      "scoring_excluded_pages": 3,
+      "scorable_cer_coverage": 0.85,
       "macro_page_cer_canonical": 0.575985,
       "micro_corpus_cer_canonical": 0.476063,
       "mean_wer_canonical": 0.784347,
@@ -178,6 +187,9 @@
       "expected": 9,
       "ok": 9,
       "error": 0,
+      "scorable_cer_pages": 9,
+      "scoring_excluded_pages": 0,
+      "scorable_cer_coverage": 1.0,
       "coverage": 1.0,
       "macro_page_cer_canonical": 0.62493,
       "page_cer_ci95": [
@@ -192,6 +204,9 @@
       "expected": 11,
       "ok": 11,
       "error": 0,
+      "scorable_cer_pages": 8,
+      "scoring_excluded_pages": 3,
+      "scorable_cer_coverage": 0.727273,
       "coverage": 1.0,
       "macro_page_cer_canonical": 0.274078,
       "page_cer_ci95": [
@@ -206,6 +221,9 @@
       "expected": 9,
       "ok": 9,
       "error": 0,
+      "scorable_cer_pages": 9,
+      "scoring_excluded_pages": 0,
+      "scorable_cer_coverage": 1.0,
       "coverage": 1.0,
       "macro_page_cer_canonical": 0.714914,
       "page_cer_ci95": [
@@ -220,6 +238,9 @@
       "expected": 11,
       "ok": 11,
       "error": 0,
+      "scorable_cer_pages": 8,
+      "scoring_excluded_pages": 3,
+      "scorable_cer_coverage": 0.727273,
       "coverage": 1.0,
       "macro_page_cer_canonical": 0.446948,
       "page_cer_ci95": [
@@ -234,6 +255,9 @@
       "expected": 9,
       "ok": 9,
       "error": 0,
+      "scorable_cer_pages": 9,
+      "scoring_excluded_pages": 0,
+      "scorable_cer_coverage": 1.0,
       "coverage": 1.0,
       "macro_page_cer_canonical": 0.723626,
       "page_cer_ci95": [
@@ -248,6 +272,9 @@
       "expected": 11,
       "ok": 11,
       "error": 0,
+      "scorable_cer_pages": 8,
+      "scoring_excluded_pages": 3,
+      "scorable_cer_coverage": 0.727273,
       "coverage": 1.0,
       "macro_page_cer_canonical": 0.40989,
       "page_cer_ci95": [
