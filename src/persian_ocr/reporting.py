@@ -728,6 +728,27 @@ def _target_contract(
 
 
 def _artifact_row(record: ValidatedArtifact) -> dict[str, Any]:
+    ok_results = [
+        result
+        for result in record.payload.get("results", [])
+        if isinstance(result, dict) and _result_status(result) in OK_STATUSES
+    ]
+    page_cers = sorted(
+        value
+        for result in ok_results
+        if (value := _result_metric(result, "cer")) is not None
+    )
+    orthographic = [
+        result["metrics"]["orthographic"]
+        for result in ok_results
+        if isinstance(result.get("metrics"), dict)
+        and isinstance(result["metrics"].get("orthographic"), dict)
+    ]
+
+    def mean_orthographic(name: str) -> float | None:
+        values = [item[name] for item in orthographic if isinstance(item.get(name), (int, float))]
+        return round(statistics.fmean(values), 6) if values else None
+
     return {
         "model_id": record.model_id or record.path.stem,
         "capability_class": record.model_class,
@@ -754,6 +775,25 @@ def _artifact_row(record: ValidatedArtifact) -> dict[str, Any]:
         "page_cer_ci95_high": record.ci95[1] if record.ci95 else None,
         "mean_seconds_per_image": record.mean_seconds,
         "median_seconds_per_image": record.median_seconds,
+        "p95_seconds_per_image": _nested(record.payload, "operations.p95_seconds_per_page"),
+        "p90_page_cer_canonical": (
+            round(page_cers[max(0, math.ceil(len(page_cers) * 0.90) - 1)], 6)
+            if page_cers
+            else None
+        ),
+        "worst_quartile_page_cer_canonical": (
+            round(statistics.fmean(page_cers[math.floor(len(page_cers) * 0.75) :]), 6)
+            if page_cers
+            else None
+        ),
+        "exact_page_rate": (
+            round(sum(value == 0 for value in page_cers) / len(page_cers), 6)
+            if page_cers
+            else None
+        ),
+        "yeh_recall": mean_orthographic("yeh_recall"),
+        "kaf_recall": mean_orthographic("kaf_recall"),
+        "zwnj_f1": mean_orthographic("zwnj_f1"),
     }
 
 
@@ -1193,8 +1233,8 @@ def _markdown(report: Mapping[str, Any]) -> str:
             [
                 "This 20-image phase is a viability screen, not a general Persian OCR ranking.",
                 "",
-                "| Decision | Model | Class | Coverage | Macro CER (95% CI) | Mean sec/image |",
-                "|---|---|---|---:|---:|---:|",
+                "| Decision | Model | Coverage | Macro CER (95% CI) | P90 CER | Worst-quartile CER | Exact pages | Mean sec/image |",
+                "|---|---|---:|---:|---:|---:|---:|---:|",
             ]
         )
         for row in report["rows"]:
@@ -1214,15 +1254,15 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 else f"{row['mean_seconds_per_image']:.3f}"
             )
             lines.append(
-                f"| {row['decision']} | `{row['model_id']}` | {row['capability_class'] or '-'} | {row['ok']}/{row['expected']} | {cer} | {seconds} |"
+                f"| {row['decision']} | `{row['model_id']}` | {row['ok']}/{row['expected']} | {cer} | {row.get('p90_page_cer_canonical') or '-'} | {row.get('worst_quartile_page_cer_canonical') or '-'} | {row.get('exact_page_rate') or '-'} | {seconds} |"
             )
     else:
         lines.extend(
             [
                 "Only complete, failure-free artifacts with the exact selected dataset and protocol identity are included.",
                 "",
-                "| Group | Rank | Model | Macro CER (95% CI) | WER | Mean sec/image |",
-                "|---|---:|---|---:|---:|---:|",
+                "| Group | Rank | Model | Macro CER | P90 CER | WER | Exact pages | Mean sec/image |",
+                "|---|---:|---|---:|---:|---:|---:|---:|",
             ]
         )
         for row in report["rows"]:
@@ -1243,7 +1283,7 @@ def _markdown(report: Mapping[str, Any]) -> str:
                 else f"{row['mean_seconds_per_image']:.3f}"
             )
             lines.append(
-                f"| {row['comparison_group']} | {row['rank']} | `{row['model_id']}` | {cer} | {wer} | {seconds} |"
+                f"| {row['comparison_group']} | {row['rank']} | `{row['model_id']}` | {cer} | {row.get('p90_page_cer_canonical') or '-'} | {wer} | {row.get('exact_page_rate') or '-'} | {seconds} |"
             )
     lines.extend(
         [

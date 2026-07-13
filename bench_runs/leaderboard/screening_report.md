@@ -6,11 +6,11 @@ Protocol: `phase1_screening` / `full_page_ocr` (`ce683321a491e5a64f2e6c54b841882
 
 This 20-image phase is a viability screen, not a general Persian OCR ranking.
 
-| Decision | Model | Class | Coverage | Macro CER (95% CI) | Mean sec/image |
-|---|---|---|---:|---:|---:|
-| Hold | `easyocr_fa` | full_page_detector_recognizer_pipeline | 20/20 | 0.4534 (0.3596-0.5459) | 14.156 |
-| Hold | `ppocrv5_arabic_mobile_rec` | full_page_detector_recognizer_pipeline | 20/20 | 0.5546 (0.4252-0.6807) | 14.555 |
-| Hold | `tesseract_fas` | full_page_detector_recognizer_pipeline | 20/20 | 0.5521 (0.4147-0.6835) | 0.758 |
+| Decision | Model | Coverage | Macro CER (95% CI) | P90 CER | Worst-quartile CER | Exact pages | Mean sec/image |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Hold | `easyocr_fa` | 20/20 | 0.4534 (0.3596-0.5459) | 0.667674 | 0.703858 | - | 14.156 |
+| Hold | `ppocrv5_arabic_mobile_rec` | 20/20 | 0.5546 (0.4252-0.6807) | 0.901278 | 0.89608 | - | 14.555 |
+| Hold | `tesseract_fas` | 20/20 | 0.5521 (0.4147-0.6835) | 0.87631 | 0.906049 | - | 0.758 |
 
 ## Validation
 

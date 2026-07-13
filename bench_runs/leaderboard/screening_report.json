@@ -22,7 +22,7 @@
       "bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json": "99020f5d95449544eba32f1bcef21ba6ef6ca05f16b097cd300b006077d4780e",
       "bench_runs/smoke20-v1/tesseract_fas.json": "4d968af51b7b6f71cc1f10ebdc7b785dc88a022bb9518913befd2f183ea64eb5"
     },
-    "report_sha256": "23cb8244f359cadf92b2589ee4883397f2b9ae85481db79b8b6f9d95f78b29a2"
+    "report_sha256": "5bbd6438d6933b7ed3f9af7afc7594a406c11ed98f7a1241e7bf79dfe8f2a864"
   },
   "rows": [
     {
@@ -51,6 +51,13 @@
       "page_cer_ci95_high": 0.545868,
       "mean_seconds_per_image": 14.156441,
       "median_seconds_per_image": 12.434873,
+      "p95_seconds_per_image": null,
+      "p90_page_cer_canonical": 0.667674,
+      "worst_quartile_page_cer_canonical": 0.703858,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.509614,
+      "kaf_recall": 0.482296,
+      "zwnj_f1": 0.0,
       "decision": "Hold",
       "decision_reasons": [
         "complete evidence retained without a forced small-sample rank"
@@ -83,6 +90,13 @@
       "page_cer_ci95_high": 0.680731,
       "mean_seconds_per_image": 14.554824,
       "median_seconds_per_image": 11.722189,
+      "p95_seconds_per_image": null,
+      "p90_page_cer_canonical": 0.901278,
+      "worst_quartile_page_cer_canonical": 0.89608,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.392238,
+      "kaf_recall": 0.46827,
+      "zwnj_f1": 0.0,
       "decision": "Hold",
       "decision_reasons": [
         "complete evidence retained without a forced small-sample rank"
@@ -115,6 +129,13 @@
       "page_cer_ci95_high": 0.683505,
       "mean_seconds_per_image": 0.758445,
       "median_seconds_per_image": 0.574833,
+      "p95_seconds_per_image": null,
+      "p90_page_cer_canonical": 0.87631,
+      "worst_quartile_page_cer_canonical": 0.906049,
+      "exact_page_rate": 0.0,
+      "yeh_recall": 0.465734,
+      "kaf_recall": 0.413643,
+      "zwnj_f1": 0.286124,
       "decision": "Hold",
       "decision_reasons": [
         "complete evidence retained without a forced small-sample rank"
