@@ -138,7 +138,12 @@ def ensure_logical_path(value: str) -> str:
     if "\\" in value:
         raise ValueError(f"Logical path must use POSIX separators: {value!r}")
     pure = PurePosixPath(value)
-    if pure.is_absolute() or pure.drive or ".." in pure.parts:
+    if (
+        pure.is_absolute()
+        or pure.drive
+        or ".." in pure.parts
+        or (pure.parts and ":" in pure.parts[0])
+    ):
         raise ValueError(f"Logical path must be relative and contained: {value!r}")
     normalized = pure.as_posix()
     if normalized in {"", "."}:
