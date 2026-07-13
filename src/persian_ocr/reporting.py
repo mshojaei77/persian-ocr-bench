@@ -1554,7 +1554,23 @@ def cli(argv: Sequence[str] | None = None, *, default_mode: str | None = None) -
         f"Artifacts:  {summary['artifacts_seen']} seen, {summary['artifacts_valid']} valid, {summary['artifacts_compatible']} compatible"
     )
     print(f"Rows:       {len(report['rows'])}")
-    print(f"Output:     {safe_source(output)}")
+    print(f"Output:     {output.resolve()}")
+    if report["rows"]:
+        print("Metrics:")
+        print("  model_id                              CER     P90 CER  Worst Q   Exact  Mean sec")
+        for row in report["rows"]:
+            def _display(name: str, digits: int = 4) -> str:
+                value = row.get(name)
+                return "-" if value is None else f"{value:.{digits}f}"
+
+            print(
+                f"  {str(row['model_id']):<36} "
+                f"{_display('macro_page_cer_canonical'):>7} "
+                f"{_display('p90_page_cer_canonical'):>8} "
+                f"{_display('worst_quartile_page_cer_canonical'):>8} "
+                f"{_display('exact_page_rate'):>7} "
+                f"{_display('mean_seconds_per_image', 3):>9}"
+            )
     print(f"Generated:  {', '.join(generated)}")
     invalid = (
         summary["errors"] > 0
