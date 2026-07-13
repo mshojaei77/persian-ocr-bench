@@ -5,6 +5,10 @@ sealed evaluation. The current 20-image `smoke20-v1` corpus is **Phase 1 only**:
 it is a viability gate, not a final model ranking or production-quality
 leaderboard.
 
+The complete execution plan is tracked in [ROADMAP.md](ROADMAP.md), including
+the remaining P0 adapters, human-review gate, sealed large benchmark, and
+separate final leaderboards.
+
 The Python package provides one shared contract for dataset validation, Persian
 normalization, recognition metrics, preprocessing, run identity, and portable
 benchmark artifacts. Model runtimes are optional so catalog and dataset checks
