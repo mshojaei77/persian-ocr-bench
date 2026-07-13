@@ -1,5 +1,5 @@
 # Persian and multilingual OCR benchmark catalog.
-# Updated and source-audited on 2026-07-11.
+# Updated and source-audited on 2026-07-13.
 #
 # IMPORTANT:
 # - Official multilingual claims are not treated as proof of Persian support.
@@ -10,8 +10,8 @@
 
 catalog:
   title: Persian and Multilingual OCR Benchmark Model Catalog
-  version: 2
-  updated_at: '2026-07-11'
+  version: 3
+  updated_at: '2026-07-13'
   scope: Open-weight OCR engines, OCR-specialized VLMs, and a small number of general VLM controls relevant to Persian
     (fa/fas) text extraction.
   objective: Choose the strongest model for Persian character recognition, RTL reading order, and structured document
@@ -43,6 +43,22 @@ catalog:
     broad_multilingual_no_fa: Officially multilingual, but Persian is not specifically named.
     not_listed: The official supported-language list does not include Persian.
     unknown: No reliable language list was found.
+execution_registry:
+  schema: persian_ocr_execution_registry_v1
+  default_status: catalog_only
+  status_values:
+    catalog_only: Catalog metadata exists, but no local adapter is available.
+    adapter_ready: A local CLI adapter exists and still needs a full benchmark artifact.
+    benchmarked: A local CLI adapter and benchmark artifact both exist.
+    blocked: Implementation was attempted and the blocking reason is recorded in the model entry.
+    rejected: A smoke run showed that the model is not suitable for the declared benchmark track.
+  entrypoint_pattern: 'src/{id}.py'
+  artifact_pattern: 'bench_runs/{id}.json'
+  dependency_policy: Keep model-specific heavyweight runtimes in named optional dependency groups.
+  selection_policy:
+  - Finish adapter_ready models before starting a catalog_only model.
+  - Within the same status, prefer P0, then P1, then P2.
+  - Use catalog rank only as the final tie-breaker; it is not a quality leaderboard rank.
 benchmark_protocol:
   leaderboards:
   - name: raw_recognition
@@ -145,6 +161,11 @@ models:
   risks:
   - weak on complex layouts and photos
   - language-pack and page-segmentation choices strongly affect results
+  execution:
+    status: benchmarked
+    entrypoint: src/tesseract_fas.py
+    dependency_group: default
+    artifact: bench_runs/tesseract_fas.json
 - rank: 2
   id: ppocrv5_arabic_mobile_rec
   name: PP-OCRv5 Arabic Mobile Recognition
@@ -192,6 +213,11 @@ models:
   risks:
   - recognition model alone is not a page parser
   - RTL line ordering must be evaluated outside the recognizer
+  execution:
+    status: benchmarked
+    entrypoint: src/ppocrv5_arabic_mobile_rec.py
+    dependency_group: default
+    artifact: bench_runs/ppocrv5_arabic_mobile_rec.json
 - rank: 3
   id: easyocr_fa
   name: EasyOCR Persian
@@ -235,6 +261,11 @@ models:
   risks:
   - older recognition architecture
   - paragraph grouping can hide RTL ordering errors
+  execution:
+    status: adapter_ready
+    entrypoint: src/easyocr_fa.py
+    dependency_group: easyocr
+    artifact: null
 - rank: 4
   id: hezar_crnn_base_fa_v2
   name: Hezar CRNN Base FA v2
