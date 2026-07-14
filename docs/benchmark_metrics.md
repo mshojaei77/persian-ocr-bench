@@ -1,625 +1,723 @@
-## Recommendation
+# Recommended benchmark design
 
-Do **not** rank all 82 systems with one undifferentiated metric. Your candidates include cropped-line recognizers, classical OCR engines, full-page parsers, general VLMs, commercial APIs, handwriting systems, and digit-only models. A single score would either punish specialized models for capabilities they were never designed to provide or reward VLMs for producing plausible-looking but inaccurate text.
+Your ten metrics are a strong basis for a **Persian text-recognition leaderboard**. CER/WER remain standard because they are reproducible and derived from one Levenshtein alignment, but they conceal whether errors came from deletion, insertion, substitution, spacing, or catastrophic repetition. That is exactly why your Persian-specific and failure-oriented metrics add value. ([OCR-D][1])
 
-Use three linked leaderboards:
+I would make four important refinements:
 
-1. **Persian Text Recognition** — common to nearly every model.
-2. **Persian Document Parsing** — only full-page-capable systems.
-3. **Specialized Persian OCR** — handwriting, scene text, and digits.
+1. Calculate Canonical CER, Omission Score, and Hallucination Score from **one shared deterministic character alignment**.
+2. Use a deliberately minimal, versioned Persian canonicalizer—not Hazm spell correction or an LLM.
+3. Measure robustness relative to each model’s clean accuracy, incorporating both average and worst-case retention.
+4. Make the common benchmark a **line/text-region recognition track**. Keep full-page layout, reading order, tables, and formulas separate.
 
-CER and WER remain the standard transcription metrics, but they cannot detect scrambled columns, broken tables, or semantically plausible hallucinations. Modern document benchmarks therefore combine text accuracy with reading order, layout, tables, faithfulness, and robustness. ([arXiv][1])
+OmniDocBench follows the same general principle by evaluating text recognition, layout detection, reading order, tables, and formulas as distinct components rather than collapsing them into one ambiguous number. ([GitHub][2])
 
 ---
 
-# 1. Persian Text Recognition leaderboard
+## 1. Define the common task precisely
 
-This should be the **primary common leaderboard** for all models. Give every model the same cropped lines and single text blocks, so layout capability does not influence recognition quality.
+For the leaderboard shared by all 82 candidates, the official input unit should be:
 
-## Suggested score
+> **One image containing one Persian text line or tightly cropped text region, with one exact reference transcription.**
 
-| Metric                                   |   Weight | Purpose                               |
-| ---------------------------------------- | -------: | ------------------------------------- |
-| Persian Canonical CER                    |  **30%** | Main Persian transcription accuracy   |
-| Strict CER                               |  **10%** | Exact Unicode and typography fidelity |
-| Canonical WER                            |  **10%** | Whole-word usability                  |
-| chrF++                                   |  **10%** | Partial character and word similarity |
-| Exact Line Accuracy                      |   **5%** | Perfect transcription frequency       |
-| ZWNJ and Spacing F1                      |  **10%** | Persian word-boundary correctness     |
-| Numeral and Critical-Field Accuracy      |  **10%** | Numbers, dates, prices, identifiers   |
-| Omission/Hallucination/Repetition Safety |  **10%** | Generative-model reliability          |
-| Robustness Retention                     |   **5%** | Resistance to degradation             |
-| **Total**                                | **100%** |                                       |
+This lets you compare:
 
-## 1.1 Persian Canonical CER — 30%
+* Classical OCR engines
+* CRNN and transformer line recognizers
+* General VLMs
+* Document VLMs
+* Commercial OCR APIs
 
-Use character edit distance after a documented Persian normalization:
+A page-level model can process the same crop. A line recognizer cannot fairly process a full page containing layout, tables, headers, and multiple columns.
+
+Maintain three tracks:
+
+| Track                    | Eligible systems              | Evaluated output                        |
+| ------------------------ | ----------------------------- | --------------------------------------- |
+| Persian Line Recognition | All real image-to-text models | Exact line transcription                |
+| Persian Page Text        | Full-page OCR/VLM systems     | Text content and line segmentation      |
+| Persian Document Parsing | Document parsers only         | Layout, reading order, tables, formulas |
+
+Models such as LayoutLMv3, LayoutXLM, and DocFormer should be marked **ineligible for recognition**, not assigned zero accuracy, because they consume OCR information rather than directly transcribing page pixels. Configurable frameworks such as MMOCR, Docling, or Marker must be entered as concrete pipelines, for example `docling+tesseract_fas`, rather than scored as abstract frameworks.
+
+---
+
+## 2. Build the evaluation dataset
+
+Use both real and controlled synthetic material. A Persian OCR study using IDPL-PFOD found substantial differences between clean, textured, blurred, and distorted subsets, while a recent Devanagari benchmark found that very strong synthetic-image results could collapse on real scans. ([pcdp.qut.ac.ir][3])
+
+Each sample should contain:
+
+```json
+{
+  "sample_id": "line_000001",
+  "source_document_id": "doc_0017",
+  "image_path": "images/line_000001.png",
+  "reference_raw": "می‌روم ساعت ۱۲:۳۰",
+  "reference_canonical": "می‌روم ساعت 12:30",
+  "numeric_spans": [
+    {
+      "start": 11,
+      "end": 16,
+      "type": "time",
+      "value": "12:30",
+      "preserve_leading_zero": false
+    }
+  ],
+  "domain": "handwritten_form",
+  "script_mix": ["Persian", "digits"],
+  "quality": "clean",
+  "pair_id": "content_00821",
+  "corruption": null,
+  "severity": 0
+}
+```
+
+### Required dataset strata
+
+Include enough examples from:
+
+* Modern printed Persian
+* Scanned books and documents
+* Mobile photographs
+* Historical or degraded print
+* Handwriting
+* Mixed Persian and Latin text
+* Numeric-heavy forms, receipts, tables, and IDs
+* ZWNJ-heavy morphology
+* Informal Persian
+* Multiple fonts and font sizes
+* Bold, italic, underlined, and low-contrast text
+* Blank or non-text crops for hallucination auditing
+
+METATR similarly emphasizes varied handwriting, print, institutional documents, layouts, and real-world conditions rather than treating OCR as one homogeneous dataset. ([arXiv][4])
+
+Split and sample by `source_document_id`, not by individual line. Lines from one page or document are correlated and can otherwise leak near-identical style, font, and scanning conditions between development and private test sets.
+
+Keep:
+
+* A public development set
+* A small public smoke set
+* A private leaderboard set
+* A private robustness set
+* A hidden refresh set for future leaderboard versions
+
+---
+
+## 3. Freeze Persian normalization as `canonical_v1`
+
+Persian electronic text contains visually similar but Unicode-distinct Arabic and Persian characters, along with inconsistent ZWNJ and spacing. Persian NLP projects such as Hazm and ParsiNorm explicitly address these normalization problems, while the Persian ZWNJ paper treats space insertion, deletion, joining, and ZWNJ recognition as a joint segmentation problem. ([GitHub][5])
+
+### Strict representation
+
+For Strict CER:
+
+* Preserve all Unicode characters.
+* Preserve Persian versus Arabic digits.
+* Preserve ordinary space and ZWNJ.
+* Preserve punctuation and diacritics.
+* Normalize only transport artifacts such as `CRLF → LF`.
+* Remove only a terminal newline inserted by the inference runner.
+
+Do **not** strip:
+
+* Leading model commentary
+* Markdown code fences
+* Quotation marks
+* “Here is the transcription:”
+* Duplicate lines
+
+Those are real hallucination/insertion errors.
+
+### Canonical representation
+
+For Canonical CER, WER, chrF++, exact-line accuracy, and edit-based failure metrics:
+
+1. Apply Unicode NFC.
+2. Fold Arabic presentation forms into normal characters.
+3. Apply explicit Persian mappings:
+
+```text
+ي → ی
+ى → ی
+ك → ک
+```
+
+4. Select one representation for Persian heh-with-hamza forms:
+
+```text
+ۀ → هٔ
+```
+
+5. Remove tatweel:
+
+```text
+ـ → ""
+```
+
+6. Remove bidi formatting controls, but **never remove ZWNJ**.
+7. Convert unusual ordinary whitespace characters to U+0020.
+8. Preserve repeated spaces; do not collapse them.
+9. Convert Persian, Arabic-Indic, and Latin digits to one canonical digit family for semantic text scoring.
+10. Preserve punctuation, ZWNJ, spelling errors, and word segmentation exactly.
+
+Do not run:
+
+* Spell correction
+* Contextual normalization
+* LLM cleanup
+* Word joining or splitting correction
+* Automatic insertion of ZWNJ
+* Date or number rewriting that changes the represented value
+
+Hazm and ParsiNorm are useful as references and test-case generators, but the leaderboard normalizer should be a small transparent mapping with unit fixtures. Otherwise the normalizer may silently repair model errors. ([GitHub][5])
+
+Version the rules:
+
+```text
+persian_normalization_version = "canonical_v1.0.0"
+```
+
+Any rule change requires recalculating every historical result.
+
+---
+
+# 4. Exact implementation of the ten metrics
+
+Let the canonical character alignment produce:
+
+* (N_c): number of reference characters
+* (S_c): substitutions
+* (D_c): deletions
+* (I_c): insertions
+
+Use one Wagner–Fischer/Levenshtein alignment with a frozen tie-breaking rule. JiWER uses minimum-edit-distance scoring through RapidFuzz and supports both CER and WER; OCR-D specifies the same insertion, deletion, and substitution decomposition. ([GitHub][6])
+
+## 1. Canonical CER — 25%
 
 [
-CER=\frac{S+D+I}{N}
+CER_c=\frac{S_c+D_c+I_c}{N_c}
 ]
-
-where (S), (D), and (I) are substitutions, deletions, and insertions, and (N) is the number of reference characters.
-
-CER should be the largest component because Persian word segmentation is affected by ordinary spaces and ZWNJ, making WER unusually sensitive to orthographic conventions. Character-level metrics also behave more consistently across different writing systems than word-only metrics. ([arXiv][1])
-
-Report both:
-
-* **Micro CER:** sum all edits and divide by all reference characters.
-* **Macro CER:** calculate CER per sample and average samples equally.
-* **Median CER:** resistant to a few catastrophic VLM outputs.
-* **95% paired-bootstrap confidence interval:** resample the same lines or pages for every model.
-
-Length-weighted and per-instance reporting reveal different behavior, and paired bootstrap intervals prevent tiny, statistically meaningless differences from deciding the ranking. ([arXiv][2])
-
-Convert CER to a leaderboard-friendly score using:
 
 [
-CanonicalCERScore=100\times\max(0,1-CER)
+CanonicalCERScore=100\max(0,1-CER_c)
 ]
 
-Do not call this simply “accuracy” without defining it.
+Use corpus-level totals:
 
-## 1.2 Strict CER — 10%
+[
+CER_c=
+\frac{\sum S_c+\sum D_c+\sum I_c}
+{\sum N_c}
+]
 
-Strict CER should apply only Unicode NFC normalization and newline standardization. It should preserve:
+Do not average per-line CER for the official result. A one-character line should not have the same influence as a 100-character line.
 
-* Persian versus Arabic `ک/ك`
-* Persian versus Arabic `ی/ي/ى`
-* ZWNJ
-* Persian, Arabic-Indic, and Latin digits
-* Punctuation
-* Diacritics
-* Line breaks where relevant
+Also publish median line CER and the 95th percentile as diagnostics.
 
-Persian documents frequently contain visually similar but computationally distinct Arabic and Persian code points. Persian also uses ZWNJ, bidirectional control behavior, a distinct digit set, and specific punctuation conventions. 
+---
 
-Strict CER answers: **“Did the model reproduce the encoded text faithfully?”**
+## 2. Strict CER — 10%
 
-Canonical CER answers: **“Did the model recover the intended Persian content?”**
+Run another alignment over the strict raw strings:
 
-You need both.
+[
+CER_s=\frac{S_s+D_s+I_s}{N_s}
+]
 
-## 1.3 Canonical WER — 10%
+[
+StrictCERScore=100\max(0,1-CER_s)
+]
 
-Compute WER after Persian canonical normalization and tokenization:
+The difference between Canonical and Strict CER becomes a useful diagnostic:
+
+[
+UnicodePenalty=CanonicalCERScore-StrictCERScore
+]
+
+A large gap means the model reads the text visually but outputs incorrect Arabic/Persian Unicode forms.
+
+---
+
+## 3. Canonical WER — 10%
+
+Tokenize the canonical text deterministically:
+
+* Keep ZWNJ inside words.
+* Split on ordinary whitespace.
+* Treat punctuation as separate tokens.
+* Keep numeric spans as tokens.
+* Do not use contextual Persian token correction.
+
+Then calculate:
 
 [
 WER=\frac{S_w+D_w+I_w}{N_w}
 ]
 
-WER is valuable because one wrong character can make an entire word unusable for search, indexing, language modeling, and RAG. However, it must not be the primary metric because ZWNJ and inconsistent Persian spacing can turn a small boundary error into multiple word errors. ([arXiv][3])
-
-Report:
-
-* WER with ZWNJ treated as an internal word boundary marker.
-* WER with ZWNJ collapsed to an ordinary space.
-* Word exact-match rate.
-
-The first evaluates correct Persian typography; the second measures recoverable linguistic content.
-
-## 1.4 chrF++ — 10%
-
-chrF++ compares character n-grams together with word n-grams. It gives partial credit when a word is nearly correct without being as forgiving as embedding-based semantic metrics. Character n-gram evaluation has shown useful behavior for morphologically rich languages and is increasingly used in low-resource script stress tests. ([ACL Anthology][4])
-
-Use standard chrF++ settings and publish them unchanged:
-
-* Character n-grams: 1–6
-* Word n-grams: 0–2
-* (\beta=2), emphasizing recall
-
-BLEU may be included for comparison with PsOCR, SARD, and OmniDocBench, but I would **not** give it leaderboard weight. Exact transcription is not machine translation, and BLEU can obscure important character-level mistakes. PsOCR itself reports a large gap between character accuracy, word accuracy, and BLEU, showing why they should not be treated as interchangeable. ([arXiv][3])
-
-## 1.5 Exact Line Accuracy — 5%
-
-Calculate:
-
 [
-ELA=\frac{\text{perfectly matched lines}}{\text{all lines}}
+CanonicalWERScore=100\max(0,1-WER)
 ]
 
-Publish both:
-
-* `exact_line_accuracy_strict`
-* `exact_line_accuracy_canonical`
-
-IDPL-PFOD2 reports sequence-level accuracy alongside normalized edit distance; its results illustrate how a model can have very high edit similarity while substantially fewer samples are completely correct. 
-
-This metric matters because 98% character similarity can still mean almost every line needs manual editing.
+Freeze the tokenizer version alongside the normalizer.
 
 ---
 
-# 2. Persian-specific orthographic metrics
+## 4. chrF++ — 8%
 
-## 2.1 ZWNJ and spacing F1 — 10%
+Use SacreBLEU’s chrF implementation with:
 
-Treat every potential boundary between adjacent characters as one of:
+```text
+character_order = 6
+word_order      = 2
+beta            = 2
+whitespace      = false
+```
 
-* no boundary
-* ZWNJ
-* ordinary space
-* newline
+Adding word unigrams and bigrams to character n-grams is what distinguishes chrF++ from ordinary chrF. The original work found that the combination improved agreement with human assessment, and SacreBLEU exposes it using `word_order=2`. 
 
-Then report macro precision, recall, and F1 for each class.
+Use canonical text and record the complete SacreBLEU signature and version.
 
-At minimum publish:
-
-* `zwnj_precision`
-* `zwnj_recall`
-* `zwnj_f1`
-* `space_f1`
-* `boundary_macro_f1`
-
-ZWNJ is not decorative metadata. It is an essential part of Persian orthography, and Persian word segmentation errors commonly involve missing spaces, extra spaces, and ZWNJ confusion. 
-
-Do not hide ZWNJ errors by normalizing them away before all evaluation. Normalize them only for the lenient content score.
-
-## 2.2 Persian character-confusion report
-
-Publish a confusion matrix and dedicated rates for:
-
-* `ی ↔ ي ↔ ى`
-* `ک ↔ ك`
-* `ه ↔ ۀ ↔ ة`
-* `ا ↔ آ`
-* Hamza forms
-* `ب/پ/ت/ث`
-* `ج/چ/ح/خ`
-* `د/ذ`
-* `ر/ز/ژ`
-* `س/ش`
-* `ص/ض`
-* `ط/ظ`
-* `ع/غ`
-* `ف/ق`
-* `ک/گ`
-* Persian versus Arabic punctuation
-* Persian versus Arabic-Indic digits
-
-Persian OCR is particularly affected by cursive joining, visually similar letters, dots, and code-point variants. Persian OCR datasets and Arabic-script OCR research repeatedly identify these as core recognition difficulties. 
-
-This should be diagnostic rather than directly folded into the score; otherwise, you risk double-counting CER errors.
-
-## 2.3 Numeral and critical-field accuracy — 10%
-
-Extract and evaluate these spans independently:
-
-* Integers and decimals
-* Persian, Latin, and Arabic-Indic digits
-* Percentages
-* Prices and currencies
-* Jalali and Gregorian dates
-* Times
-* Telephone numbers
-* Postal codes
-* National identifiers
-* Mathematical operators
-* Mixed RTL/LTR strings
-
-Report:
-
-* Numeric character accuracy
-* Exact numeric span accuracy
-* Numeric insertion/deletion/substitution rate
-* Date exact-match rate
-* Currency-value exact-match rate
-* Mixed-direction span accuracy
-
-Persian has a distinct Unicode digit set and frequently mixes RTL text with Latin strings and numbers. Mapping every numeral to a single form in the main metric would conceal whether a system actually reproduced the document correctly. 
-
-For numeric values, add a **semantic numeric score** where `۱٬۲۵۰`, `١٢٥٠`, and `1250` can map to the same numeric value. Keep this separate from exact transcription.
+Using `whitespace=false` is appropriate here because spacing already receives a dedicated 10% metric. It prevents ordinary spaces from being rewarded twice inside chrF character n-grams, while word n-grams still capture word-level similarity.
 
 ---
 
-# 3. Faithfulness metrics for VLMs
-
-Generative OCR models can produce fluent but visually unsupported text, repeat sections, or silently omit blocks. Aggregate CER alone can hide this behavior, especially when only a small percentage of pages fail catastrophically. ([arXiv][5])
-
-## Required metrics
-
-### Character-level decomposition
-
-Report separately:
+## 5. Exact Line Accuracy — 7%
 
 [
-SubstitutionRate=S/N
+ELA=100\times
+\frac{#{i:canonical(ref_i)=canonical(pred_i)}}
+{#lines}
+]
+
+This is intentionally unforgiving. One incorrect punctuation mark, digit, space, or ZWNJ makes the line incorrect.
+
+Publish strict exact-line accuracy separately as an unweighted diagnostic.
+
+---
+
+## 6. ZWNJ and Spacing F1 — 10%
+
+Do not calculate this by simply counting space characters.
+
+### Boundary-based evaluation
+
+For each reference and prediction:
+
+1. Remove ordinary spaces and ZWNJs to create base-character sequences.
+2. Align the two base-character sequences.
+3. For every gap between adjacent aligned base characters, assign one label:
+
+```text
+NONE
+SPACE
+ZWNJ
+INVALID_OR_REPEATED
+```
+
+4. Compare reference and prediction labels.
+5. Calculate corpus-level F1 separately for `SPACE` and `ZWNJ`.
+
+[
+SpacingScore=50(F1_{SPACE}+F1_{ZWNJ})
+]
+
+where each F1 is between 0 and 1.
+
+Example:
+
+```text
+Reference:  می‌روم
+Prediction: می روم
+```
+
+This produces:
+
+* One false negative for `ZWNJ`
+* One false positive for `SPACE`
+
+For:
+
+```text
+Reference:  دانشگاه تهران
+Prediction: دانشگاهتهران
+```
+
+it produces one false negative for `SPACE`.
+
+Calculate F1 over the whole corpus, not individually per line. Many lines contain no ZWNJ, and per-line averaging would produce unstable or undefined results. Persian segmentation research confirms that ordinary spaces, joining, splitting, and ZWNJ recognition are closely related but distinct error categories. ([arXiv][7])
+
+Also publish:
+
+* `ZWNJ_precision`
+* `ZWNJ_recall`
+* `space_precision`
+* `space_recall`
+* ZWNJ-to-space substitution count
+* ZWNJ deletion count
+
+---
+
+## 7. Numeric Span Exact Accuracy — 10%
+
+Numeric spans must be annotated in the reference instead of discovered only through regex after inference.
+
+Recommended types:
+
+```text
+integer
+decimal
+currency
+percentage
+date
+time
+phone
+national_id
+postal_code
+serial_number
+measurement
+```
+
+Normalize values type-by-type:
+
+* Fold Persian, Arabic, and Latin digit families.
+* Normalize decimal and thousands separators.
+* Normalize percent signs and surrounding spaces.
+* Preserve leading zeros for phones, IDs, postal codes, and serial numbers.
+* Do not treat `1403/02/04` and `04/02/1403` as equivalent.
+* Do not rewrite Persian-calendar dates into Gregorian dates.
+
+Use one-to-one span matching based on text alignment and surrounding anchors. A span is correct only when:
+
+* Its type matches.
+* Its normalized value matches exactly.
+* All required digits are present and ordered correctly.
+
+To penalize invented numeric spans:
+
+[
+NumericScore=
+100\times
+\frac{ExactMatches}
+{ReferenceSpans+UnmatchedExtraPredictionSpans}
+]
+
+A wrong predicted value matched to a reference is already included as an incorrect reference span; it should not be counted twice.
+
+ParsiNorm’s coverage of numbers, dates, times, telephone numbers, and currencies is useful for constructing normalization fixtures and adversarial examples. ([GitHub][8])
+
+---
+
+## 8. Omission Score — 7%
+
+Use the deletion count from the same canonical character alignment used for CER:
+
+[
+DeletionRate=\frac{D_c}{N_c}
 ]
 
 [
-DeletionRate=D/N
+OmissionScore=100\max(0,1-DeletionRate)
 ]
 
-[
-InsertionRate=I/N
-]
-
-Interpretation:
-
-* High deletion rate: omitted content.
-* High insertion rate: hallucinated or repeated content.
-* High substitution rate: recognition confusion.
-
-### Word-level faithfulness
-
-* **Missing-word rate:** unmatched reference words ÷ reference words.
-* **Extra-word rate:** unmatched predicted words ÷ predicted words.
-* **Content recall:** matched reference words ÷ reference words.
-* **Content precision:** matched predicted words ÷ predicted words.
-
-### Catastrophic failure rate
-
-Use:
-
-[
-CatastrophicRate=\frac{#{samples:CER>0.5}}{#samples}
-]
-
-The recent Devanagari OCR-VLM stress test explicitly recommends median CER and the percentage of samples above 50% CER because rare repetition loops badly distort means. ([arXiv][6])
+Do not run a second fuzzy matcher. Separate alignments can assign the same ambiguous error differently and make CER, omission, and hallucination internally inconsistent.
 
 Also report:
 
-* `output_reference_length_ratio`
-* `p95_length_ratio`
-* percentage with ratio above 2
-* repeated 4-gram ratio
-* percentage ending because of token limit
-* empty-output rate
-* invalid-format rate
-* timeout/error rate
+* Entirely omitted line rate
+* Word deletion rate
+* Longest consecutive omitted span
+* Percentage of lines losing more than 25% of reference characters
 
-A model with 1% catastrophic pages should not beat a stable model merely because its remaining pages are marginally cleaner.
+Character deletions are a direct approximation of missed reference content, while insertions approximate extra or hallucinated content. ([arXiv][9])
 
 ---
 
-# 4. Persian Document Parsing leaderboard
+## 9. Hallucination Score — 7%
 
-Only page-capable models should enter this track. Line recognizers such as CRNN and PARSeq should be marked `not_applicable`, not assigned zero.
-
-## Suggested document score
-
-| Component                         |   Weight |
-| --------------------------------- | -------: |
-| Persian text transcription        |  **35%** |
-| Reading order                     |  **15%** |
-| Layout and element detection      |  **10%** |
-| Table extraction                  |  **10%** |
-| Formula and code extraction       |   **5%** |
-| Hallucination and omission safety |  **10%** |
-| Degradation robustness            |  **10%** |
-| Efficiency and reliability        |   **5%** |
-| **Total**                         | **100%** |
-
-## 4.1 Reading-order score — 15%
-
-Use two metrics:
-
-1. **Reading-order normalized edit similarity**, compatible with OmniDocBench.
-2. **Successor-edge F1**, comparing whether each text block or line is followed by the correct next block.
-
-OmniDocBench evaluates reading order using normalized edit distance, while newer work treats order as explicit relations between elements and reports edge-level accuracy. The edge metric is easier to interpret and less entangled with recognition errors. ([arXiv][7])
-
-Persian test pages must include:
-
-* RTL single-column pages
-* RTL two- and three-column pages
-* Persian body text with LTR formulas
-* Persian text containing English paragraphs
-* sidebars and pull quotes
-* footnotes
-* newspapers
-* captions
-* forms
-* tables embedded between paragraphs
-
-Score text recognition and reading order independently. A model should not receive a bad reading-order score merely because it misrecognized a few letters.
-
-## 4.2 Layout F1 or mAP — 10%
-
-For systems returning bounding boxes and confidence scores, report:
-
-* mAP@[.50:.95]
-* AP50
-* macro class F1
-* mean IoU
-* detection recall
-
-Recommended Persian classes:
-
-* title
-* paragraph
-* list
-* table
-* image
-* caption
-* footnote
-* header
-* footer
-* page number
-* equation
-* code
-* form field
-* handwriting
-* stamp/seal
-
-For autoregressive VLMs that do not return confidence values, use class-aware box matching and macro F1 at IoU 0.5 rather than inventing confidence scores. dots.ocr similarly argues that conventional mAP is awkward for autoregressive parsers that do not natively emit confidence values. ([arXiv][7])
-
-## 4.3 Table extraction — 10%
-
-Use:
-
-* **GriTS-Topology:** rows, columns, spans and cell relationships.
-* **GriTS-Content:** recognized cell contents.
-* **GriTS-Location:** spatial cell alignment when boxes exist.
-* **TEDS-Structure:** compatibility with existing document benchmarks.
-* **Cell exact-match rate:** especially for numbers.
-* **Row/column count accuracy.**
-
-GriTS compares tables as two-dimensional matrices and separates topology, content, and location, avoiding cases where one mistaken cell offset disproportionately destroys the whole score. TEDS remains useful for comparison with PubTabNet and OmniDocBench. 
-
-For Persian tables, explicitly test:
-
-* RTL column order
-* Persian and Latin digits in the same table
-* merged cells
-* multi-line headers
-* borderless tables
-* financial reports
-* timetables
-* forms
-* tables containing Persian abbreviations
-* tables containing formulas
-
-An LLM judge can be added for semantic table quality, but it should be secondary. A recent study reported strong correlation with human table judgments, yet broader judge evaluations show instability across scenarios. ([arXiv][8])
-
-## 4.4 Formula and code extraction — 5%
-
-For pages containing formulas or code, report:
-
-* Exact LaTeX match after safe canonicalization
-* Rendered formula similarity or CDM
-* Formula detection recall
-* Code exact-match rate
-* Indentation accuracy
-* Persian-text/formula boundary accuracy
-
-OmniDocBench evaluates formulas using CDM, normalized edit distance, and BLEU because character-level string equality can penalize visually equivalent LaTeX forms. ([arXiv][7])
-
----
-
-# 5. Robustness metrics
-
-A clean synthetic set is useful for debugging but should not dominate the ranking. Recent low-resource-script studies found that systems clustered closely on clean rendered text but separated dramatically on real scans and degraded inputs. Real-world physical reconstruction benchmarks likewise show a substantial gap between digital PDFs and captured documents. ([arXiv][9])
-
-Create matched clean/degraded pairs and report:
-
-## Relative robustness retention
+Use insertion count from that same alignment:
 
 [
-RCR=100\times\frac{Score_{degraded}}{Score_{clean}}
+InsertionRate=\frac{I_c}{N_c}
 ]
-
-## Absolute degradation
 
 [
-Drop=Score_{clean}-Score_{degraded}
+HallucinationScore=100\max(0,1-InsertionRate)
 ]
 
-## Worst-case retention
+This captures:
 
-Take the minimum retention across degradation families.
+* Introduced words
+* Preambles
+* Duplicated lines
+* Repetition loops
+* Invented numeric values
+* Wrong-script additions
+* Markdown wrappers
 
-Suggested degradation families:
+For an empty reference:
 
-* Gaussian and motion blur
-* JPEG compression
-* downscaling
-* scanner noise
-* bleed-through
-* faded ink
-* uneven illumination
-* shadows
-* perspective distortion
-* page curvature
-* rotation and skew
-* watermark
-* colored or patterned background
-* partial cropping
-* stains and folds
-* screen photography
-* photocopy generations
-
-Publish per-severity curves rather than one average. OCR-Robust similarly evaluates clean performance, relative retention, worst-case retention, and a composite robustness index across multiple perturbation levels. ([arXiv][10])
-
----
-
-# 6. Optional downstream usefulness score
-
-For a real document-intelligence leaderboard, add a **separate**, non-core downstream track:
-
-* Retrieval Recall@5
-* nDCG@10
-* evidence-span recall
-* question-answer exact match
-* ANLS for short extracted answers
-* key-value extraction F1
-* named-entity recall
-* numeric answer accuracy
-
-Character accuracy does not always predict RAG quality because structural errors, lost table relationships, and scrambled reading order can break retrieval despite low CER. OHRBench and InduOCRBench therefore evaluate retrieval and generation effects in addition to text edit distance. ([arXiv][11])
-
-ANLS or ANLS* is appropriate for short information-extraction answers with minor OCR differences. It is **not** a replacement for CER on full transcription. ([arXiv][12])
-
----
-
-# 7. LLM-as-judge: keep it small
-
-I would **not use 70% LLMJudgeScore** for this leaderboard.
-
-For exact OCR, the ground truth already exists. A judge can forgive a wrong digit, silently overlook missing lines, prefer fluent Persian over faithful Persian, or vary when evaluating long documents. Current work finds useful human correlation for specialized table and formula judging, but broader long-form judge studies still report instability, and multi-model agreement has outperformed a single VLM judge for OCR quality verification. ([arXiv][8])
-
-Recommended judge use:
-
-* **0%** for line-level OCR.
-* **Maximum 5%** for full document parsing.
-* Use it only for:
-
-  * semantic table equivalence
-  * visually equivalent formulas
-  * formatting usability
-  * obvious structural corruption
-  * qualitative error taxonomy
-* Never let it override:
-
-  * wrong numbers
-  * missing text
-  * hallucinated text
-  * exact character errors
-  * ZWNJ and Unicode errors
-
-Calibrate the judge against at least 300 manually scored Persian outputs, publish its agreement with humans, freeze the prompt/model/version, use deterministic inference, and rerun the calibration whenever the judge model changes.
-
----
-
-# 8. Three normalization tracks
-
-Every prediction should be evaluated through these three pipelines.
-
-## Track A — Strict/diplomatic
-
-Normalize only:
-
-* Unicode NFC
-* CRLF to LF
-* model wrapper tokens and accidental Markdown fences
-
-Preserve everything else.
-
-## Track B — Persian canonical
-
-Normalize:
-
-* Arabic Kaf `ك` → Persian Kaf `ک`
-* Arabic Yeh and Alef Maksura `ي/ى` → Persian Yeh `ی`
-* Arabic presentation forms → base Unicode characters
-* deprecated Heh/Hamza representations → canonical sequence
-* bidi control characters that have no textual content
-* repeated ordinary spaces
-* line-ending conventions
-
-Preserve:
-
-* ZWNJ
-* digit script
-* punctuation
-* text content
-
-## Track C — Content-lenient
-
-Additionally:
-
-* remove Tatweel
-* remove optional diacritics
-* collapse ZWNJ and spaces to a common boundary
-* map all numeral scripts to numeric values
-* normalize punctuation variants
-
-Track C must never replace strict scoring; it only shows how much of the content is recoverable after normalization. Persian computing research documents why Yeh/Kaf variants, ZWNJ, Tatweel, digits, Hamza sequences, and bidi behavior require explicit handling. 
-
----
-
-# 9. Reporting format
-
-For every model, publish at least:
-
-```yaml
-text:
-  cer_strict_micro:
-  cer_strict_macro:
-  cer_canonical_micro:
-  cer_canonical_macro:
-  cer_median:
-  cer_ci95:
-  wer_canonical:
-  chrf_pp:
-  exact_line_strict:
-  exact_line_canonical:
-
-persian:
-  zwnj_precision:
-  zwnj_recall:
-  zwnj_f1:
-  boundary_macro_f1:
-  persian_kaf_yeh_accuracy:
-  digit_exact_accuracy:
-  numeric_span_exact_accuracy:
-  punctuation_accuracy:
-
-faithfulness:
-  substitution_rate:
-  deletion_rate:
-  insertion_rate:
-  missing_word_rate:
-  extra_word_rate:
-  catastrophic_rate:
-  repetition_failure_rate:
-  empty_output_rate:
-
-document:
-  reading_order_ned:
-  reading_order_edge_f1:
-  layout_macro_f1:
-  map_50_95:
-  grits_topology:
-  grits_content:
-  grits_location:
-  teds_structure:
-  formula_cdm:
-
-robustness:
-  clean_score:
-  degraded_score:
-  relative_retention:
-  worst_case_retention:
-
-efficiency:
-  median_seconds_per_page:
-  p95_seconds_per_page:
-  peak_vram_gb:
-  peak_ram_gb:
-  cost_per_1000_pages:
-  timeout_rate:
+```text
+reference = ""
 ```
 
-Always publish both **mean and variance/distributional information**, per-domain results, and confidence intervals. Attribute-level evaluation is more informative than one global score, and recent benchmark audits show that annotation errors and score saturation can otherwise produce unreliable rankings. ([arXiv][7])
+define:
 
-## Final metric priority
+```text
+prediction == ""  → Hallucination Score = 100
+prediction != ""  → Hallucination Score = 0
+```
 
-The highest-value metrics for your Persian benchmark are:
+JiWER explicitly defines meaningful empty-reference behavior, which is useful for silence and hallucination testing. Modern multilingual OCR studies also report wrong-script generation and repetition as distinct real-world VLM failure modes. ([GitHub][6])
 
-1. **Persian Canonical CER**
-2. **Strict CER**
-3. **Canonical WER**
-4. **ZWNJ and spacing F1**
-5. **Numeric-span exact accuracy**
-6. **chrF++**
-7. **Omission, insertion and catastrophic-failure rates**
-8. **Reading-order edge F1**
-9. **GriTS for tables**
-10. **Robustness retention**
-11. **Exact-line accuracy**
-12. **Latency, memory, cost and runtime-failure rate**
+Publish these additional diagnostics:
 
-That stack will tell you not merely which model produces the most plausible Persian, but which one most faithfully recovers the document.
+* Output/reference length ratio
+* Repeated 3-gram ratio
+* Duplicate-line rate
+* Blank-image hallucination rate
+* Catastrophic insertion rate
+* 95th-percentile insertion rate
 
-[1]: https://arxiv.org/html/2603.25761v1 "A Survey of OCR Evaluation Methods and Metrics and the Invisibility of Historical Documents"
-[2]: https://arxiv.org/html/2602.14524v1?utm_source=chatgpt.com "Error Patterns in Historical OCR: A Comparative Analysis of ..."
-[3]: https://arxiv.org/html/2505.10055v1 "PsOCR: Benchmarking Large Multimodal Models for Optical Character Recognition in Low-resource Pashto Language"
-[4]: https://aclanthology.org/anthology-files/pdf/W/W15/W15-3049.pdf?utm_source=chatgpt.com "chrF: character n-gram F-score for automatic MT evaluation"
-[5]: https://arxiv.org/html/2603.02803v1?utm_source=chatgpt.com "Structure-Aware Text Recognition for Ancient Greek Critical ..."
-[6]: https://arxiv.org/html/2606.29213v1?utm_source=chatgpt.com "Can OCR-VLMs Read Devanagari? A Stress-Test ..."
-[7]: https://arxiv.org/html/2412.07626v2 "OmniDocBench: Benchmarking Diverse PDF Document Parsing with Comprehensive Annotations"
-[8]: https://arxiv.org/html/2603.18652v1?utm_source=chatgpt.com "Benchmarking PDF Parsers on Table Extraction with LLM ..."
-[9]: https://arxiv.org/abs/2606.29213?utm_source=chatgpt.com "Can OCR-VLMs Read Devanagari? A Stress-Test Benchmark and Post-Correction Study"
-[10]: https://arxiv.org/abs/2606.26041?utm_source=chatgpt.com "How Robust is OCR-Reasoning? Evaluating OCR-Reasoning Robustness of Vision-Language Models under Visual Perturbations"
-[11]: https://arxiv.org/html/2412.02592v2?utm_source=chatgpt.com "Evaluating the Cascading Impact of OCR on Retrieval ..."
-[12]: https://arxiv.org/html/2402.03848v9 "ANLS* - A Universal Document Processing Metric for Generative Large Language Models"
+The recent Devanagari benchmark reported extreme repetition loops that made mean error statistics misleading, which supports publishing median and catastrophic-rate diagnostics alongside the weighted score. ([GitHub][10])
+
+---
+
+## 10. Robustness Accuracy Retention — 6%
+
+Do not use degraded accuracy alone. A model with 95% clean accuracy dropping to 75% is not equivalent to a model starting at 76% and dropping to 75%.
+
+For every original clean image, create paired degradations of exactly the same content.
+
+Recommended corruption families:
+
+1. Gaussian and motion blur
+2. Sensor, Gaussian, and salt-and-pepper noise
+3. JPEG compression
+4. Low resolution and downsampling
+5. Rotation, skew, and perspective distortion
+6. Shadows, illumination gradients, and low contrast
+7. Background texture or show-through
+
+Use three calibrated severity levels per family. Severity 3 must remain human-readable; otherwise the benchmark measures destroyed information rather than OCR robustness.
+
+Let:
+
+[
+A_0=\max(0,1-CER_{clean})
+]
+
+For each corruption condition (c):
+
+[
+r_c=\min\left(1,\frac{A_c}{\max(A_0,\epsilon)}\right)
+]
+
+Then:
+
+[
+RCR=\operatorname{mean}_c(r_c)
+]
+
+[
+WCR=\min_c(r_c)
+]
+
+I recommend the official robustness score:
+
+[
+RobustnessScore=100\sqrt{RCR\times WCR}
+]
+
+This rewards average retention while penalizing a model with one catastrophic weakness.
+
+OCR-Robust similarly separates clean accuracy, relative corrupted performance, and worst-case retention, then combines capability and robustness geometrically. Because your first nine metrics already represent clean capability, including clean accuracy again inside this 6% component would double-count it; therefore the adapted formula above uses only average and worst-case retention. ([arXiv][11])
+
+Keep the corruption generation code and exact parameters in the repository. OCR-Robust publishes its perturbation and evaluation implementation for this purpose. ([GitHub][12])
+
+---
+
+# 5. Final composite calculation
+
+All component values must be scores from 0 to 100:
+
+[
+\begin{aligned}
+PersianOCRScore={}&
+0.25C_{CER}+
+0.10S_{CER}+
+0.10W_{canonical}+\
+&0.08chrF+++
+0.07ELA+
+0.10SpacingF1+\
+&0.10Numeric+
+0.07Omission+
+0.07Hallucination+
+0.06Robustness
+\end{aligned}
+]
+
+Use full floating-point precision internally and round only the displayed result.
+
+### Avoid dataset-composition bias
+
+Calculate each metric inside fixed strata first:
+
+```text
+clean_print
+real_scan
+mobile_photo
+handwriting
+numeric_heavy
+mixed_script
+historical
+```
+
+Then combine them using frozen stratum weights:
+
+[
+MetricScore=\sum_h w_h MetricScore_h
+]
+
+Otherwise adding many easy synthetic lines could move the leaderboard without any model improving.
+
+---
+
+# 6. Standard inference protocol
+
+Every model adapter should save:
+
+```json
+{
+  "model_id": "qwen3_vl_8b_instruct",
+  "model_revision": "commit-or-api-version",
+  "adapter_version": "1.2.0",
+  "sample_id": "line_000001",
+  "prompt": "Transcribe the image exactly...",
+  "raw_prediction": "می‌روم ساعت ۱۲:۳۰",
+  "runtime_ms": 842,
+  "input_width": 1280,
+  "input_height": 196,
+  "decoding": {
+    "temperature": 0,
+    "do_sample": false,
+    "max_new_tokens": 512
+  },
+  "status": "success"
+}
+```
+
+Rules:
+
+* Use the official image processor required by the model.
+* Do not add external deskewing, denoising, OCR, or spell correction unless it is part of the declared pipeline.
+* Use greedy or deterministic decoding where available.
+* Give general VLMs a minimal frozen prompt requesting exact text only.
+* Store raw output before normalization.
+* Do not retry a low-quality answer.
+* Retry only transport, timeout, or infrastructure failures.
+* Record truncation separately from ordinary OCR errors.
+* Use a sufficiently high output-token limit so the runner does not create artificial omissions.
+* Freeze dependency versions, model revisions, prompts, preprocessing, and hardware settings.
+
+METATR likewise applies identical normalization to references and predictions and freezes model settings except where output limits must accommodate long documents. ([arXiv][4])
+
+For nondeterministic closed APIs, run the full set three times and publish mean, standard deviation, and worst run. A deterministic local checkpoint needs one official pass after the adapter has passed validation.
+
+---
+
+# 7. Statistical reporting
+
+The leaderboard should show:
+
+| Result               | Publish                             |
+| -------------------- | ----------------------------------- |
+| Composite score      | Point estimate and 95% CI           |
+| Ten component scores | All visible                         |
+| Per-domain results   | All visible                         |
+| CER distribution     | Mean, median, p95                   |
+| Failure rates        | Timeout, crash, truncation          |
+| Efficiency           | Runtime, VRAM, API cost             |
+| Versioning           | Model revision and adapter revision |
+
+Use paired bootstrap resampling by `source_document_id`, not individual lines. This preserves the correlation between lines from the same page. At least 1,000 bootstrap replicates is consistent with implementations used in SacreBLEU significance testing and OCR robustness evaluation. ([GitHub][13])
+
+Do not pretend tiny score differences are meaningful. When two models’ paired bootstrap difference interval includes zero, show them in the same statistical tier even if the displayed scores differ slightly.
+
+---
+
+# 8. Validation tests before benchmarking 82 models
+
+Before running the full leaderboard, create a metric fixture containing manually verified cases such as:
+
+```text
+يادگیری  vs یادگیری
+كتاب     vs کتاب
+می روم   vs می‌روم
+میروم    vs می‌روم
+۱۲۳      vs 123
+۱۲۳۴     vs ۱۲۳
+۱۴۰۳/۰۲  vs ۱۴۰۳/۰۲/۰۱
+سلام     vs سلام سلام سلام
+""       vs متن ساختگی
+```
+
+For every fixture, assert:
+
+* Strict edit counts
+* Canonical edit counts
+* Word tokens
+* Space and ZWNJ labels
+* Numeric span match
+* Deletions
+* Insertions
+* Exact-line status
+* Final weighted score
+
+Also verify the identity case:
+
+```text
+prediction == reference
+```
+
+must produce exactly `100.0` for all applicable metrics.
+
+The final repository should therefore have this structure:
+
+```text
+benchmark/
+├── schemas/
+│   ├── sample.schema.json
+│   └── prediction.schema.json
+├── normalization/
+│   ├── canonical_v1.py
+│   └── fixtures.json
+├── metrics/
+│   ├── edit_alignment.py
+│   ├── cer_wer.py
+│   ├── chrf.py
+│   ├── spacing.py
+│   ├── numeric.py
+│   ├── failure_scores.py
+│   └── robustness.py
+├── corruptions/
+├── adapters/
+├── tests/
+├── dataset/
+└── leaderboard/
+```
+
+This produces a leaderboard that answers not merely **“which model has the lowest CER?”**, but also which model preserves Persian Unicode, handles نیم‌فاصله correctly, reads numbers exactly, avoids dropping content, resists repetition loops, and survives realistic degradation.
+
+[1]: https://ocr-d.de/en/spec/ocrd_eval.html "Quality Assurance in OCR-D - OCR-D"
+[2]: https://github.com/opendatalab/OmniDocBench?utm_source=chatgpt.com "opendatalab/OmniDocBench: [CVPR 2025] A ..."
+[3]: https://pcdp.qut.ac.ir/article_722202.html "Empirical Evaluation of Well-known Farsi OCR Engines on the IDPL-PFOD Dataset"
+[4]: https://arxiv.org/html/2605.26712v1 "METATR: A Multilingual, Evolving Benchmark for Automatic Text Recognition"
+[5]: https://github.com/roshan-research/hazm "GitHub - roshan-research/hazm: Persian NLP Toolkit · GitHub"
+[6]: https://github.com/jitsi/jiwer "GitHub - jitsi/jiwer: Evaluate your speech-to-text system with similarity measures such as word error rate (WER) · GitHub"
+[7]: https://arxiv.org/abs/2010.00287 "[2010.00287] Joint Persian Word Segmentation Correction and Zero-Width Non-Joiner Recognition Using BERT"
+[8]: https://github.com/haraai/ParsiNorm/blob/main/README.md "ParsiNorm/README.md at main · haraai/ParsiNorm · GitHub"
+[9]: https://arxiv.org/html/2603.02803v1 "Structure-Aware Text Recognition for Ancient Greek Critical Editions"
+[10]: https://github.com/Aditya-PS-05/devanagari-ocr-benchmark/blob/main/README.md "devanagari-ocr-benchmark/README.md at main · Aditya-PS-05/devanagari-ocr-benchmark · GitHub"
+[11]: https://arxiv.org/html/2606.26041v1 "How Robust is OCR-Reasoning? Evaluating OCR-Reasoning Robustness of Vision-Language Models under Visual Perturbations"
+[12]: https://github.com/pasterinjlu/OCR-Reasoning-Robust "GitHub - pasterinjlu/OCR-Reasoning-Robust · GitHub"
+[13]: https://github.com/mjpost/sacrebleu?utm_source=chatgpt.com "mjpost/sacrebleu: Reference BLEU implementation that ..."

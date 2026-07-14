@@ -10,9 +10,6 @@ wheels/
 
 # Virtual environments
 .venv
+.venv-bench
 .env
 models
-tessdata
-bench_runs/validation/
-bench_runs/smoke20-v1/logs/
-bench_runs/smoke20-v1/state.json
