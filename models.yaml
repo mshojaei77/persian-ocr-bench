@@ -184,6 +184,7 @@ models:
     entrypoint: src/tesseract_fas.py
     dependency_group: tesseract
     artifact: bench_runs/smoke20-v1/tesseract_fas.json
+    comparison_class: full_page_detector_recognizer_pipeline
 - rank: 2
   id: ppocrv5_arabic_mobile_rec
   name: PP-OCRv5 Arabic Mobile Recognition
@@ -236,6 +237,7 @@ models:
     entrypoint: src/ppocrv5_arabic_mobile_rec.py
     dependency_group: paddle
     artifact: bench_runs/smoke20-v1/ppocrv5_arabic_mobile_rec.json
+    comparison_class: full_page_detector_recognizer_pipeline
 - rank: 3
   id: easyocr_fa
   name: EasyOCR Persian
@@ -284,6 +286,7 @@ models:
     entrypoint: src/easyocr_fa.py
     dependency_group: easyocr
     artifact: bench_runs/smoke20-v1/easyocr_fa.json
+    comparison_class: full_page_detector_recognizer_pipeline
 - rank: 4
   id: hezar_crnn_base_fa_v2
   name: Hezar CRNN Base FA v2
@@ -325,6 +328,12 @@ models:
   risks:
   - not a full-page layout system
   - line-length and crop quality constraints
+  execution:
+    status: benchmarked
+    entrypoint: src/hezar_crnn_base_fa_v2.py
+    dependency_group: hezar
+    artifact: bench_runs/smoke20-v1/hezar_crnn_base_fa_v2.json
+    comparison_class: component_recognizer
 - rank: 5
   id: weightedai_persian_ocr
   name: WeightedAI Persian-OCR
@@ -512,6 +521,12 @@ models:
   - official Persian result is vendor-internal
   - separate detector complicates total-size and latency comparisons
   - modified model license
+  execution:
+    status: adapter_ready
+    entrypoint: src/surya_ocr_2.py
+    dependency_group: surya
+    artifact: bench_runs/smoke20-v1/surya_ocr_2.json
+    comparison_class: document_ocr_vlm
 - rank: 9
   id: paddleocr_vl_1_6
   name: PaddleOCR-VL-1.6
@@ -566,6 +581,12 @@ models:
   risks:
   - family-level Persian claim is not a Persian score for 1.6
   - pipeline and element-only Transformers paths are not equivalent
+  execution:
+    status: adapter_ready
+    entrypoint: src/paddleocr_vl_1_6.py
+    dependency_group: paddleocr_vl
+    artifact: bench_runs/smoke20-v1/paddleocr_vl_1_6.json
+    comparison_class: document_ocr_vlm
 - rank: 10
   id: glm_ocr
   name: GLM-OCR
@@ -854,6 +875,12 @@ models:
   - community checkpoint with limited public evaluation
   - possible synthetic/domain overfitting
   - upstream GitHub is not model-specific
+  execution:
+    status: adapter_ready
+    entrypoint: src/qwen3_vl_2b_persian_arabic_ocr.py
+    dependency_group: qwen3_vl
+    artifact: bench_runs/smoke20-v1/qwen3_vl_2b_persian_arabic_ocr.json
+    comparison_class: document_ocr_vlm
 - rank: 16
   id: khanandeh_0_1_persian_ocr_2b
   name: Khanandeh 0.1 Persian OCR 2B Instruct
@@ -941,6 +968,12 @@ models:
   - not OCR-specialized
   - Persian not explicitly named
   - prompt can trade transcription fidelity for helpful rewriting
+  execution:
+    status: adapter_ready
+    entrypoint: src/qwen3_vl_2b_instruct.py
+    dependency_group: qwen3_vl
+    artifact: bench_runs/smoke20-v1/qwen3_vl_2b_instruct.json
+    comparison_class: document_ocr_vlm
 - rank: 18
   id: infinity_parser2_flash
   name: Infinity Parser 2 Flash
